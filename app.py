@@ -236,7 +236,9 @@ def api_sms_get():
             save_sms_data(sms_list)
     # แสดง 7 รายการล่าสุด (มากสุด)
     sms_list = load_sms_data()
-    return jsonify(sms_list[-7:][::-1])
+    resp = jsonify(sms_list[-7:][::-1])
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    return resp
 
 @app.route("/api/sms", methods=["POST"])
 def api_sms_post():
