@@ -115,20 +115,65 @@ def get_transactions():
     })
 
 
-# -------------------- API สำหรับ SMS (Mock) --------------------
-@app.route("/api/sms")
-def api_sms():
-    # mock ข้อมูล SMS 7 รายการล่าสุด
-    sms_list = [
-        {"date_time": "12/09@10:49", "detail": "100.00 จากKTB/x380824เข้าx014229", "balance": "3,618.64บ"},
         {"date_time": "12/09@11:01", "detail": "125.00 จากKBNK/x891364เข้าx014229", "balance": "3,743.64บ"},
-        {"date_time": "12/09@11:14", "detail": "100.00 จากSCB/x982800เข้าx014229", "balance": "3,843.64บ"},
-        {"date_time": "12/09@11:21", "detail": "ถอน/โอนเงิน 600.00บ", "balance": "3,243.64บ"},
-        {"date_time": "12/09@11:21", "detail": "ถอน/โอนเงิน 1,000.00บ", "balance": "2,243.64บ"},
-        {"date_time": "12/09@11:23", "detail": "ถอน/โอนเงิน 200.00บ", "balance": "2,043.64บ"},
-        {"date_time": "12/09@11:38", "detail": "300.00 จากSCB/x982800เข้าx014229", "balance": "2,343.64บ"},
-    ]
-    return jsonify(sms_list)
+
+# -------------------- API สำหรับ SMS (จริง) --------------------
+import threading
+sms_data_file = "sms_data.json"
+sms_data_lock = threading.Lock()
+
+def load_sms_data():
+    try:
+        with open(sms_data_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_sms_data(sms_list):
+    with sms_data_lock:
+        with open(sms_data_file, "w", encoding="utf-8") as f:
+            json.dump(sms_list, f, ensure_ascii=False, indent=2)
+
+@app.route("/api/sms", methods=["GET"])
+def api_sms_get():
+    sms_list = load_sms_data()
+    # แสดง 7 รายการล่าสุด (มากสุด)
+    return jsonify(sms_list[-7:][::-1])
+
+@app.route("/api/sms", methods=["POST"])
+def api_sms_post():
+    # รับข้อมูล SMS จาก macro หรือระบบอื่น
+    data = request.get_json(force=True, silent=True) or {}
+    # รองรับทั้งแบบ body json และ query string
+    date_time = data.get("date_time") or request.args.get("date_time")
+    detail = data.get("detail") or request.args.get("detail")
+    balance = data.get("balance") or request.args.get("balance")
+    # หรือรับ raw body sms (body)
+    body = data.get("body") or request.args.get("body")
+    # ถ้ามี body เดียว ให้พยายาม parse
+    if body and not (date_time and detail and balance):
+        # ตัวอย่าง: 12/09@11:38 300.00 จากSCB/x982800เข้าx014229 ใช้ได้2,343.64บ
+        import re
+        m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", body)
+        if m:
+            date_time = m.group(1)
+            detail = m.group(2) + ' ' + m.group(3)
+            balance = m.group(4) + 'บ'
+        else:
+            # fallback: แยกด้วยช่องว่าง
+            parts = body.split()
+            if len(parts) >= 3:
+                date_time = parts[0]
+                detail = ' '.join(parts[1:-1])
+                balance = parts[-1]
+    # ถ้าไม่มีข้อมูลพอ ไม่บันทึก
+    if not (date_time and detail and balance):
+        return jsonify({"status":"error","message":"ข้อมูลไม่ครบ"}), 400
+    # โหลดและบันทึก
+    sms_list = load_sms_data()
+    sms_list.append({"date_time": date_time, "detail": detail, "balance": balance})
+    save_sms_data(sms_list)
+    return jsonify({"status":"success"}), 200
 @app.route("/approve", methods=["POST"])
 def approve():
     txid = request.json.get("id")
