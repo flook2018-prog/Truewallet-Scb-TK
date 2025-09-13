@@ -199,22 +199,28 @@ sms_data_lock = threading.Lock()
 def load_sms_data():
     try:
         with open(sms_data_file, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            if isinstance(data, dict):
+                return data
+            # กรณีเก่าเป็น list ให้แปลงเป็น dict
+            return {"default": data}
     except Exception:
-        return []
+        return {}
 
-def save_sms_data(sms_list):
+def save_sms_data(sms_dict):
     with sms_data_lock:
         with open(sms_data_file, "w", encoding="utf-8") as f:
-            json.dump(sms_list, f, ensure_ascii=False, indent=2)
+            json.dump(sms_dict, f, ensure_ascii=False, indent=2)
 
 
 @app.route("/api/sms", methods=["GET"])
 def api_sms_get():
-    # ถ้ามี query string body=... ให้บันทึก SMS
+    tag = request.args.get("tag", "default")
     body = request.args.get("body")
+    sms_dict = load_sms_data()
+    if tag not in sms_dict:
+        sms_dict[tag] = []
     if body:
-        # parse body เช่นเดียวกับ POST
         import re
         date_time = None
         detail = None
@@ -231,28 +237,22 @@ def api_sms_get():
                 detail = ' '.join(parts[1:-1])
                 balance = parts[-1]
         if date_time and detail and balance:
-            sms_list = load_sms_data()
-            sms_list.append({"date_time": date_time, "detail": detail, "balance": balance})
-            save_sms_data(sms_list)
-    # แสดง 7 รายการล่าสุด (มากสุด)
-    sms_list = load_sms_data()
+            sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+            save_sms_data(sms_dict)
+    sms_list = sms_dict.get(tag, [])
     resp = jsonify(sms_list[-7:][::-1])
     resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
 @app.route("/api/sms", methods=["POST"])
 def api_sms_post():
-    # รับข้อมูล SMS จาก macro หรือระบบอื่น
+    tag = request.args.get("tag") or request.json.get("tag") or "default"
     data = request.get_json(force=True, silent=True) or {}
-    # รองรับทั้งแบบ body json และ query string
     date_time = data.get("date_time") or request.args.get("date_time")
     detail = data.get("detail") or request.args.get("detail")
     balance = data.get("balance") or request.args.get("balance")
-    # หรือรับ raw body sms (body)
     body = data.get("body") or request.args.get("body")
-    # ถ้ามี body เดียว ให้พยายาม parse
     if body and not (date_time and detail and balance):
-        # ตัวอย่าง: 12/09@11:38 300.00 จากSCB/x982800เข้าx014229 ใช้ได้2,343.64บ
         import re
         m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", body)
         if m:
@@ -260,21 +260,20 @@ def api_sms_post():
             detail = m.group(2) + ' ' + m.group(3)
             balance = m.group(4) + 'บ'
         else:
-            # fallback: แยกด้วยช่องว่าง
             parts = body.split()
             if len(parts) >= 3:
                 date_time = parts[0]
                 detail = ' '.join(parts[1:-1])
                 balance = parts[-1]
-    # ถ้าไม่มีข้อมูลพอ ไม่บันทึก
     if not (date_time and detail and balance):
         resp = jsonify({"status":"error","message":"ข้อมูลไม่ครบ"})
         resp.headers.add('Access-Control-Allow-Origin', '*')
         return resp, 400
-    # โหลดและบันทึก
-    sms_list = load_sms_data()
-    sms_list.append({"date_time": date_time, "detail": detail, "balance": balance})
-    save_sms_data(sms_list)
+    sms_dict = load_sms_data()
+    if tag not in sms_dict:
+        sms_dict[tag] = []
+    sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+    save_sms_data(sms_dict)
     resp = jsonify({"status":"success"})
     resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp, 200

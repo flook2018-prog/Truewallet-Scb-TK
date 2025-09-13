@@ -64,6 +64,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <h2>💰 ยอด Wallet วันนี้</h2>
     <span id="wallet-info">0</span>
     <div style="margin-top:10px;text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;">
+        <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;">
+        <span style="font-weight:bold;font-size:1.1em;">Wallet</span>
+      </div>
       <button onclick="resetApproved()">รีเซทรายการอนุมัติ</button>
       <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
     </div>
@@ -120,7 +124,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="scb-status-text">เชื่อมต่อ...</span>
       </div>
       <div style="margin-bottom:8px;">
-        <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
+        <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์ 4272014229</span>
       </div>
       <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
         <table id="scb-sms-table" style="width:100%;border:none">
