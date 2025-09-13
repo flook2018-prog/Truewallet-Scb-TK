@@ -1,4 +1,45 @@
 # -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
+# (Moved below config and app = Flask(__name__))
+
+# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
+# (Moved below app = Flask(__name__))
+from flask import Flask, request, jsonify, render_template, send_from_directory
+import os, json, jwt, random
+from datetime import datetime, timedelta
+from collections import defaultdict
+from werkzeug.utils import secure_filename
+import pytz
+
+# -------------------- Config --------------------
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+transactions = {"new": [], "approved": [], "cancelled": []}
+daily_summary_history = defaultdict(float)
+ip_approver_map = {}
+
+DATA_FILE = "transactions_data.json"
+LOG_FILE = "transactions.log"
+SECRET_KEY = "f557ff6589e6d075581d68df1d4f3af7"
+
+# กำหนด timezone
+TZ = pytz.timezone("Asia/Bangkok")
+
+BANK_MAP_TH = {
+    "BBL": "กรุงเทพ",
+    "KBANK": "กสิกรไทย",
+    "SCB": "ไทยพาณิชย์",
+    "KTB": "กรุงไทย",
+    "BAY": "กรุงศรีอยุธยา",
+    "TMB": "ทหารไทย",
+    "TRUEWALLET": "ทรูวอเลท",
+    "7-ELEVEN": "7-Eleven",
+}
+
+# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
 @app.route("/webhook", methods=["POST"])
 def generic_truewallet_webhook():
     try:
@@ -66,44 +107,6 @@ def generic_truewallet_webhook():
     except Exception as e:
         log_with_time("[WEBHOOK EXCEPTION] /webhook", str(e))
         return jsonify({"status":"error","message":str(e)}), 500
-
-# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
-# (Moved below app = Flask(__name__))
-from flask import Flask, request, jsonify, render_template, send_from_directory
-import os, json, jwt, random
-from datetime import datetime, timedelta
-from collections import defaultdict
-from werkzeug.utils import secure_filename
-import pytz
-
-# -------------------- Config --------------------
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-transactions = {"new": [], "approved": [], "cancelled": []}
-daily_summary_history = defaultdict(float)
-ip_approver_map = {}
-
-DATA_FILE = "transactions_data.json"
-LOG_FILE = "transactions.log"
-SECRET_KEY = "f557ff6589e6d075581d68df1d4f3af7"
-
-# กำหนด timezone
-TZ = pytz.timezone("Asia/Bangkok")
-
-BANK_MAP_TH = {
-    "BBL": "กรุงเทพ",
-    "KBANK": "กสิกรไทย",
-    "SCB": "ไทยพาณิชย์",
-    "KTB": "กรุงไทย",
-    "BAY": "กรุงศรีอยุธยา",
-    "TMB": "ทหารไทย",
-    "TRUEWALLET": "ทรูวอเลท",
-    "7-ELEVEN": "7-Eleven",
-}
 
 # -------------------- Helpers --------------------
 def save_transactions():
