@@ -176,7 +176,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 // --- ดึงข้อมูล SCB สุมิธร์ มาแสดงในกล่อง SCB พลอยไพริน (copy data) ---
 async function fetchScbSummaryBox() {
   try {
-    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=${getSetting('tag-scb1','scbtk168')}&sender=027777777`);
+    const resp = await fetch(`/api/sms?tag=scbtk168&sender=027777777`);
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     if (smsList.length > 5) smsList = smsList.slice(-5);
@@ -210,21 +210,15 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tagKey, fallbac
   const statusText = document.getElementById(statusTextId);
   try {
     const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=${tag}&sender=027777777`);
-    if (resp.ok) {
-      statusLight.style.background = '#28a745';
+setInterval(fetchScbSummaryBox, 3000);
+fetchScbSummaryBox();
       statusText.innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      statusLight.style.background = '#dc3545';
-      statusText.innerText = 'เชื่อมต่อขัดข้อง';
-    }
-    const data = await resp.json();
-    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    if (smsList.length > 5) smsList = smsList.slice(-5);
-    smsList = smsList.reverse();
-    const tbody = document.querySelector(`#${tableId} tbody`);
-    tbody.innerHTML = '';
+async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
+  const statusLight = document.getElementById(statusLightId);
+  const statusText = document.getElementById(statusTextId);
     let count = 0;
-    smsList.forEach(sms => {
+    const resp = await fetch(`/api/sms?tag=${tag}&sender=027777777`);
       if (count >= 5) return;
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || '-'}</td><td>${sms.balance || '-'}</td>`;
@@ -254,33 +248,13 @@ function updateScbName(inputId, labelId) {
 }
 
 
-// ตั้งค่า input และอัปเดตข้อมูลสำหรับแต่ละบัญชี SCB
-setupInput('tag-scb1', 'tag-scb1', 'scbtk168', () => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'));
-setupInput('tag-scb2', 'tag-scb2', 'scbsk789', () => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'));
-setupInput('name-scb1', 'name-scb1', 'SCB สุมิธร์ คิมภิรานนท์', () => updateScbName('name-scb1', 'scb1-name-label'));
-setupInput('name-scb2', 'name-scb2', 'SCB พลอยไพริน นามโคตร', () => updateScbName('name-scb2', 'scb2-name-label'));
-
 window.addEventListener('DOMContentLoaded', () => {
-  updateScbName('name-scb1', 'scb1-name-label');
-  updateScbName('name-scb2', 'scb2-name-label');
-  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168');
-  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789');
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
 });
-
-setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'), 3000);
-setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'), 3000);
-
+fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
 setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
 setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
-fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168');
-fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
-let nightMode=false;
-const toggleBtn=document.getElementById("toggle-mode");
-toggleBtn.onclick=()=>{
-    nightMode=!nightMode;
-    document.body.classList.toggle("night",nightMode);
-    toggleBtn.innerText = nightMode ? "🌙" : "🌞";
-};
 
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
