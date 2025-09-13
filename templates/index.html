@@ -110,17 +110,21 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 <div id="bottom-row">
 
+
   <div style="display: flex; gap: 20px; align-items: flex-start;">
-    <div style="flex:1;">
-      <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ -->
+    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/SCB_Logo_2020.png" alt="SCB Logo" style="height:32px;">
         <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
         <span id="scb-status-text">เชื่อมต่อ...</span>
       </div>
-      <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
-      <span id="scb1-name-label">SCB สุมิธร์ คิมภิรานนท์</span>
-      <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
-      <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:120px;" />
-      <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
+      <div style="margin-bottom:8px;">
+        <span id="scb1-name-label" style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
+        <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:180px;margin-left:10px;" />
+        <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:100px;" />
+      </div>
+      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
         <table id="scb-sms-table" style="width:100%;border:none">
           <thead>
             <tr>
@@ -133,19 +137,20 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         </table>
       </div>
     </div>
-    <div style="flex:1;">
-      <div id="right-column"></div>
-      <div style="display: flex; gap: 20px; align-items: flex-start;">
-    <div style="flex:1;">
-      <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-        <span id="scb-status-text">เชื่อมต่อ...</span>
-      <h2>SCB พลอยไพริน นามโคตร</h2>
-      <span id="scb1-name-label">SCB พลอยไพริน นามโคตร</span>
-      <input id="name-scb1" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
-      <input id="tag-scb1" value="scbsk789" style="margin-left:10px;width:120px;" />
-      <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
-        <table id="scb-sms-table" style="width:100%;border:none">
+    <!-- กล่องขวา: พลอยไพริน นามโคตร -->
+    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/SCB_Logo_2020.png" alt="SCB Logo" style="height:32px;">
+        <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="scb2-status-text">เชื่อมต่อ...</span>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span id="scb2-name-label" style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
+        <input id="name-scb2" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:180px;margin-left:10px;" />
+        <input id="tag-scb2" value="scbsk789" style="margin-left:10px;width:100px;" />
+      </div>
+      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+        <table id="scb2-sms-table" style="width:100%;border:none">
           <thead>
             <tr>
               <th>วันที่/เวลา</th>
@@ -166,7 +171,15 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <tbody></tbody>
     </table>
   </div>
-   
+
+</div>
+
+<!-- ยอดรวมวอเลทรายวัน (wallet) ย้ายไปล่างสุด -->
+<div id="wallet-daily-total-box" style="margin-top:30px;text-align:center;">
+  <div class="summary-card" style="display:inline-block;min-width:260px;">
+    <h2>💰 ยอด Wallet วันนี้</h2>
+    <span id="wallet-info">0</span>
+  </div>
 </div>
 
 <script>
@@ -250,6 +263,8 @@ function updateScbName(inputId, labelId) {
   document.getElementById(labelId).textContent = name;
 }
 
+
+// ตั้งค่า input และอัปเดตข้อมูลสำหรับแต่ละบัญชี SCB
 setupInput('tag-scb1', 'tag-scb1', 'scbtk168', () => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'));
 setupInput('tag-scb2', 'tag-scb2', 'scbsk789', () => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'));
 setupInput('name-scb1', 'name-scb1', 'SCB สุมิธร์ คิมภิรานนท์', () => updateScbName('name-scb1', 'scb1-name-label'));
@@ -258,12 +273,12 @@ setupInput('name-scb2', 'name-scb2', 'SCB พลอยไพริน นาม�
 window.addEventListener('DOMContentLoaded', () => {
   updateScbName('name-scb1', 'scb1-name-label');
   updateScbName('name-scb2', 'scb2-name-label');
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789');
 });
 
 setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'), 3000);
 setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'), 3000);
-fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168');
-fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789');
 
 setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
 setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
