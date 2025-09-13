@@ -197,28 +197,29 @@ setInterval(fetchScbSummaryBox, 3000);
 fetchScbSummaryBox();
 
 // --- ดึง SMS จาก API และแสดงในแต่ละตาราง พร้อมเปลี่ยนชื่อบัญชีและ tag ได้ ---
-function getSetting(key, fallback) {
-  return localStorage.getItem(key) || fallback;
-}
-function setSetting(key, value) {
-  localStorage.setItem(key, value);
-}
 
-async function fetchScbSms(tableId, statusLightId, statusTextId, tagKey, fallbackTag) {
-  const tag = getSetting(tagKey, fallbackTag);
-  const statusLight = document.getElementById(statusLightId);
-  const statusText = document.getElementById(statusTextId);
-  try {
-    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=${tag}&sender=027777777`);
-setInterval(fetchScbSummaryBox, 3000);
-fetchScbSummaryBox();
-      statusText.innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
+
+
 async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
   const statusLight = document.getElementById(statusLightId);
   const statusText = document.getElementById(statusTextId);
-    let count = 0;
+  try {
     const resp = await fetch(`/api/sms?tag=${tag}&sender=027777777`);
+    if (resp.ok) {
+      statusLight.style.background = '#28a745';
+      statusText.innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      statusLight.style.background = '#dc3545';
+      statusText.innerText = 'เชื่อมต่อขัดข้อง';
+    }
+    const data = await resp.json();
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    if (smsList.length > 5) smsList = smsList.slice(-5);
+    smsList = smsList.reverse();
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '';
+    let count = 0;
+    smsList.forEach(sms => {
       if (count >= 5) return;
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || '-'}</td><td>${sms.balance || '-'}</td>`;
@@ -233,28 +234,23 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
   }
 }
 
-function setupInput(inputId, key, fallback, onChange) {
-  const input = document.getElementById(inputId);
-  input.value = getSetting(key, fallback);
-  input.addEventListener('change', () => {
-    setSetting(key, input.value.trim());
-    if (onChange) onChange();
-  });
-}
 
-function updateScbName(inputId, labelId) {
-  const name = getSetting(inputId, document.getElementById(inputId).value);
-  document.getElementById(labelId).textContent = name;
-}
+
+
+
 
 
 window.addEventListener('DOMContentLoaded', () => {
-  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168');
-  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
+  fetchScbSummaryBox();
 });
-fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
-setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
-setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
+
+setInterval(() => {
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
+  fetchScbSummaryBox();
+}, 3000);
 
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
