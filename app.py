@@ -66,6 +66,9 @@ def generic_truewallet_webhook():
     except Exception as e:
         log_with_time("[WEBHOOK EXCEPTION] /webhook", str(e))
         return jsonify({"status":"error","message":str(e)}), 500
+
+# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
+# (Moved below app = Flask(__name__))
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import os, json, jwt, random
 from datetime import datetime, timedelta
