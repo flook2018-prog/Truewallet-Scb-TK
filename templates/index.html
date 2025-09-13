@@ -60,6 +60,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <h1>THKBot168 Dashboard (Realtime)</h1>
 
 <div id="top-bar">
+  <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-right:16px;">
+    <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+    <span id="scb-status-text">กำลังเชื่อมต่อ...</span>
+  </div>
   <div class="summary-card">
     <h2>💰 ยอด Wallet วันนี้</h2>
     <span id="wallet-info">0</span>
@@ -109,7 +113,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <div id="bottom-row">
-  <h2>SCB สุมิธร์ คิมภิรานนท์ - รายการ SMS ที่ดึงด้วยมาโคร</h2>
+  <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
   <div class="scroll-box" style="max-height:320px;overflow-y:auto;">
     <table id="scb-sms-table" style="width:100%;border:none">
       <thead>
@@ -135,11 +139,18 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <script>
 // --- ดึง SMS จาก API และแสดงในตาราง ---
 async function fetchScbSms() {
+  const statusLight = document.getElementById('scb-status-light');
+  const statusText = document.getElementById('scb-status-text');
   try {
-  const resp = await fetch('https://xinon1565.up.railway.app/api/sms?tag=scbtk168&sender=027777777');
+    const resp = await fetch('https://xinon1565.up.railway.app/api/sms?tag=scbtk168&sender=027777777');
+    if (resp.ok) {
+      statusLight.style.background = '#28a745';
+      statusText.innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      statusLight.style.background = '#dc3545';
+      statusText.innerText = 'เชื่อมต่อขัดข้อง';
+    }
     const data = await resp.json();
-    // สมมุติ data = [{date_time, detail, balance}, ...]
-    // หาก API ส่งข้อมูลในรูปแบบอื่น ให้ปรับ mapping ด้านล่างนี้
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     // แสดงแค่ 7 รายการล่าสุด (มากสุด)
     smsList = smsList.slice(-7).reverse();
@@ -151,7 +162,8 @@ async function fetchScbSms() {
       tbody.appendChild(tr);
     });
   } catch (e) {
-    // กรณี error ให้ล้างตาราง
+    statusLight.style.background = '#dc3545';
+    statusText.innerText = 'เชื่อมต่อขัดข้อง';
     const tbody = document.querySelector('#scb-sms-table tbody');
     tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
   }
