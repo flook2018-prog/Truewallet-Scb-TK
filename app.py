@@ -268,12 +268,16 @@ def api_sms_post():
                 balance = parts[-1]
     # ถ้าไม่มีข้อมูลพอ ไม่บันทึก
     if not (date_time and detail and balance):
-        return jsonify({"status":"error","message":"ข้อมูลไม่ครบ"}), 400
+        resp = jsonify({"status":"error","message":"ข้อมูลไม่ครบ"})
+        resp.headers.add('Access-Control-Allow-Origin', '*')
+        return resp, 400
     # โหลดและบันทึก
     sms_list = load_sms_data()
     sms_list.append({"date_time": date_time, "detail": detail, "balance": balance})
     save_sms_data(sms_list)
-    return jsonify({"status":"success"}), 200
+    resp = jsonify({"status":"success"})
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    return resp, 200
 @app.route("/approve", methods=["POST"])
 def approve():
     txid = request.json.get("id")
