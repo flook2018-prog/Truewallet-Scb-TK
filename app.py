@@ -49,13 +49,14 @@ def generic_truewallet_webhook():
             return jsonify({"status":"error","message":"No JSON received"}), 400
 
         message_jwt = data.get("message")
-        decoded = {}
+        decoded = None
         if message_jwt:
             try:
                 decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
             except Exception as e:
                 log_with_time("[JWT ERROR] /webhook", str(e))
-                return jsonify({"status":"error","message":"Invalid JWT"}), 400
+                # ถ้า decode ไม่ผ่าน ให้ใช้ payload ดิบแทน
+                decoded = data
         else:
             decoded = data
 
@@ -365,13 +366,14 @@ def truewallet_webhook():
             return jsonify({"status":"error","message":"No JSON received"}), 400
 
         message_jwt = data.get("message")
-        decoded = {}
+        decoded = None
         if message_jwt:
             try:
                 decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
             except Exception as e:
                 log_with_time("[JWT ERROR]", str(e))
-                return jsonify({"status":"error","message":"Invalid JWT"}), 400
+                # ถ้า decode ไม่ผ่าน ให้ใช้ payload ดิบแทน
+                decoded = data
         else:
             decoded = data
 
