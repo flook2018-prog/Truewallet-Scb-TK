@@ -110,7 +110,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 <div id="bottom-row">
   <h2>SCB สุมิธร์ คิมภิรานนท์ - รายการ SMS ที่ดึงด้วยมาโคร</h2>
-  <div class="scroll-box">
+  <div class="scroll-box" style="max-height:320px;overflow-y:auto;">
     <table id="scb-sms-table" style="width:100%;border:none">
       <thead>
         <tr>
@@ -119,15 +119,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           <th>ยอดคงเหลือ</th>
         </tr>
       </thead>
-      <tbody>
-        <tr><td>12/09@10:49</td><td>100.00 จากKTB/x380824เข้าx014229</td><td>3,618.64บ</td></tr>
-        <tr><td>12/09@11:01</td><td>125.00 จากKBNK/x891364เข้าx014229</td><td>3,743.64บ</td></tr>
-        <tr><td>12/09@11:14</td><td>100.00 จากSCB/x982800เข้าx014229</td><td>3,843.64บ</td></tr>
-        <tr><td>12/09@11:21</td><td>ถอน/โอนเงิน 600.00บ</td><td>3,243.64บ</td></tr>
-        <tr><td>12/09@11:21</td><td>ถอน/โอนเงิน 1,000.00บ</td><td>2,243.64บ</td></tr>
-        <tr><td>12/09@11:23</td><td>ถอน/โอนเงิน 200.00บ</td><td>2,043.64บ</td></tr>
-        <tr><td>12/09@11:38</td><td>300.00 จากSCB/x982800เข้าx014229</td><td>2,343.64บ</td></tr>
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
@@ -141,6 +133,32 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <script>
+// --- ดึง SMS จาก API และแสดงในตาราง ---
+async function fetchScbSms() {
+  try {
+    const resp = await fetch('https://truewallet-scb-tk-production.up.railway.app/api/sms?tag=scb167&sender=027777777');
+    const data = await resp.json();
+    // สมมุติ data = [{date_time, detail, balance}, ...]
+    // หาก API ส่งข้อมูลในรูปแบบอื่น ให้ปรับ mapping ด้านล่างนี้
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    // แสดงแค่ 7 รายการล่าสุด (มากสุด)
+    smsList = smsList.slice(-7).reverse();
+    const tbody = document.querySelector('#scb-sms-table tbody');
+    tbody.innerHTML = '';
+    smsList.forEach(sms => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || '-'}</td><td>${sms.balance || '-'}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    // กรณี error ให้ล้างตาราง
+    const tbody = document.querySelector('#scb-sms-table tbody');
+    tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
+  }
+}
+
+setInterval(fetchScbSms, 3000); // อัปเดตทุก 3 วินาที
+fetchScbSms();
 let nightMode=false;
 const toggleBtn=document.getElementById("toggle-mode");
 toggleBtn.onclick=()=>{
