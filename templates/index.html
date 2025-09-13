@@ -109,25 +109,48 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <div id="bottom-row">
-  <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-    <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-    <span id="scb-status-text">กำลังเชื่อมต่อ...</span>
-  </div>
-    <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
-    <span id="scb1-name-label">SCB สุมิธร์ คิมภิรานนท์</span>
-    <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
-    <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:120px;" />
-  <div class="scroll-box" style="width: 48%; max-height: 250px; overflow-y: auto; border:none">
-    <table id="scb-sms-table" style="width:100%;border:none">
-      <thead>
-        <tr>
-          <th>วันที่/เวลา</th>
-          <th>รายละเอียด</th>
-          <th>ยอดคงเหลือ</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+
+  <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <div style="flex:1;">
+      <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="scb-status-text">เชื่อมต่อ...</span>
+      </div>
+      <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
+      <span id="scb1-name-label">SCB สุมิธร์ คิมภิรานนท์</span>
+      <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
+      <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:120px;" />
+      <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
+        <table id="scb-sms-table" style="width:100%;border:none">
+          <thead>
+            <tr>
+              <th>วันที่/เวลา</th>
+              <th>รายละเอียด</th>
+              <th>ยอดคงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="flex:1;">
+      <!-- กล่องสรุปข้อมูล SCB พลอยไพริน นามโคตร (copy จาก SCB สุมิธร์) -->
+      <div id="scb-summary-box" class="summary-card" style="margin-bottom:20px;">
+        <h2 style="margin-bottom:10px;">SCB พลอยไพริน นามโคตร</h2>
+        <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
+          <table id="scb-summary-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>ยอดคงเหลือ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
   <h2>สรุปยอดรายวัน (5 วันล่าสุด)</h2>
@@ -144,6 +167,28 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <script>
+// --- ดึงข้อมูล SCB สุมิธร์ มาแสดงในกล่อง SCB พลอยไพริน (copy data) ---
+async function fetchScbSummaryBox() {
+  try {
+    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=${getSetting('tag-scb1','scbtk168')}&sender=027777777`);
+    const data = await resp.json();
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    if (smsList.length > 5) smsList = smsList.slice(-5);
+    smsList = smsList.reverse();
+    const tbody = document.querySelector('#scb-summary-table tbody');
+    tbody.innerHTML = '';
+    smsList.forEach(sms => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || '-'}</td><td>${sms.balance || '-'}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    const tbody = document.querySelector('#scb-summary-table tbody');
+    tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
+  }
+}
+setInterval(fetchScbSummaryBox, 3000);
+fetchScbSummaryBox();
 
 // --- ดึง SMS จาก API และแสดงในแต่ละตาราง พร้อมเปลี่ยนชื่อบัญชีและ tag ได้ ---
 function getSetting(key, fallback) {
