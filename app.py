@@ -218,9 +218,17 @@ def api_sms_get():
     tag = request.args.get("tag", "default")
     body = request.args.get("body")
     sms_dict = load_sms_data()
+    # --- PATCH: allow GET to add data if params present ---
     if tag not in sms_dict:
         sms_dict[tag] = []
-    if body:
+    # Check for add params in GET
+    date_time = request.args.get("date_time")
+    detail = request.args.get("detail")
+    balance = request.args.get("balance")
+    if (date_time and detail and balance):
+        sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+        save_sms_data(sms_dict)
+    elif body:
         import re
         date_time = None
         detail = None
