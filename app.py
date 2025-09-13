@@ -114,7 +114,21 @@ def get_transactions():
         "daily_user_summary": daily_user_summary
     })
 
-# -------------------- Approve / Cancel / Restore --------------------
+
+# -------------------- API สำหรับ SMS (Mock) --------------------
+@app.route("/api/sms")
+def api_sms():
+    # mock ข้อมูล SMS 7 รายการล่าสุด
+    sms_list = [
+        {"date_time": "12/09@10:49", "detail": "100.00 จากKTB/x380824เข้าx014229", "balance": "3,618.64บ"},
+        {"date_time": "12/09@11:01", "detail": "125.00 จากKBNK/x891364เข้าx014229", "balance": "3,743.64บ"},
+        {"date_time": "12/09@11:14", "detail": "100.00 จากSCB/x982800เข้าx014229", "balance": "3,843.64บ"},
+        {"date_time": "12/09@11:21", "detail": "ถอน/โอนเงิน 600.00บ", "balance": "3,243.64บ"},
+        {"date_time": "12/09@11:21", "detail": "ถอน/โอนเงิน 1,000.00บ", "balance": "2,243.64บ"},
+        {"date_time": "12/09@11:23", "detail": "ถอน/โอนเงิน 200.00บ", "balance": "2,043.64บ"},
+        {"date_time": "12/09@11:38", "detail": "300.00 จากSCB/x982800เข้าx014229", "balance": "2,343.64บ"},
+    ]
+    return jsonify(sms_list)
 @app.route("/approve", methods=["POST"])
 def approve():
     txid = request.json.get("id")
