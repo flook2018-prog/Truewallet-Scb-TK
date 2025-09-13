@@ -120,9 +120,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="scb-status-text">เชื่อมต่อ...</span>
       </div>
       <div style="margin-bottom:8px;">
-        <span id="scb1-name-label" style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
-        <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:180px;margin-left:10px;" />
-        <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:100px;" />
+        <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
       </div>
       <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
         <table id="scb-sms-table" style="width:100%;border:none">
@@ -145,9 +143,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="scb2-status-text">เชื่อมต่อ...</span>
       </div>
       <div style="margin-bottom:8px;">
-        <span id="scb2-name-label" style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
-        <input id="name-scb2" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:180px;margin-left:10px;" />
-        <input id="tag-scb2" value="scbsk789" style="margin-left:10px;width:100px;" />
+        <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
       </div>
       <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
         <table id="scb2-sms-table" style="width:100%;border:none">
@@ -258,26 +254,14 @@ function updateScbName(inputId, labelId) {
 }
 
 
-// ตั้งค่า input และอัปเดตข้อมูลสำหรับแต่ละบัญชี SCB
-setupInput('tag-scb1', 'tag-scb1', 'scbtk168', () => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'));
-setupInput('tag-scb2', 'tag-scb2', 'scbsk789', () => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'));
-setupInput('name-scb1', 'name-scb1', 'SCB สุมิธร์ คิมภิรานนท์', () => updateScbName('name-scb1', 'scb1-name-label'));
-setupInput('name-scb2', 'name-scb2', 'SCB พลอยไพริน นามโคตร', () => updateScbName('name-scb2', 'scb2-name-label'));
-
+// โหลดข้อมูลธุรกรรม SCB แยกแต่ละบัญชี (tag, id ตาราง)
 window.addEventListener('DOMContentLoaded', () => {
-  updateScbName('name-scb1', 'scb1-name-label');
-  updateScbName('name-scb2', 'scb2-name-label');
-  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168');
-  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789');
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', null, 'scbtk168');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', null, 'scbsk789');
 });
 
-setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'), 3000);
-setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'), 3000);
-
-setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
-setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
-fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168');
-fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
+setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', null, 'scbtk168'), 3000);
+setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', null, 'scbsk789'), 3000);
 let nightMode=false;
 const toggleBtn=document.getElementById("toggle-mode");
 toggleBtn.onclick=()=>{
