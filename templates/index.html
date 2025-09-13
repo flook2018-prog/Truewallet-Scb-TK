@@ -113,7 +113,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
     <span id="scb-status-text">กำลังเชื่อมต่อ...</span>
   </div>
-  <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
+    <h2>SCB สุมิธร์ คิมภิรานนท์</h2>
+    <span id="scb1-name-label">SCB สุมิธร์ คิมภิรานนท์</span>
+    <input id="name-scb1" value="SCB สุมิธร์ คิมภิรานนท์" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
+    <input id="tag-scb1" value="scbtk168" style="margin-left:10px;width:120px;" />
   <div class="scroll-box" style="width: 48%; max-height: 250px; overflow-y: auto; border:none">
     <table id="scb-sms-table" style="width:100%;border:none">
       <thead>
@@ -134,12 +137,24 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <tbody></tbody>
     </table>
   </div>
+    <h2>SCB พลอยไพริน นามโคตร</h2>
+    <span id="scb2-name-label">SCB พลอยไพริน นามโคตร</span>
+    <input id="name-scb2" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
+    <input id="tag-scb2" value="scbsk789" style="margin-left:10px;width:120px;" />
 </div>
 
 <script>
 
-// --- ดึง SMS จาก API และแสดงในแต่ละตาราง ---
-async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
+// --- ดึง SMS จาก API และแสดงในแต่ละตาราง พร้อมเปลี่ยนชื่อบัญชีและ tag ได้ ---
+function getSetting(key, fallback) {
+  return localStorage.getItem(key) || fallback;
+}
+function setSetting(key, value) {
+  localStorage.setItem(key, value);
+}
+
+async function fetchScbSms(tableId, statusLightId, statusTextId, tagKey, fallbackTag) {
+  const tag = getSetting(tagKey, fallbackTag);
   const statusLight = document.getElementById(statusLightId);
   const statusText = document.getElementById(statusTextId);
   try {
@@ -172,6 +187,35 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
     tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
   }
 }
+
+function setupInput(inputId, key, fallback, onChange) {
+  const input = document.getElementById(inputId);
+  input.value = getSetting(key, fallback);
+  input.addEventListener('change', () => {
+    setSetting(key, input.value.trim());
+    if (onChange) onChange();
+  });
+}
+
+function updateScbName(inputId, labelId) {
+  const name = getSetting(inputId, document.getElementById(inputId).value);
+  document.getElementById(labelId).textContent = name;
+}
+
+setupInput('tag-scb1', 'tag-scb1', 'scbtk168', () => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'));
+setupInput('tag-scb2', 'tag-scb2', 'scbsk789', () => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'));
+setupInput('name-scb1', 'name-scb1', 'SCB สุมิธร์ คิมภิรานนท์', () => updateScbName('name-scb1', 'scb1-name-label'));
+setupInput('name-scb2', 'name-scb2', 'SCB พลอยไพริน นามโคตร', () => updateScbName('name-scb2', 'scb2-name-label'));
+
+window.addEventListener('DOMContentLoaded', () => {
+  updateScbName('name-scb1', 'scb1-name-label');
+  updateScbName('name-scb2', 'scb2-name-label');
+});
+
+setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168'), 3000);
+setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789'), 3000);
+fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'tag-scb1', 'scbtk168');
+fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'tag-scb2', 'scbsk789');
 
 setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
 setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
