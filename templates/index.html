@@ -134,21 +134,27 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       </div>
     </div>
     <div style="flex:1;">
-      <!-- กล่องสรุปข้อมูล SCB พลอยไพริน นามโคตร (copy จาก SCB สุมิธร์) -->
-      <div id="scb-summary-box" class="summary-card" style="margin-bottom:20px;">
-        <h2 style="margin-bottom:10px;">SCB พลอยไพริน นามโคตร</h2>
-        <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
-          <table id="scb-summary-table" style="width:100%;border:none">
-            <thead>
-              <tr>
-                <th>วันที่/เวลา</th>
-                <th>รายละเอียด</th>
-                <th>ยอดคงเหลือ</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      <div id="right-column"></div>
+      <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <div style="flex:1;">
+      <div id="scb-connection-status" style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="scb-status-text">เชื่อมต่อ...</span>
+      <h2>SCB พลอยไพริน นามโคตร</h2>
+      <span id="scb1-name-label">SCB พลอยไพริน นามโคตร</span>
+      <input id="name-scb1" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
+      <input id="tag-scb1" value="scbsk789" style="margin-left:10px;width:120px;" />
+      <div class="scroll-box" style="width: 100%; max-height: 250px; overflow-y: auto; border:none">
+        <table id="scb-sms-table" style="width:100%;border:none">
+          <thead>
+            <tr>
+              <th>วันที่/เวลา</th>
+              <th>รายละเอียด</th>
+              <th>ยอดคงเหลือ</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -160,10 +166,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <tbody></tbody>
     </table>
   </div>
-    <h2>SCB พลอยไพริน นามโคตร</h2>
-    <span id="scb2-name-label">SCB พลอยไพริน นามโคตร</span>
-    <input id="name-scb2" value="SCB พลอยไพริน นามโคตร" style="font-weight:bold;font-size:1em;width:220px;margin-left:10px;" />
-    <input id="tag-scb2" value="scbsk789" style="margin-left:10px;width:120px;" />
+   
 </div>
 
 <script>
