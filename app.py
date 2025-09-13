@@ -115,7 +115,6 @@ def get_transactions():
     })
 
 
-        {"date_time": "12/09@11:01", "detail": "125.00 จากKBNK/x891364เข้าx014229", "balance": "3,743.64บ"},
 
 # -------------------- API สำหรับ SMS (จริง) --------------------
 import threading
