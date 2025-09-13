@@ -153,8 +153,10 @@ async function fetchScbSms() {
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     // แสดง 5 รายการล่าสุด ใหม่สุดบนสุด (บังคับตัดเหลือ 5 รายการ)
-    if (smsList.length > 5) smsList = smsList.slice(-5);
-    smsList = smsList.reverse();
+  // ตัดเหลือ 5 รายการล่าสุด และเรียงใหม่สุดบนสุด
+  if (smsList.length > 5) smsList = smsList.slice(-5);
+  // smsList ที่ slice(-5) จะได้ 5 รายการสุดท้าย (เก่าสุด -> ใหม่สุด)
+  smsList = smsList.reverse(); // ใหม่สุดอยู่บนสุด
     const tbody = document.querySelector('#scb-sms-table tbody');
     tbody.innerHTML = '';
     // เผื่อกรณี API ส่งเกิน 5 รายการหรือ slice ไม่ทำงาน
