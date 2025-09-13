@@ -137,12 +137,13 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <script>
-// --- ดึง SMS จาก API และแสดงในตาราง ---
-async function fetchScbSms() {
-  const statusLight = document.getElementById('scb-status-light');
-  const statusText = document.getElementById('scb-status-text');
+
+// --- ดึง SMS จาก API และแสดงในแต่ละตาราง ---
+async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
+  const statusLight = document.getElementById(statusLightId);
+  const statusText = document.getElementById(statusTextId);
   try {
-    const resp = await fetch('https://xinon1565.up.railway.app/api/sms?tag=scbtk168&sender=027777777');
+    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=${tag}&sender=027777777`);
     if (resp.ok) {
       statusLight.style.background = '#28a745';
       statusText.innerText = 'เชื่อมต่อสำเร็จ';
@@ -152,14 +153,10 @@ async function fetchScbSms() {
     }
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    // แสดง 5 รายการล่าสุด ใหม่สุดบนสุด (บังคับตัดเหลือ 5 รายการ)
-  // ตัดเหลือ 5 รายการล่าสุด และเรียงใหม่สุดบนสุด
-  if (smsList.length > 5) smsList = smsList.slice(-5);
-  // smsList ที่ slice(-5) จะได้ 5 รายการสุดท้าย (เก่าสุด -> ใหม่สุด)
-  smsList = smsList.reverse(); // ใหม่สุดอยู่บนสุด
-    const tbody = document.querySelector('#scb-sms-table tbody');
+    if (smsList.length > 5) smsList = smsList.slice(-5);
+    smsList = smsList.reverse();
+    const tbody = document.querySelector(`#${tableId} tbody`);
     tbody.innerHTML = '';
-    // เผื่อกรณี API ส่งเกิน 5 รายการหรือ slice ไม่ทำงาน
     let count = 0;
     smsList.forEach(sms => {
       if (count >= 5) return;
@@ -171,13 +168,15 @@ async function fetchScbSms() {
   } catch (e) {
     statusLight.style.background = '#dc3545';
     statusText.innerText = 'เชื่อมต่อขัดข้อง';
-    const tbody = document.querySelector('#scb-sms-table tbody');
+    const tbody = document.querySelector(`#${tableId} tbody`);
     tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
   }
 }
 
-setInterval(fetchScbSms, 3000); // อัปเดตทุก 3 วินาที
-fetchScbSms();
+setInterval(() => fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168'), 3000);
+setInterval(() => fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789'), 3000);
+fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'scbtk168');
+fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'scbsk789');
 let nightMode=false;
 const toggleBtn=document.getElementById("toggle-mode");
 toggleBtn.onclick=()=>{
