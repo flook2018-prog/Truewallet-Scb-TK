@@ -152,8 +152,9 @@ async function fetchScbSms() {
     }
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    // แสดงแค่ 7 รายการล่าสุด (มากสุด)
-    smsList = smsList.slice(-7).reverse();
+      // แสดงรายการใหม่สุดบนสุด (ไม่ slice)
+      // smsList ปกติ: เก่าสุด -> ใหม่สุด, ต้อง reverse ให้ ใหม่สุด -> เก่าสุด
+      smsList = smsList.slice().reverse();
     const tbody = document.querySelector('#scb-sms-table tbody');
     tbody.innerHTML = '';
     smsList.forEach(sms => {
