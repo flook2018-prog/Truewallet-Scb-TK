@@ -133,10 +133,34 @@ def save_sms_data(sms_list):
         with open(sms_data_file, "w", encoding="utf-8") as f:
             json.dump(sms_list, f, ensure_ascii=False, indent=2)
 
+
 @app.route("/api/sms", methods=["GET"])
 def api_sms_get():
-    sms_list = load_sms_data()
+    # ถ้ามี query string body=... ให้บันทึก SMS
+    body = request.args.get("body")
+    if body:
+        # parse body เช่นเดียวกับ POST
+        import re
+        date_time = None
+        detail = None
+        balance = None
+        m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", body)
+        if m:
+            date_time = m.group(1)
+            detail = m.group(2) + ' ' + m.group(3)
+            balance = m.group(4) + 'บ'
+        else:
+            parts = body.split()
+            if len(parts) >= 3:
+                date_time = parts[0]
+                detail = ' '.join(parts[1:-1])
+                balance = parts[-1]
+        if date_time and detail and balance:
+            sms_list = load_sms_data()
+            sms_list.append({"date_time": date_time, "detail": detail, "balance": balance})
+            save_sms_data(sms_list)
     # แสดง 7 รายการล่าสุด (มากสุด)
+    sms_list = load_sms_data()
     return jsonify(sms_list[-7:][::-1])
 
 @app.route("/api/sms", methods=["POST"])
