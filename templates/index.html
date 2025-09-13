@@ -152,14 +152,19 @@ async function fetchScbSms() {
     }
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    // แสดง 5 รายการล่าสุด ใหม่สุดบนสุด
-    smsList = smsList.slice(-5).reverse();
+    // แสดง 5 รายการล่าสุด ใหม่สุดบนสุด (บังคับตัดเหลือ 5 รายการ)
+    if (smsList.length > 5) smsList = smsList.slice(-5);
+    smsList = smsList.reverse();
     const tbody = document.querySelector('#scb-sms-table tbody');
     tbody.innerHTML = '';
+    // เผื่อกรณี API ส่งเกิน 5 รายการหรือ slice ไม่ทำงาน
+    let count = 0;
     smsList.forEach(sms => {
+      if (count >= 5) return;
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || '-'}</td><td>${sms.balance || '-'}</td>`;
       tbody.appendChild(tr);
+      count++;
     });
   } catch (e) {
     statusLight.style.background = '#dc3545';
