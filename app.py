@@ -216,37 +216,16 @@ def save_sms_data(sms_dict):
 @app.route("/api/sms", methods=["GET"])
 def api_sms_get():
     tag = request.args.get("tag", "default")
-    body = request.args.get("body")
+    sender = request.args.get("sender")
+    sms_content = request.args.get("sms") or request.args.get("body")
     sms_dict = load_sms_data()
-    # --- PATCH: allow GET to add data if params present ---
     if tag not in sms_dict:
         sms_dict[tag] = []
-    # Check for add params in GET
-    date_time = request.args.get("date_time")
-    detail = request.args.get("detail")
-    balance = request.args.get("balance")
-    if (date_time and detail and balance):
-        sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+    # รับ sender และ sms_content จาก GET แล้วบันทึกลง tag ที่ถูกต้อง
+    if sender and sms_content:
+        sms_dict[tag].append({"sender": sender, "sms": sms_content})
         save_sms_data(sms_dict)
-    elif body:
-        import re
-        date_time = None
-        detail = None
-        balance = None
-        m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", body)
-        if m:
-            date_time = m.group(1)
-            detail = m.group(2) + ' ' + m.group(3)
-            balance = m.group(4) + 'บ'
-        else:
-            parts = body.split()
-            if len(parts) >= 3:
-                date_time = parts[0]
-                detail = ' '.join(parts[1:-1])
-                balance = parts[-1]
-        if date_time and detail and balance:
-            sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
-            save_sms_data(sms_dict)
+    # รองรับการดึงข้อมูลล่าสุด 7 รายการของ tag นั้น
     sms_list = sms_dict.get(tag, [])
     resp = jsonify(sms_list[-7:][::-1])
     resp.headers.add('Access-Control-Allow-Origin', '*')
