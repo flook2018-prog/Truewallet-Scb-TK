@@ -509,27 +509,27 @@ window.addEventListener('DOMContentLoaded', function() {
 // --- ดึงยอดคงเหลือ SCB สุมิธร์ คิมภิรานนท์ และ พลอยไพริน นามโคตร มาแสดงในกล่องใหม่ ---
 async function updateAccountBalanceBox() {
   try {
-    const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
+    const apiBase = 'https://xinon1565.up.railway.app';
+    const resp = await fetch(`${apiBase}/api/sms?tag=sumitkimphiranon&sender=027777777`);
     const data = await resp.json();
-    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    let smsList = Array.isArray(data.sms) ? data.sms : [];
+    let latest = smsList.length > 0 ? smsList[0] : null;
     let balance = latest && latest.balance ? latest.balance.replace(/[^\d.,]/g, '') : '0';
     document.getElementById('account-balance-info').innerText = balance + ' บาท';
-    // ถ้ามีข้อมูลล่าสุด ให้ไฟเป็นสีเขียว
-    document.getElementById('scb-status-light').style.background = latest ? 'lime' : '#ccc';
+    document.getElementById('scb-status-light').style.background = (data.status === 'connected') ? '#28a745' : '#ccc';
   } catch (e) {
     document.getElementById('account-balance-info').innerText = '0';
-    // ถ้า error ให้ไฟเป็นสีแดง
     document.getElementById('scb-status-light').style.background = 'red';
   }
   try {
-    const resp2 = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
+    const apiBase = 'https://xinon1565.up.railway.app';
+    const resp2 = await fetch(`${apiBase}/api/sms?tag=ploypairinnamkhot&sender=027777777`);
     const data2 = await resp2.json();
-    let smsList2 = Array.isArray(data2) ? data2 : (data2.sms_list || []);
-    let latest2 = smsList2.length > 0 ? smsList2[smsList2.length-1] : null;
+    let smsList2 = Array.isArray(data2.sms) ? data2.sms : [];
+    let latest2 = smsList2.length > 0 ? smsList2[0] : null;
     let balance2 = latest2 && latest2.balance ? latest2.balance.replace(/[^\d.,]/g, '') : '0';
     document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
-    document.getElementById('scb2-status-light').style.background = latest2 ? 'lime' : '#ccc';
+    document.getElementById('scb2-status-light').style.background = (data2.status === 'connected') ? '#28a745' : '#ccc';
   } catch (e) {
     document.getElementById('account-balance-info2').innerText = '0';
     document.getElementById('scb2-status-light').style.background = 'red';
