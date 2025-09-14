@@ -130,8 +130,12 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 <div id="top-bar">
   <div class="summary-card">
-    <h2>💰 ยอด Wallet วันนี้</h2>
-    <span id="wallet-info">0</span>
+    <h2>💰 Truewallet TK</h2>
+    <span id="tw-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
+    <div id="tw-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
+      <span id="tw-mobile">-</span><br>
+      <span id="tw-updated">-</span>
+    </div>
     <div style="margin-top:10px;text-align:center;">
       <button onclick="resetApproved()">รีเซทรายการอนุมัติ</button>
       <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
@@ -259,6 +263,36 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 
 <script>
+// --- ดึงยอด TrueMoney Wallet ผ่าน API แล้วแสดงผล ---
+async function fetchTruewalletBalance() {
+  try {
+    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer dce99fdf74189d0854c0eeb627c1f4d8'
+      }
+    });
+    if (!resp.ok) throw new Error('API Error');
+    const data = await resp.json();
+    if (data.status === 'ok' && data.data) {
+      // แปลงยอดจากสตางค์เป็นบาท
+      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
+      document.getElementById('tw-balance').innerText = balance + ' บาท';
+      document.getElementById('tw-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
+      document.getElementById('tw-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
+    } else {
+      document.getElementById('tw-balance').innerText = '-';
+      document.getElementById('tw-mobile').innerText = '-';
+      document.getElementById('tw-updated').innerText = '-';
+    }
+  } catch (e) {
+    document.getElementById('tw-balance').innerText = '-';
+    document.getElementById('tw-mobile').innerText = '-';
+    document.getElementById('tw-updated').innerText = '-';
+  }
+}
+setInterval(fetchTruewalletBalance, 10000); // อัปเดตทุก 10 วินาที
+fetchTruewalletBalance();
 // --- ซ่อนโลโก้ 2 อันหลังเข้าเว็บ 5 นาที ---
 window.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
