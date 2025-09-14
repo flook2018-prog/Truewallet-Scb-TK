@@ -1,3 +1,50 @@
+from flask import send_file
+# -------------------- Account Settings Backend --------------------
+import threading
+accounts_file = "accounts.json"
+accounts_lock = threading.Lock()
+
+def load_accounts():
+    try:
+        with open(accounts_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def save_accounts(accounts):
+    with accounts_lock:
+        with open(accounts_file, "w", encoding="utf-8") as f:
+            json.dump(accounts, f, ensure_ascii=False, indent=2)
+
+@app.route("/account_settings")
+def account_settings_page():
+    return send_file("templates/account_settings.html")
+
+@app.route("/api/accounts", methods=["GET", "POST", "DELETE"])
+def api_accounts():
+    if request.method == "GET":
+        return jsonify(load_accounts())
+    elif request.method == "POST":
+        data = request.get_json()
+        first_name = data.get("first_name", "").strip()
+        last_name = data.get("last_name", "").strip()
+        bank = data.get("bank", "").strip()
+        tag = data.get("tag", "").strip()
+        if not (first_name and last_name and bank and tag):
+            return jsonify({"error": "ข้อมูลไม่ครบ"}), 400
+        accounts = load_accounts()
+        accounts.append({"first_name": first_name, "last_name": last_name, "bank": bank, "tag": tag})
+        save_accounts(accounts)
+        return jsonify({"status": "success"})
+    elif request.method == "DELETE":
+        data = request.get_json()
+        idx = data.get("idx")
+        accounts = load_accounts()
+        if idx is not None and 0 <= idx < len(accounts):
+            accounts.pop(idx)
+            save_accounts(accounts)
+            return jsonify({"status": "deleted"})
+        return jsonify({"error": "ไม่พบบัญชี"}), 404
 # -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
 # (Moved below config and app = Flask(__name__))
 

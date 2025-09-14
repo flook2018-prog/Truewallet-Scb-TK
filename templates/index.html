@@ -3,6 +3,23 @@
 <head>
 <title>THKBot168 Dashboard</title>
 <style>
+/* ปุ่มตั้งค่าระบบบัญชี */
+.account-settings-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+  margin-left: 10px;
+}
+.account-settings-btn:hover {
+  background: #0056b3;
+}
 body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;padding:20px;color:#333;transition:all 0.3s}
 body.night{background:#121212;color:#eee}
 body.night table{border-color:#444}
@@ -70,7 +87,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
     </div>
   </div>
-  <div id="toggle-mode">🌞</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="account-settings-btn" onclick="window.location.href='/account_settings'">⚙️ ตั้งค่าระบบบัญชี</button>
+    <div id="toggle-mode">🌞</div>
+  </div>
 </div>
 
 <div id="dashboard">
@@ -145,7 +165,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="scb2-status-text">เชื่อมต่อ...</span>
       </div>
       <div style="margin-bottom:8px;">
-  <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
+  <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร </span>
       </div>
       <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
         <table id="scb2-sms-table" style="width:100%;border:none">

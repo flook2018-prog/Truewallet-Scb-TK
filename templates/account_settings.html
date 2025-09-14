@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ตั้งค่าระบบบัญชี</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #333; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 32px 24px; }
+    h2 { text-align: center; margin-bottom: 24px; }
+    form { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+    label { font-weight: bold; margin-bottom: 4px; }
+    input, select { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em; }
+    button { padding: 10px 0; border: none; border-radius: 8px; background: #007bff; color: #fff; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #0056b3; }
+    .account-list { margin-top: 24px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; }
+    tr:last-child td { border-bottom: none; }
+    .delete-btn { background: #dc3545; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 1em; }
+    .delete-btn:hover { background: #b71c1c; }
+    .back-btn { background: #6c757d; margin-bottom: 18px; }
+    .back-btn:hover { background: #495057; }
+    .tag-label { color: #007bff; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="back-btn" onclick="window.location.href='/'">← กลับหน้าแรก</button>
+    <h2>ตั้งค่าระบบบัญชีธนาคาร</h2>
+    <form id="account-form">
+      <div>
+        <label>ชื่อ</label>
+        <input type="text" id="first_name" required>
+      </div>
+      <div>
+        <label>นามสกุล</label>
+        <input type="text" id="last_name" required>
+      </div>
+      <div>
+        <label>ธนาคาร</label>
+        <select id="bank" required>
+          <option value="">-- เลือกธนาคาร --</option>
+          <option value="SCB">ไทยพาณิชย์ (SCB)</option>
+          <option value="KBANK">กสิกรไทย (KBANK)</option>
+          <option value="BBL">กรุงเทพ (BBL)</option>
+          <option value="KTB">กรุงไทย (KTB)</option>
+          <option value="BAY">กรุงศรี (BAY)</option>
+          <option value="TMB">ทหารไทย (TMB)</option>
+          <option value="TRUEWALLET">ทรูวอเลท</option>
+        </select>
+      </div>
+      <div>
+        <label>Tag (ใช้สำหรับเชื่อมโยง SMS)</label>
+        <input type="text" id="tag" required placeholder="เช่น ploypairinnamkhot">
+      </div>
+      <button type="submit">➕ เพิ่มบัญชี</button>
+    </form>
+    <div class="account-list">
+      <h3>บัญชีที่มีอยู่</h3>
+      <table id="accounts-table">
+        <thead>
+          <tr>
+            <th>ชื่อ</th>
+            <th>นามสกุล</th>
+            <th>ธนาคาร</th>
+            <th>Tag</th>
+            <th>ลบ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- บัญชีจะแสดงที่นี่ -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    async function fetchAccounts() {
+      const resp = await fetch('/api/accounts');
+      const accounts = await resp.json();
+      const tbody = document.querySelector('#accounts-table tbody');
+      tbody.innerHTML = '';
+      accounts.forEach((acc, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${acc.first_name}</td>
+          <td>${acc.last_name}</td>
+          <td>${acc.bank}</td>
+          <td class="tag-label">${acc.tag}</td>
+          <td><button class="delete-btn" onclick="deleteAccount(${idx})">ลบ</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    async function deleteAccount(idx) {
+      if (!confirm('คุณแน่ใจว่าต้องการลบบัญชีนี้?')) return;
+      await fetch('/api/accounts', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idx })
+      });
+      fetchAccounts();
+    }
+    document.getElementById('account-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const first_name = document.getElementById('first_name').value.trim();
+      const last_name = document.getElementById('last_name').value.trim();
+      const bank = document.getElementById('bank').value;
+      const tag = document.getElementById('tag').value.trim();
+      if (!first_name || !last_name || !bank || !tag) return;
+      await fetch('/api/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ first_name, last_name, bank, tag })
+      });
+      document.getElementById('account-form').reset();
+      fetchAccounts();
+    });
+    fetchAccounts();
+  </script>
+</body>
+</html>
