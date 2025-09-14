@@ -1,3 +1,71 @@
+# -------------------- Webhook TrueWallet (เชื่อมใหม่ ไม่กระทบของเดิม) --------------------
+@app.route("/truewallet/webhook_v2", methods=["POST"])
+def truewallet_webhook_v2():
+    try:
+        data = request.get_json(force=True, silent=True)
+        if not data:
+            log_with_time("[WEBHOOK ERROR] No JSON received (v2)")
+            return jsonify({"status":"error","message":"No JSON received"}), 400
+
+        message_jwt = data.get("message")
+        decoded = None
+        if message_jwt:
+            try:
+                decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
+            except Exception as e:
+                log_with_time("[JWT ERROR] /truewallet/webhook_v2", str(e))
+                decoded = data
+        else:
+            decoded = data
+
+        txid = decoded.get("transaction_id") or f"TX{len(transactions['new'])+len(transactions['approved'])+len(transactions['cancelled'])+1}"
+
+        if any(tx["id"] == txid for lst in transactions.values() for tx in lst):
+            return jsonify({"status":"success","message":"Transaction exists"}), 200
+
+        amount = int(decoded.get("amount",0))
+        sender_name = decoded.get("sender_name","-")
+        sender_mobile = decoded.get("sender_mobile","-")
+        name = f"{sender_name} / {sender_mobile}" if sender_mobile and sender_mobile != "-" else sender_name
+
+        event_type = decoded.get("event_type","ฝาก").upper()
+        bank_code = (decoded.get("channel") or "").upper()
+
+        if event_type=="P2P" or bank_code in ["TRUEWALLET","WALLET"]:
+            bank_name_th="ทรูวอเลท"
+        elif bank_code in BANK_MAP_TH:
+            bank_name_th=BANK_MAP_TH[bank_code]
+        elif bank_code:
+            bank_name_th=bank_code
+        else:
+            bank_name_th="-"
+
+        time_str = decoded.get("received_time") or datetime.utcnow().isoformat()
+        try:
+            tx_time_utc = datetime.fromisoformat(time_str)
+        except:
+            tx_time_utc = datetime.utcnow()
+
+        tx = {
+            "id": txid,
+            "event": event_type,
+            "amount": amount,
+            "amount_str": f"{amount/100:,.2f}",
+            "name": name,
+            "bank": bank_name_th,
+            "status": "new",
+            "time": tx_time_utc.isoformat(),
+            "slip_filename": None
+        }
+
+        transactions["new"].append(tx)
+        save_transactions()
+        log_with_time("[WEBHOOK RECEIVED] /truewallet/webhook_v2", tx)
+        return jsonify({"status":"success"}), 200
+
+    except Exception as e:
+        log_with_time("[WEBHOOK EXCEPTION] /truewallet/webhook_v2", str(e))
+        return jsonify({"status":"error","message":str(e)}), 500
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
