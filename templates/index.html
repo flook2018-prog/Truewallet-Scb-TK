@@ -629,17 +629,24 @@ setInterval(() => {
 
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
+// --- DEMO ONLY: เก็บสถานะรายการฝากวอเลทฝั่ง client ---
+let demoWalletList = [];
+let demoApprovedList = [];
+let demoCancelledList = [];
 
 // ดึงข้อมูลฝากวอเลทใหม่จาก backend proxy และแสดงในตาราง wallet-deposit-table
 async function fetchDepositWallets() {
+  // DEMO ONLY: โหลดข้อมูลครั้งแรกจาก backend แล้วเก็บไว้ในตัวแปร client
   try {
-    let resp = await fetch("/api/wallet_deposit_data");
-    let data = await resp.json();
-    let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
+    if (demoWalletList.length === 0 && demoApprovedList.length === 0 && demoCancelledList.length === 0) {
+      let resp = await fetch("/api/wallet_deposit_data");
+      let data = await resp.json();
+      demoWalletList = Array.isArray(data.new_orders) ? data.new_orders : [];
+    }
     let walletBody = document.querySelector("#wallet-deposit-table tbody");
     if (!walletBody) return;
     walletBody.innerHTML = "";
-    walletList.forEach(tx => {
+    demoWalletList.forEach(tx => {
       let row = walletBody.insertRow();
       row.insertCell(0).innerText = tx.event;
       row.insertCell(1).innerText = tx.amount_str;
@@ -650,13 +657,11 @@ async function fetchDepositWallets() {
       inputUser.value = tempUserData[tx.id] || tx.customer_user || "";
       inputUser.oninput = () => { tempUserData[tx.id] = inputUser.value; };
       userCell.appendChild(inputUser);
-      // Format time: 'วัน/เดือน/ปี เวลา' (remove +07:00 but keep timezone logic)
+      // Format time: 'วัน/เดือน/ปี เวลา'
       let rawTime = tx.time_str || tx.time || "-";
       let displayTime = rawTime;
       if (rawTime && rawTime !== "-") {
-        // Remove timezone part if present
         let t = rawTime.replace(/\+\d{2}:?\d{2}$/, "");
-        // Try to parse and format as DD/MM/YYYY HH:mm:ss
         let d = new Date(t);
         if (!isNaN(d.getTime())) {
           let pad = n => n.toString().padStart(2, '0');
@@ -667,7 +672,7 @@ async function fetchDepositWallets() {
       }
       row.insertCell(4).innerText = displayTime;
       row.insertCell(5).innerText = tx.bank || "-";
-      row.insertCell(6).innerText = "-"; // ไม่มีสลิป
+      row.insertCell(6).innerText = "-";
       let cell = row.insertCell(7);
       let btnApprove = document.createElement("button");
       btnApprove.className = "approve"; btnApprove.innerText = "อนุมัติ";
@@ -675,14 +680,30 @@ async function fetchDepositWallets() {
         let customer_user = inputUser.value.trim();
         alert("(Demo) กดอนุมัติ: " + tx.id + (customer_user ? " | user: " + customer_user : ""));
         delete tempUserData[tx.id];
+        // ย้ายไป approved (demo)
+        let idx = demoWalletList.findIndex(x => x.id === tx.id);
+        if (idx !== -1) {
+          let txCopy = {...tx, customer_user, status: 'approved'};
+          demoWalletList.splice(idx, 1);
+          demoApprovedList.unshift(txCopy);
+        }
         fetchDepositWallets();
+        renderDemoApprovedCancelled();
       };
       let btnCancel = document.createElement("button");
       btnCancel.className = "cancel"; btnCancel.innerText = "ยกเลิก";
       btnCancel.onclick = async () => {
         alert("(Demo) กดยกเลิก: " + tx.id + " (สถานะ: อนุมัติ / ยกเลิก)");
         delete tempUserData[tx.id];
+        // ย้ายไป cancelled (demo)
+        let idx = demoWalletList.findIndex(x => x.id === tx.id);
+        if (idx !== -1) {
+          let txCopy = {...tx, status: 'cancelled'};
+          demoWalletList.splice(idx, 1);
+          demoCancelledList.unshift(txCopy);
+        }
         fetchDepositWallets();
+        renderDemoApprovedCancelled();
       };
       cell.appendChild(btnApprove);
       cell.appendChild(btnCancel);
@@ -691,6 +712,73 @@ async function fetchDepositWallets() {
     let walletBody = document.querySelector("#wallet-deposit-table tbody");
     if (walletBody) walletBody.innerHTML = '<tr><td colspan="8">เกิดข้อผิดพลาดในการโหลดข้อมูลฝากวอเลท</td></tr>';
   }
+}
+
+// DEMO ONLY: render รายการอนุมัติ/ยกเลิก (client-side)
+function renderDemoApprovedCancelled() {
+  // Approved
+  let approvedBody = document.querySelector("#approved-orders-table tbody");
+  if (approvedBody) {
+    approvedBody.innerHTML = "";
+    demoApprovedList.forEach(tx => {
+      let row = approvedBody.insertRow();
+      row.insertCell(0).innerText = tx.event;
+      row.insertCell(1).innerText = tx.amount_str;
+      row.insertCell(2).innerText = tx.name || "-";
+      row.insertCell(3).innerText = tx.time_str || tx.time || "-";
+      row.insertCell(4).innerText = tx.bank || "-";
+      row.insertCell(5).innerText = "(Demo)";
+      row.insertCell(6).innerText = "(Demo)";
+      row.insertCell(7).innerText = tx.customer_user || "-";
+      row.insertCell(8).innerText = "-";
+      let restoreBtn = document.createElement("button");
+      restoreBtn.className = "restore"; restoreBtn.innerText = "คืนเป็น New";
+      restoreBtn.onclick = () => {
+        // คืนกลับไป wallet deposit
+        let idx = demoApprovedList.findIndex(x => x.id === tx.id);
+        if (idx !== -1) {
+          let txCopy = {...tx};
+          demoApprovedList.splice(idx, 1);
+          demoWalletList.unshift(txCopy);
+        }
+        fetchDepositWallets();
+        renderDemoApprovedCancelled();
+      };
+      row.insertCell(9).appendChild(restoreBtn);
+    });
+  }
+  // Cancelled
+  let cancelledBody = document.querySelector("#cancelled-orders-table tbody");
+  if (cancelledBody) {
+    cancelledBody.innerHTML = "";
+    demoCancelledList.forEach(tx => {
+      let row = cancelledBody.insertRow();
+      row.insertCell(0).innerText = tx.event;
+      row.insertCell(1).innerText = tx.amount_str;
+      row.insertCell(2).innerText = tx.name || "-";
+      row.insertCell(3).innerText = tx.time_str || tx.time || "-";
+      row.insertCell(4).innerText = tx.bank || "-";
+      row.insertCell(5).innerText = "(Demo)";
+      row.insertCell(6).innerText = "(Demo)";
+      row.insertCell(7).innerText = tx.customer_user || "-";
+      row.insertCell(8).innerText = "-";
+      let restoreBtn = document.createElement("button");
+      restoreBtn.className = "restore"; restoreBtn.innerText = "คืนเป็น New";
+      restoreBtn.onclick = () => {
+        // คืนกลับไป wallet deposit
+        let idx = demoCancelledList.findIndex(x => x.id === tx.id);
+        if (idx !== -1) {
+          let txCopy = {...tx};
+          demoCancelledList.splice(idx, 1);
+          demoWalletList.unshift(txCopy);
+        }
+        fetchDepositWallets();
+        renderDemoApprovedCancelled();
+      };
+      row.insertCell(9).appendChild(restoreBtn);
+    });
+  }
+}
 }
 
 // เรียกฟังก์ชันนี้หลัง fetchTransactions() ทุกครั้ง
@@ -867,8 +955,9 @@ async function resetCancelled(){
     fetchTransactions();
 }
 
-setInterval(fetchTransactions,3000);
+setInterval(() => { renderDemoApprovedCancelled(); fetchTransactions(); }, 3000);
 fetchTransactions();
+renderDemoApprovedCancelled();
 </script>
 </body>
 </html>
