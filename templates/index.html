@@ -581,7 +581,7 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
   const statusText = document.getElementById(statusTextId);
   try {
     // URL ของ API ใหม่ (เช่น http://localhost:5001/api/sms หรือ URL ที่ deploy)
-    const apiBase = 'http://localhost:5001'; // เปลี่ยนเป็น URL จริงถ้า deploy
+  const apiBase = 'https://xinon1565.up.railway.app'; // production API
     const resp = await fetch(`${apiBase}/api/sms?tag=${tag}&sender=027777777`);
     const data = await resp.json();
     if (data.status === 'connected') {
