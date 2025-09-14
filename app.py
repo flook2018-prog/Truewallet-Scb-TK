@@ -100,7 +100,27 @@ ip_approver_map = {}
 DATA_FILE = "transactions_data.json"
 LOG_FILE = "transactions.log"
 
+# --- ฟังก์ชันโหลด/บันทึกธุรกรรม ---
+def load_transactions():
+    global transactions
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                for k in ["new", "approved", "cancelled"]:
+                    transactions[k] = data.get(k, [])
+        except Exception as e:
+            print("Error loading transactions:", e)
 
+def save_transactions():
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(transactions, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("Error saving transactions:", e)
+
+# โหลดธุรกรรมจากไฟล์เมื่อเริ่มต้น
+load_transactions()
 
 deposit_wallets = []  # รายการฝากวอเลทใหม่
 

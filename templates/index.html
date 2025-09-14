@@ -122,8 +122,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
-<!-- โลโก้หัวเว็บ (2 โลโก้, ขนาดเหมาะสม, อยู่กลาง) -->
-<div class="header-logos">
+<!-- โลโก้หัวเว็บ (2 โลโก้, ขนาดเหมาะสม, อยู่กลาง, ซ่อนหลัง 5 นาที) -->
+<div class="header-logos" id="header-logos">
   <img src="{{ url_for('static', filename='5e9e7571-ef8d-4e7c-9e51-6b50221aceec.png') }}" alt="Logo1" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
   <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="NGOX Logo" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
 </div>
@@ -386,10 +386,10 @@ async function fetchTruewalletBalance() {
 }
 setInterval(fetchTruewalletBalance, 10000); // อัปเดตทุก 10 วินาที
 fetchTruewalletBalance();
-// --- ซ่อนโลโก้ 2 อันหลังเข้าเว็บ 5 นาที ---
+// --- ซ่อนโลโก้หัวเว็บหลังเข้าเว็บ 5 นาที ---
 window.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
-    var logos = document.querySelector('.header-logos');
+    var logos = document.getElementById('header-logos');
     if (logos) logos.style.display = 'none';
   }, 300000); // 5 นาที = 300,000 ms
 });
@@ -645,7 +645,6 @@ async function fetchTransactions(){
         btnApprove.className="approve"; btnApprove.innerText="อนุมัติ";
         btnApprove.onclick=async ()=>{
           let customer_user = inputUser.value.trim();
-          if(!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
           await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id,customer_user})});
           delete tempUserData[tx.id];
           fetchTransactions();
