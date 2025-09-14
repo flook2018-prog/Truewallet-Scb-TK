@@ -6,3 +6,4 @@ eventlet==0.33.3
 python-dotenv==1.0.1
 psycopg2-binary==2.9.7
 pytz
+requests
