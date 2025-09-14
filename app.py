@@ -37,10 +37,18 @@ def wallet_deposit_data():
         # ถ้า data เป็น dict ที่มี message (JWT หรือ error string)
         if "message" in data:
             token = data["message"]
-            # ถ้า message ไม่ใช่ JWT (เช่น Application not found) ให้ return new_orders ว่าง
+            # ถ้า message ไม่ใช่ JWT (เช่น Application not found) ให้ fallback ไปอ่านไฟล์ local
             if not isinstance(token, str) or token.count('.') != 2:
                 print("WALLET DEPOSIT: message is not JWT, got:", token)
-                return jsonify({"new_orders": []})
+                # fallback: อ่าน new_orders จากไฟล์ local
+                try:
+                    with open(DATA_FILE, "r", encoding="utf-8") as f:
+                        local_data = json.load(f)
+                        new_orders = local_data.get("new", [])
+                        return jsonify({"new_orders": new_orders})
+                except Exception as e:
+                    print("WALLET DEPOSIT: fallback local error", e)
+                    return jsonify({"new_orders": []})
             import jwt
             try:
                 decoded = jwt.decode(token, "defbe102c9f4e9eaad1e16de7f8efe13", algorithms=["HS256"], options={"verify_iat": False})
@@ -59,9 +67,25 @@ def wallet_deposit_data():
             except Exception as e:
                 print("WALLET DEPOSIT ERROR: JWT decode", e)
                 print("RAW MESSAGE:", token)
-                return jsonify({"new_orders": []})
+                # fallback: อ่าน new_orders จากไฟล์ local
+                try:
+                    with open(DATA_FILE, "r", encoding="utf-8") as f:
+                        local_data = json.load(f)
+                        new_orders = local_data.get("new", [])
+                        return jsonify({"new_orders": new_orders})
+                except Exception as e2:
+                    print("WALLET DEPOSIT: fallback local error", e2)
+                    return jsonify({"new_orders": []})
         print("WALLET DEPOSIT ERROR: No data", data)
-        return jsonify({"new_orders": []})
+        # fallback: อ่าน new_orders จากไฟล์ local
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                local_data = json.load(f)
+                new_orders = local_data.get("new", [])
+                return jsonify({"new_orders": new_orders})
+        except Exception as e:
+            print("WALLET DEPOSIT: fallback local error", e)
+            return jsonify({"new_orders": []})
     except Exception as e:
         print("WALLET DEPOSIT ERROR: Outer", e)
         return jsonify({'error': str(e)}), 500
