@@ -1,14 +1,3 @@
-# Proxy endpoint สำหรับ wallet deposit (GET ข้อมูลจาก API กลาง)
-@app.route('/api/wallet_deposit_data')
-def wallet_deposit_data():
-    try:
-        url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
-        headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
-        resp = requests.get(url, headers=headers, timeout=10)
-        return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
@@ -25,6 +14,17 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Proxy endpoint สำหรับ wallet deposit (GET ข้อมูลจาก API กลาง)
+@app.route('/api/wallet_deposit_data')
+def wallet_deposit_data():
+    try:
+        url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
+        headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
+        resp = requests.get(url, headers=headers, timeout=10)
+        return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 accounts_file = "accounts.json"
 accounts_lock = threading.Lock()
