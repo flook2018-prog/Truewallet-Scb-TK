@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>บัญชี SCB (SMS)</h1>
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+  <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ -->
+  <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="scb-status-text">เชื่อมต่อ...</span>
+    </div>
+    <div style="margin-bottom:8px;">
+      <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
+    </div>
+    <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+      <table id="scb-sms-table" style="width:100%;border:none">
+        <thead>
+          <tr>
+            <th>วันที่/เวลา</th>
+            <th>รายละเอียด</th>
+            <th>ยอดคงเหลือ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- กล่องขวา: พลอยไพริน นามโคตร -->
+  <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="scb2-status-text">เชื่อมต่อ...</span>
+    </div>
+    <div style="margin-bottom:8px;">
+      <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
+    </div>
+    <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+      <table id="scb2-sms-table" style="width:100%;border:none">
+        <thead>
+          <tr>
+            <th>วันที่/เวลา</th>
+            <th>รายละเอียด</th>
+            <th>ยอดคงเหลือ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
+  const statusLight = document.getElementById(statusLightId);
+  const statusText = document.getElementById(statusTextId);
+  try {
+    const resp = await fetch(`/api/sms?tag=${tag}&sender=027777777`);
+    const data = await resp.json();
+    if (data.status === 'connected') {
+      statusLight.style.background = '#28a745';
+      statusText.innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      statusLight.style.background = '#ccc';
+      statusText.innerText = 'เชื่อมต่อ...';
+    }
+    let smsList = Array.isArray(data.sms) ? data.sms : [];
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '';
+    smsList.forEach(sms => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${sms.date_time || '-'}</td><td>${sms.detail || sms.sms || '-'}</td><td>${sms.balance || '-'}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    statusLight.style.background = '#dc3545';
+    statusText.innerText = 'เชื่อมต่อขัดข้อง';
+    const tbody = document.querySelector(`#${tableId} tbody`);
+    tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
+  }
+}
+window.addEventListener('DOMContentLoaded', () => {
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
+});
+setInterval(() => {
+  fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
+  fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
+}, 3000);
+</script>
+{% endblock %}

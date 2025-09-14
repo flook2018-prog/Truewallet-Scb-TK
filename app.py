@@ -1,3 +1,7 @@
+# -------------------- SCB SMS PAGE --------------------
+@app.route("/scb_sms")
+def scb_sms_page():
+    return render_template("scb_sms.html")
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
