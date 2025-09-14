@@ -514,7 +514,7 @@ let tempUserData = {};
 // ดึงข้อมูลฝากวอเลทใหม่จาก backend proxy และแสดงในตาราง wallet-deposit-table
 async function fetchDepositWallets() {
   try {
-    let resp = await fetch("/api/proxy_wallet_deposit");
+    let resp = await fetch("/api/wallet_deposit_data");
     let data = await resp.json();
     let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
     let walletBody = document.querySelector("#wallet-deposit-table tbody");
