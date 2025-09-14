@@ -34,10 +34,14 @@ def wallet_deposit_data():
         # ถ้า data เป็น list (อนาคต), return ได้เลย
         if isinstance(data, list):
             return jsonify({"new_orders": data})
-        # ถ้า data เป็น dict ที่มี message (JWT)
+        # ถ้า data เป็น dict ที่มี message (JWT หรือ error string)
         if "message" in data:
-            import jwt
             token = data["message"]
+            # ถ้า message ไม่ใช่ JWT (เช่น Application not found) ให้ return new_orders ว่าง
+            if not isinstance(token, str) or token.count('.') != 2:
+                print("WALLET DEPOSIT: message is not JWT, got:", token)
+                return jsonify({"new_orders": []})
+            import jwt
             try:
                 decoded = jwt.decode(token, "defbe102c9f4e9eaad1e16de7f8efe13", algorithms=["HS256"], options={"verify_iat": False})
                 tx = {
@@ -55,9 +59,9 @@ def wallet_deposit_data():
             except Exception as e:
                 print("WALLET DEPOSIT ERROR: JWT decode", e)
                 print("RAW MESSAGE:", token)
-                return jsonify({"error": f"JWT decode error: {str(e)}", "raw_message": token}), 500
+                return jsonify({"new_orders": []})
         print("WALLET DEPOSIT ERROR: No data", data)
-        return jsonify({"error": "No data", "data": data}), 500
+        return jsonify({"new_orders": []})
     except Exception as e:
         print("WALLET DEPOSIT ERROR: Outer", e)
         return jsonify({'error': str(e)}), 500
