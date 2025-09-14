@@ -146,15 +146,15 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
   <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;">
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
-    <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
+  <div style="font-size:1.5em;font-weight:bold;color:#8000ff;">SCB</div>
+  <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
   <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;">
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
-    <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
+  <div style="font-size:1.5em;font-weight:bold;color:#8000ff;">SCB</div>
+  <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่อง Truewallet BB ENJ -->
@@ -401,8 +401,8 @@ async function updateAccountBalanceBox() {
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
-    let balance = latest && latest.balance ? latest.balance : '0';
-    document.getElementById('account-balance-info').innerText = balance;
+  let balance = latest && latest.balance ? latest.balance.replace(/[^\d.,]/g, '') : '0';
+  document.getElementById('account-balance-info').innerText = balance + ' บาท';
   } catch (e) {
     document.getElementById('account-balance-info').innerText = '0';
   }
@@ -411,8 +411,8 @@ async function updateAccountBalanceBox() {
     const data2 = await resp2.json();
     let smsList2 = Array.isArray(data2) ? data2 : (data2.sms_list || []);
     let latest2 = smsList2.length > 0 ? smsList2[smsList2.length-1] : null;
-    let balance2 = latest2 && latest2.balance ? latest2.balance : '0';
-    document.getElementById('account-balance-info2').innerText = balance2;
+  let balance2 = latest2 && latest2.balance ? latest2.balance.replace(/[^\d.,]/g, '') : '0';
+  document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
   } catch (e) {
     document.getElementById('account-balance-info2').innerText = '0';
   }
