@@ -155,6 +155,15 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
+  <!-- กล่อง Truewallet BB ENJ -->
+  <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;">
+    <h2>🪙 Truewallet BB ENJ</h2>
+    <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
+    <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
+      <span id="tw-bb-mobile">-</span><br>
+      <span id="tw-bb-updated">-</span>
+    </div>
+  </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button class="account-settings-btn" onclick="window.location.href='/account_settings'">⚙️ ตั้งค่าระบบบัญชี</button>
     <div id="toggle-mode">🌞</div>
@@ -263,6 +272,35 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 
 <script>
+// --- ดึงยอด Truewallet BB ENJ ผ่าน API แล้วแสดงผล ---
+async function fetchTruewalletBBBalance() {
+  try {
+    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer 4cb88e53852339a9257c6fa1dccdb6af'
+      }
+    });
+    if (!resp.ok) throw new Error('API Error');
+    const data = await resp.json();
+    if (data.status === 'ok' && data.data) {
+      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
+      document.getElementById('tw-bb-balance').innerText = balance + ' บาท';
+      document.getElementById('tw-bb-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
+      document.getElementById('tw-bb-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
+    } else {
+      document.getElementById('tw-bb-balance').innerText = '-';
+      document.getElementById('tw-bb-mobile').innerText = '-';
+      document.getElementById('tw-bb-updated').innerText = '-';
+    }
+  } catch (e) {
+    document.getElementById('tw-bb-balance').innerText = '-';
+    document.getElementById('tw-bb-mobile').innerText = '-';
+    document.getElementById('tw-bb-updated').innerText = '-';
+  }
+}
+setInterval(fetchTruewalletBBBalance, 10000); // อัปเดตทุก 10 วินาที
+fetchTruewalletBBBalance();
 // --- ดึงยอด TrueMoney Wallet ผ่าน API แล้วแสดงผล ---
 async function fetchTruewalletBalance() {
   try {
