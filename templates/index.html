@@ -680,7 +680,7 @@ async function fetchDepositWallets() {
       let btnCancel = document.createElement("button");
       btnCancel.className = "cancel"; btnCancel.innerText = "ยกเลิก";
       btnCancel.onclick = async () => {
-        alert("(Demo) กดยกเลิก: " + tx.id);
+        alert("(Demo) กดยกเลิก: " + tx.id + " (สถานะ: อนุมัติ / ยกเลิก)");
         delete tempUserData[tx.id];
         fetchDepositWallets();
       };
