@@ -3,48 +3,6 @@
 <head>
 <title>THKBot168 Dashboard</title>
 <style>
-.header-logos img:first-child {
-  height: 216px;
-}
-/* โลโก้หัวเว็บ */
-/* โลโก้หัวเว็บ (ขนาดใหญ่ 3 เท่าและอยู่กลาง) */
-.header-logos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 48px;
-  margin-bottom: 16px;
-  margin-top: 16px;
-}
-.header-logos img {
-  height: 144px;
-  width: auto;
-  object-fit: contain;
-  background: transparent !important;
-  border-radius: 12px;
-  box-shadow: none;
-}
-.header-logos .sk-logo {
-  height: 108px;
-  background: transparent !important;
-}
-/* ปุ่มตั้งค่าระบบบัญชี */
-.account-settings-btn {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 18px;
-  font-size: 1em;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.2s;
-  margin-left: 10px;
-}
-.account-settings-btn:hover {
-  background: #0056b3;
-}
 body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;padding:20px;color:#333;transition:all 0.3s}
 body.night{background:#121212;color:#eee}
 body.night table{border-color:#444}
@@ -55,29 +13,8 @@ body.night .summary-card{background:#1e1e1e;color:#eee;box-shadow:0 4px 12px rgb
 body.night td{background-color:#1e1e1e;color:#eee;transition:background-color 0.3s;}
 h1{text-align:center;margin-bottom:20px}
 h2{margin:10px 0}
-/* ปรับขนาดและตำแหน่งกล่อง summary-card */
-#top-bar{
-  display:flex;
-  justify-content:flex-start;
-  align-items:flex-start;
-  flex-wrap:wrap;
-  margin-bottom:20px;
-  gap:10px;
-  position:relative;
-}
-.summary-card{
-  background:#fff;
-  border-radius:12px;
-  padding:15px 24px 15px 24px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
-  min-width:0;
-  width:auto;
-  max-width:420px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  transition:all 0.3s;
-}
+#top-bar{display:flex;justify-content:space-between;flex-wrap:wrap;margin-bottom:20px;gap:10px;position:relative}
+.summary-card{background:#fff;border-radius:12px;padding:15px;box-shadow:0 4px 12px rgba(0,0,0,0.08);min-width:250px;flex:1;transition:all 0.3s}
 .summary-card h2{font-size:1.2em;text-align:center;margin-bottom:10px;}
 .summary-card span#wallet-info{
     display:block;
@@ -100,9 +37,7 @@ body.night .summary-card span#wallet-info::after{
 #bottom-row{margin-top:20px}
 .scroll-box{max-height:400px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:10px;scroll-behavior:smooth;transition:all 0.3s}
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px;text-align:center;font-size:0.95em;border-bottom:1px solid #ddd;}
-thead th {white-space:nowrap;word-break:normal;max-width:none;}
-tbody td {word-break:break-all;max-width:180px;overflow:hidden;text-overflow:ellipsis;}
+th,td{padding:10px;text-align:center;font-size:0.95em;border-bottom:1px solid #ddd}
 th{position:sticky;top:0;background:#f8f9fa;z-index:2}
 tr:hover{background-color:#f1f5f9;transition:0.3s}
 button{padding:5px 10px;border:none;border-radius:6px;cursor:pointer;transition:0.3s;margin:2px}
@@ -122,61 +57,18 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
-<div class="header-logos">
-  <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="Ngox Logo">
-  <img src="{{ url_for('static', filename='5e9e7571-ef8d-4e7c-9e51-6b50221aceec.png') }}" alt="SK Logo" class="sk-logo">
-</div>
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
   <div class="summary-card">
-    <h2>💰 Truewallet TK</h2>
-    <span id="tw-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
-    <div id="tw-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
-      <span id="tw-mobile">-</span><br>
-      <span id="tw-updated">-</span>
-    </div>
+    <h2>💰 ยอด Wallet วันนี้</h2>
+    <span id="wallet-info">0</span>
     <div style="margin-top:10px;text-align:center;">
       <button onclick="resetApproved()">รีเซทรายการอนุมัติ</button>
       <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
     </div>
   </div>
-  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
-  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;">
-    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
-    <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
-    <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
-  </div>
-  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
-  <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;">
-    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
-    <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
-    <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
-  </div>
-  <!-- กล่อง Truewallet BB ENJ -->
-  <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;">
-    <h2>🪙 Truewallet BB ENJ</h2>
-    <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
-    <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
-      <span id="tw-bb-mobile">-</span><br>
-      <span id="tw-bb-updated">-</span>
-    </div>
-  </div>
-  <!-- กล่อง Truewallet BP -->
-  <div class="summary-card" id="tw-bp-box" style="max-width:420px;min-width:180px;">
-    <h2>🧧 Truewallet BP</h2>
-    <span id="tw-bp-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
-    <div id="tw-bp-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
-      <span id="tw-bp-mobile">-</span><br>
-      <span id="tw-bp-updated">-</span>
-    </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="account-settings-btn" onclick="window.location.href='/account_settings'">⚙️ ตั้งค่าระบบบัญชี</button>
-    <div id="toggle-mode">🌞</div>
-  </div>
+  <div id="toggle-mode">🌞</div>
 </div>
 
 <div id="dashboard">
@@ -281,142 +173,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 
 <script>
-// --- ดึงยอด Truewallet BP ผ่าน API แล้วแสดงผล ---
-async function fetchTruewalletBPBalance() {
-  try {
-    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer 2ecade3f36166b2b9858e281e95c8560'
-      }
-    });
-    if (!resp.ok) throw new Error('API Error');
-    const data = await resp.json();
-    if (data.status === 'ok' && data.data) {
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-bp-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-bp-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-bp-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
-    } else {
-      document.getElementById('tw-bp-balance').innerText = '-';
-      document.getElementById('tw-bp-mobile').innerText = '-';
-      document.getElementById('tw-bp-updated').innerText = '-';
-    }
-  } catch (e) {
-    document.getElementById('tw-bp-balance').innerText = '-';
-    document.getElementById('tw-bp-mobile').innerText = '-';
-    document.getElementById('tw-bp-updated').innerText = '-';
-  }
-}
-setInterval(fetchTruewalletBPBalance, 10000); // อัปเดตทุก 10 วินาที
-fetchTruewalletBPBalance();
-// --- ดึงยอด Truewallet BB ENJ ผ่าน API แล้วแสดงผล ---
-async function fetchTruewalletBBBalance() {
-  try {
-    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer 4cb88e53852339a9257c6fa1dccdb6af'
-      }
-    });
-    if (!resp.ok) throw new Error('API Error');
-    const data = await resp.json();
-    if (data.status === 'ok' && data.data) {
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-bb-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-bb-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-bb-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
-    } else {
-      document.getElementById('tw-bb-balance').innerText = '-';
-      document.getElementById('tw-bb-mobile').innerText = '-';
-      document.getElementById('tw-bb-updated').innerText = '-';
-    }
-  } catch (e) {
-    document.getElementById('tw-bb-balance').innerText = '-';
-    document.getElementById('tw-bb-mobile').innerText = '-';
-    document.getElementById('tw-bb-updated').innerText = '-';
-  }
-}
-setInterval(fetchTruewalletBBBalance, 10000); // อัปเดตทุก 10 วินาที
-fetchTruewalletBBBalance();
-// --- ดึงยอด TrueMoney Wallet ผ่าน API แล้วแสดงผล ---
-async function fetchTruewalletBalance() {
-  try {
-    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer dce99fdf74189d0854c0eeb627c1f4d8'
-      }
-    });
-    if (!resp.ok) throw new Error('API Error');
-    const data = await resp.json();
-    if (data.status === 'ok' && data.data) {
-      // แปลงยอดจากสตางค์เป็นบาท
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
-    } else {
-      document.getElementById('tw-balance').innerText = '-';
-      document.getElementById('tw-mobile').innerText = '-';
-      document.getElementById('tw-updated').innerText = '-';
-    }
-  } catch (e) {
-    document.getElementById('tw-balance').innerText = '-';
-    document.getElementById('tw-mobile').innerText = '-';
-    document.getElementById('tw-updated').innerText = '-';
-  }
-}
-setInterval(fetchTruewalletBalance, 10000); // อัปเดตทุก 10 วินาที
-fetchTruewalletBalance();
-// --- ซ่อนโลโก้ 2 อันหลังเข้าเว็บ 5 นาที ---
-window.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
-    var logos = document.querySelector('.header-logos');
-    if (logos) logos.style.display = 'none';
-  }, 300000); // 5 นาที = 300,000 ms
-});
-// --- ดึงยอดคงเหลือ SCB สุมิธร์ คิมภิรานนท์ และ พลอยไพริน นามโคตร มาแสดงในกล่องใหม่ ---
-async function updateAccountBalanceBox() {
-  try {
-    const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
-    const data = await resp.json();
-    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
-    let balance = latest && latest.balance ? latest.balance : '0';
-    document.getElementById('account-balance-info').innerText = balance;
-  } catch (e) {
-    document.getElementById('account-balance-info').innerText = '0';
-  }
-  try {
-    const resp2 = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
-    const data2 = await resp2.json();
-    let smsList2 = Array.isArray(data2) ? data2 : (data2.sms_list || []);
-    let latest2 = smsList2.length > 0 ? smsList2[smsList2.length-1] : null;
-    let balance2 = latest2 && latest2.balance ? latest2.balance : '0';
-    document.getElementById('account-balance-info2').innerText = balance2;
-  } catch (e) {
-    document.getElementById('account-balance-info2').innerText = '0';
-  }
-}
-setInterval(updateAccountBalanceBox, 3000);
-updateAccountBalanceBox();
-// --- ปุ่มเปิด/ปิดโหมดกลางคืน ---
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleModeBtn = document.getElementById('toggle-mode');
-  toggleModeBtn.addEventListener('click', function() {
-    document.body.classList.toggle('night');
-    if(document.body.classList.contains('night')) {
-      toggleModeBtn.textContent = '🌙';
-    } else {
-      toggleModeBtn.textContent = '🌞';
-    }
-  });
-});
 // --- ดึงข้อมูล SCB สุมิธร์ มาแสดงในกล่อง SCB พลอยไพริน (copy data) ---
 async function fetchScbSummaryBox() {
   try {
-  const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
+    const resp = await fetch(`/api/sms?tag=scbtk168&sender=027777777`);
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     if (smsList.length > 5) smsList = smsList.slice(-5);
@@ -498,190 +258,143 @@ setInterval(() => {
 let tempUserData = {};
 
 async function fetchTransactions(){
-  try {
-    let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer defbe102c9f4e9eaad1e16de7f8efe13"
-      }
-    });
-    let data = await resp.json();
+    let resp=await fetch("/get_transactions"); 
+    let data=await resp.json();
 
-    // กำหนด wallet_daily_total ถ้ามี
-    if (data.wallet_daily_total !== undefined && document.getElementById("wallet-info")) {
-      document.getElementById("wallet-info").innerText = data.wallet_daily_total;
-    }
+    document.getElementById("wallet-info").innerText = data.wallet_daily_total;
 
     // daily summary
     let dailyBody = document.querySelector("#daily-summary tbody");
-    if (dailyBody && Array.isArray(data.daily_summary)) {
-      dailyBody.innerHTML="";
-      let last5 = data.daily_summary.slice(-5);
-      last5.forEach(d=>{
+    dailyBody.innerHTML="";
+    let last5 = data.daily_summary.slice(-5);
+    last5.forEach(d=>{
         let row = dailyBody.insertRow();
         row.insertCell(0).innerText=d.date;
         row.insertCell(1).innerText=d.total;
-      });
-    }
+    });
 
     function renderSlip(tx){
-      let fileInput = `<input type="file" onchange="uploadSlip(event,'${tx.id}')">`;
-      let pasteArea = `<div class="paste-area" contenteditable="true" onpaste="handlePaste(event,'${tx.id}')">วางรูปที่นี่ (Ctrl+V)</div>`;
-      let deleteBtn = tx.slip_filename ? `<button class="delete-slip" onclick="deleteSlip('${tx.id}')">ลบรูป</button>` : "";
-      if(tx.slip_filename){
-        return `<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>` + pasteArea + deleteBtn;
-      } else {
-        return fileInput + pasteArea;
-      }
+        let fileInput = `<input type="file" onchange="uploadSlip(event,'${tx.id}')">`;
+        let pasteArea = `<div class="paste-area" contenteditable="true" onpaste="handlePaste(event,'${tx.id}')">วางรูปที่นี่ (Ctrl+V)</div>`;
+        let deleteBtn = tx.slip_filename ? `<button class="delete-slip" onclick="deleteSlip('${tx.id}')">ลบรูป</button>` : "";
+        if(tx.slip_filename){
+            return `<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>` + pasteArea + deleteBtn;
+        } else {
+            return fileInput + pasteArea;
+        }
     }
 
     // New Orders
     let newBody = document.querySelector("#new-orders-table tbody");
-    if (newBody && Array.isArray(data.new_orders)) {
-      newBody.innerHTML="";
-      data.new_orders.forEach(tx=>{
+    newBody.innerHTML="";
+    data.new_orders.forEach(tx=>{
         let row=newBody.insertRow();
         row.insertCell(0).innerText=tx.event;
-        try {
-          let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
-            method: "GET",
-            headers: {
-              "Authorization": "Bearer defbe102c9f4e9eaad1e16de7f8efe13"
-            }
-          });
-          if (!resp.ok) {
-            let msg = `HTTP ${resp.status} ${resp.statusText}`;
-            throw new Error(msg);
-          }
-          let data;
-          try {
-            data = await resp.json();
-          } catch(jsonErr) {
-            throw new Error("JSON parse error: " + jsonErr.message);
-          }
+        row.insertCell(1).innerText=tx.amount_str;
+        row.insertCell(2).innerText=tx.name||"-";
 
-          // กำหนด wallet_daily_total ถ้ามี
-          if (data.wallet_daily_total !== undefined && document.getElementById("wallet-info")) {
-            document.getElementById("wallet-info").innerText = data.wallet_daily_total;
-          }
+        let userCell = row.insertCell(3);
+        let inputUser = document.createElement("input");
+        inputUser.className="customer-user";
+        inputUser.value=tempUserData[tx.id] || tx.customer_user || "";
+        inputUser.oninput=()=>{ tempUserData[tx.id] = inputUser.value; };
+        userCell.appendChild(inputUser);
 
-          // daily summary
-          let dailyBody = document.querySelector("#daily-summary tbody");
-          if (dailyBody && Array.isArray(data.daily_summary)) {
-            dailyBody.innerHTML="";
-            let last5 = data.daily_summary.slice(-5);
-            last5.forEach(d=>{
-              let row = dailyBody.insertRow();
-              row.insertCell(0).innerText=d.date;
-              row.insertCell(1).innerText=d.total;
-            });
-          }
+        row.insertCell(4).innerText=tx.time_str||"-";
+        row.insertCell(5).innerText=tx.bank||"-";
+        row.insertCell(6).innerHTML=renderSlip(tx);
 
-          function renderSlip(tx){
-            let fileInput = `<input type="file" onchange="uploadSlip(event,'${tx.id}')">`;
-            let pasteArea = `<div class="paste-area" contenteditable="true" onpaste="handlePaste(event,'${tx.id}')">วางรูปที่นี่ (Ctrl+V)</div>`;
-            let deleteBtn = tx.slip_filename ? `<button class="delete-slip" onclick="deleteSlip('${tx.id}')">ลบรูป</button>` : "";
-            if(tx.slip_filename){
-              return `<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>` + pasteArea + deleteBtn;
-            } else {
-              return fileInput + pasteArea;
-            }
-          }
+        let cell=row.insertCell(7);
+        let btnApprove=document.createElement("button");
+        btnApprove.className="approve"; btnApprove.innerText="อนุมัติ";
+        btnApprove.onclick=async ()=>{
+            let customer_user = inputUser.value.trim();
+            if(!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
+            await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id,customer_user})});
+            delete tempUserData[tx.id];
+            fetchTransactions();
+        };
+        let btnCancel=document.createElement("button");
+        btnCancel.className="cancel"; btnCancel.innerText="ยกเลิก";
+        btnCancel.onclick=async ()=>{
+            await fetch("/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});
+            delete tempUserData[tx.id];
+            fetchTransactions();
+        };
+        cell.appendChild(btnApprove);
+        cell.appendChild(btnCancel);
+    });
 
-          // New Orders
-          let newBody = document.querySelector("#new-orders-table tbody");
-          if (newBody && Array.isArray(data.new_orders)) {
-            newBody.innerHTML="";
-            data.new_orders.forEach(tx=>{
-              let row=newBody.insertRow();
-              row.insertCell(0).innerText=tx.event;
-              row.insertCell(1).innerText=tx.amount_str;
-              row.insertCell(2).innerText=tx.name||"-";
+    // Approved Orders
+    let approvedBody=document.querySelector("#approved-orders-table tbody");
+    approvedBody.innerHTML="";
+    data.approved_orders.forEach(tx=>{
+        let row=approvedBody.insertRow();
+        row.insertCell(0).innerText=tx.event;
+        row.insertCell(1).innerText=tx.amount_str;
+        row.insertCell(2).innerText=tx.name||"-";
+        row.insertCell(3).innerText=tx.time_str||"-";
+        row.insertCell(4).innerText=tx.bank||"-";
+        row.insertCell(5).innerText=tx.approver_name||"-";
+        row.insertCell(6).innerText=tx.approved_time_str||"-";
+        row.insertCell(7).innerText=tx.customer_user||"-";
+        row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
+        let restoreBtn=document.createElement("button");
+        restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
+        restoreBtn.onclick=async ()=>{if(!confirm("คุณแน่ใจว่าจะคืนรายการนี้เป็น New?")) return;await fetch("/restore",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});fetchTransactions();};
+        row.insertCell(9).appendChild(restoreBtn);
+    });
 
-              let userCell = row.insertCell(3);
-              let inputUser = document.createElement("input");
-              inputUser.className="customer-user";
-              inputUser.value=tempUserData[tx.id] || tx.customer_user || "";
-              inputUser.oninput=()=>{ tempUserData[tx.id] = inputUser.value; };
-              userCell.appendChild(inputUser);
+    // Cancelled Orders
+    let cancelledBody=document.querySelector("#cancelled-orders-table tbody");
+    cancelledBody.innerHTML="";
+    data.cancelled_orders.forEach(tx=>{
+        let row=cancelledBody.insertRow();
+        row.insertCell(0).innerText=tx.event;
+        row.insertCell(1).innerText=tx.amount_str;
+        row.insertCell(2).innerText=tx.name||"-";
+        row.insertCell(3).innerText=tx.time_str||"-";
+        row.insertCell(4).innerText=tx.bank||"-";
+        row.insertCell(5).innerText=tx.canceler_name||"-";
+        row.insertCell(6).innerText=tx.cancelled_time_str||"-";
+        row.insertCell(7).innerText=tx.customer_user||"-";
+        row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
+        let restoreBtn=document.createElement("button");
+        restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
+        restoreBtn.onclick=async ()=>{if(!confirm("คุณแน่ใจว่าจะคืนรายการนี้เป็น New?")) return;await fetch("/restore",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});fetchTransactions();};
+        row.insertCell(9).appendChild(restoreBtn);
+    });
+}
 
-              row.insertCell(4).innerText=tx.time_str||"-";
-              row.insertCell(5).innerText=tx.bank||"-";
-              row.insertCell(6).innerHTML=renderSlip(tx);
+async function uploadSlip(event, txid){
+    const file = event.target.files[0];
+    if(!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    await fetch(`/upload_slip/${txid}`, {method:"POST", body:formData});
+    fetchTransactions();
+}
 
-              let cell=row.insertCell(7);
-              let btnApprove=document.createElement("button");
-              btnApprove.className="approve"; btnApprove.innerText="อนุมัติ";
-              btnApprove.onclick=async ()=>{
-                let customer_user = inputUser.value.trim();
-                if(!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
-                await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id,customer_user})});
-                delete tempUserData[tx.id];
-                fetchTransactions();
-              };
-              let btnCancel=document.createElement("button");
-              btnCancel.className="cancel"; btnCancel.innerText="ยกเลิก";
-              btnCancel.onclick=async ()=>{
-                await fetch("/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});
-                delete tempUserData[tx.id];
-                fetchTransactions();
-              };
-              cell.appendChild(btnApprove);
-              cell.appendChild(btnCancel);
-            });
-          }
-
-          // Approved Orders
-          let approvedBody=document.querySelector("#approved-orders-table tbody");
-          if (approvedBody && Array.isArray(data.approved_orders)) {
-            approvedBody.innerHTML="";
-            data.approved_orders.forEach(tx=>{
-              let row=approvedBody.insertRow();
-              row.insertCell(0).innerText=tx.event;
-              row.insertCell(1).innerText=tx.amount_str;
-              row.insertCell(2).innerText=tx.name||"-";
-              row.insertCell(3).innerText=tx.time_str||"-";
-              row.insertCell(4).innerText=tx.bank||"-";
-              row.insertCell(5).innerText=tx.approver_name||"-";
-              row.insertCell(6).innerText=tx.approved_time_str||"-";
-              row.insertCell(7).innerText=tx.customer_user||"-";
-              row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
-              let restoreBtn=document.createElement("button");
-              restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
-              row.insertCell(9).appendChild(restoreBtn);
-            });
-          }
-
-          // Cancelled Orders
-          let cancelledBody=document.querySelector("#cancelled-orders-table tbody");
-          if (cancelledBody && Array.isArray(data.cancelled_orders)) {
-            cancelledBody.innerHTML="";
-            data.cancelled_orders.forEach(tx=>{
-              let row=cancelledBody.insertRow();
-              row.insertCell(0).innerText=tx.event;
-              row.insertCell(1).innerText=tx.amount_str;
-              row.insertCell(2).innerText=tx.name||"-";
-              row.insertCell(3).innerText=tx.time_str||"-";
-              row.insertCell(4).innerText=tx.bank||"-";
-              row.insertCell(5).innerText=tx.canceler_name||"-";
-              row.insertCell(6).innerText=tx.cancelled_time_str||"-";
-              row.insertCell(7).innerText=tx.customer_user||"-";
-              row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
-              let restoreBtn=document.createElement("button");
-              restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
-              row.insertCell(9).appendChild(restoreBtn);
-            });
-          }
-        } catch (e) {
-          // แสดง error message ที่ละเอียดขึ้น
-          let newBody = document.querySelector("#new-orders-table tbody");
-          let approvedBody = document.querySelector("#approved-orders-table tbody");
-          let cancelledBody = document.querySelector("#cancelled-orders-table tbody");
-          let msg = (e && e.message) ? e.message : 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
-          if (newBody) newBody.innerHTML = `<tr><td colspan="8">${msg}</td></tr>`;
-          if (approvedBody) approvedBody.innerHTML = `<tr><td colspan="10">${msg}</td></tr>`;
-          if (cancelledBody) cancelledBody.innerHTML = `<tr><td colspan="10">${msg}</td></tr>`;
+function handlePaste(event, txid){
+    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+    for(let i=0;i<items.length;i++){
+        const item = items[i];
+        if(item.kind === 'file'){
+            const blob = item.getAsFile();
+            const formData = new FormData();
+            formData.append("file", blob, `pasted_${Date.now()}.png`);
+            fetch(`/upload_slip/${txid}`, {method:"POST", body:formData}).then(()=>fetchTransactions());
+            event.preventDefault();
+            break;
         }
+    }
+}
+
+async function deleteSlip(txid){
+    if(!confirm("คุณแน่ใจว่าจะลบรูปนี้?")) return;
+    await fetch(`/delete_slip/${txid}`, {method:"POST"});
+    fetchTransactions();
+}
 
 async function resetApproved(){
     if(!confirm("คุณแน่ใจว่าจะรีเซทรายการที่อนุมัติทั้งหมด?")) return;
