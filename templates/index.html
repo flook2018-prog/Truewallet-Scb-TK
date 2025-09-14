@@ -122,10 +122,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
-<div class="header-logos">
-  <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="Ngox Logo">
-  <img src="{{ url_for('static', filename='5e9e7571-ef8d-4e7c-9e51-6b50221aceec.png') }}" alt="SK Logo" class="sk-logo">
-</div>
+<!-- ลบโลโก้ header-logos ออก -->
+<!-- <div class="header-logos"> ... </div> -->
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
@@ -180,6 +178,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <div id="dashboard">
+  <!-- ลบกล่อง New Orders ออก -->
+  <!--
   <div id="left-column">
   <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการใหม่ (New Orders)</h2>
     <div class="scroll-box">
@@ -191,9 +191,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       </table>
     </div>
   </div>
+  -->
   <!-- Section ใหม่: รายการฝากวอเลท -->
   <div id="wallet-deposit-section">
-    <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+    <h2>รายการฝากวอเลท (Wallet Deposits)</h2>
     <div class="scroll-box">
       <table id="wallet-deposit-table">
         <thead>
@@ -565,8 +566,8 @@ async function fetchDepositWallets() {
 }
 
 // เรียกฟังก์ชันนี้หลัง fetchTransactions() ทุกครั้ง
-setInterval(() => { fetchTransactions(); fetchDepositWallets(); }, 3000);
-window.addEventListener('DOMContentLoaded', () => { fetchTransactions(); fetchDepositWallets(); });
+setInterval(() => { fetchDepositWallets(); }, 3000);
+window.addEventListener('DOMContentLoaded', () => { fetchDepositWallets(); });
 
 async function fetchTransactions(){
   try {
