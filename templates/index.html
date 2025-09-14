@@ -191,6 +191,19 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       </table>
     </div>
   </div>
+  <!-- Section ใหม่: รายการฝากวอเลท -->
+  <div id="wallet-deposit-section">
+    <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+    <div class="scroll-box">
+      <table id="wallet-deposit-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /Section ใหม่ -->
   <div id="right-column">
   <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
     <div class="scroll-box">
@@ -497,7 +510,7 @@ setInterval(() => {
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
 
-// ดึงข้อมูลฝากวอเลทใหม่จาก API กลางและแสดงใน New Orders
+// ดึงข้อมูลฝากวอเลทใหม่จาก API กลางและแสดงในตาราง wallet-deposit-table
 async function fetchDepositWallets() {
   try {
     let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
@@ -507,15 +520,12 @@ async function fetchDepositWallets() {
       }
     });
     let data = await resp.json();
-    // สมมติว่า data.new_orders คือ array ของฝากวอเลทใหม่ (ปรับตามโครงสร้างจริงถ้าไม่ตรง)
     let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
-    let newBody = document.querySelector("#new-orders-table tbody");
-    if (!newBody) return;
-    // ลบเฉพาะแถวที่เป็นของฝากวอเลท (แยกด้วย class)
-    Array.from(newBody.querySelectorAll("tr.wallet-row")).forEach(tr => tr.remove());
+    let walletBody = document.querySelector("#wallet-deposit-table tbody");
+    if (!walletBody) return;
+    walletBody.innerHTML = "";
     walletList.forEach(tx => {
-      let row = newBody.insertRow(0);
-      row.className = "wallet-row";
+      let row = walletBody.insertRow();
       row.insertCell(0).innerText = tx.event;
       row.insertCell(1).innerText = tx.amount_str;
       row.insertCell(2).innerText = tx.name || "-";
@@ -549,8 +559,8 @@ async function fetchDepositWallets() {
       cell.appendChild(btnCancel);
     });
   } catch (e) {
-    let newBody = document.querySelector("#new-orders-table tbody");
-    if (newBody) newBody.innerHTML = '<tr><td colspan="8">เกิดข้อผิดพลาดในการโหลดข้อมูลฝากวอเลท</td></tr>';
+    let walletBody = document.querySelector("#wallet-deposit-table tbody");
+    if (walletBody) walletBody.innerHTML = '<tr><td colspan="8">เกิดข้อผิดพลาดในการโหลดข้อมูลฝากวอเลท</td></tr>';
   }
 }
 
