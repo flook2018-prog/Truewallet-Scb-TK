@@ -673,14 +673,12 @@ async function fetchDepositWallets() {
       btnApprove.className = "approve"; btnApprove.innerText = "อนุมัติ";
       btnApprove.onclick = async () => {
         let customer_user = inputUser.value.trim();
-        alert("(Demo) กดอนุมัติ: " + tx.id + (customer_user ? " | user: " + customer_user : ""));
         delete tempUserData[tx.id];
         fetchDepositWallets();
       };
       let btnCancel = document.createElement("button");
       btnCancel.className = "cancel"; btnCancel.innerText = "ยกเลิก";
       btnCancel.onclick = async () => {
-        alert("(Demo) กดยกเลิก: " + tx.id + " (สถานะ: อนุมัติ / ยกเลิก)");
         delete tempUserData[tx.id];
         fetchDepositWallets();
       };
