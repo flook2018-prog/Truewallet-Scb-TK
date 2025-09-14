@@ -1,3 +1,17 @@
+class DepositWallet:
+    def __init__(self, id, event, amount, amount_str, name, bank, status, time, slip_filename=None):
+        self.id = id
+        self.event = event
+        self.amount = amount
+        self.amount_str = amount_str
+        self.name = name
+        self.bank = bank
+        self.status = status
+        self.time = time
+        self.slip_filename = slip_filename
+
+    def to_dict(self):
+        return self.__dict__
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
