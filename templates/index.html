@@ -146,14 +146,20 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
   <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;">
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
-  <div style="font-size:1.5em;font-weight:bold;color:#8000ff;">SCB</div>
+    <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
+      SCB
+      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+    </div>
   <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
   <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;">
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
-  <div style="font-size:1.5em;font-weight:bold;color:#8000ff;">SCB</div>
+    <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
+      SCB
+      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+    </div>
   <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
@@ -401,20 +407,26 @@ async function updateAccountBalanceBox() {
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
-  let balance = latest && latest.balance ? latest.balance.replace(/[^\d.,]/g, '') : '0';
-  document.getElementById('account-balance-info').innerText = balance + ' บาท';
+    let balance = latest && latest.balance ? latest.balance.replace(/[^\d.,]/g, '') : '0';
+    document.getElementById('account-balance-info').innerText = balance + ' บาท';
+    // ถ้ามีข้อมูลล่าสุด ให้ไฟเป็นสีเขียว
+    document.getElementById('scb-status-light').style.background = latest ? 'lime' : '#ccc';
   } catch (e) {
     document.getElementById('account-balance-info').innerText = '0';
+    // ถ้า error ให้ไฟเป็นสีแดง
+    document.getElementById('scb-status-light').style.background = 'red';
   }
   try {
     const resp2 = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
     const data2 = await resp2.json();
     let smsList2 = Array.isArray(data2) ? data2 : (data2.sms_list || []);
     let latest2 = smsList2.length > 0 ? smsList2[smsList2.length-1] : null;
-  let balance2 = latest2 && latest2.balance ? latest2.balance.replace(/[^\d.,]/g, '') : '0';
-  document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
+    let balance2 = latest2 && latest2.balance ? latest2.balance.replace(/[^\d.,]/g, '') : '0';
+    document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
+    document.getElementById('scb2-status-light').style.background = latest2 ? 'lime' : '#ccc';
   } catch (e) {
     document.getElementById('account-balance-info2').innerText = '0';
+    document.getElementById('scb2-status-light').style.background = 'red';
   }
 }
 setInterval(updateAccountBalanceBox, 3000);
