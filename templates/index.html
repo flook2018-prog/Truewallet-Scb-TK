@@ -137,6 +137,20 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
     </div>
   </div>
+  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
+  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;">
+    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
+    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
+    <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
+  </div>
+  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
+  <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;">
+    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
+    <div style="font-size:1.5em;font-weight:bold;color:#007bff;">SCB</div>
+    <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0</span>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
+  </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button class="account-settings-btn" onclick="window.location.href='/account_settings'">⚙️ ตั้งค่าระบบบัญชี</button>
     <div id="toggle-mode">🌞</div>
@@ -245,6 +259,31 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 
 <script>
+// --- ดึงยอดคงเหลือ SCB สุมิธร์ คิมภิรานนท์ และ พลอยไพริน นามโคตร มาแสดงในกล่องใหม่ ---
+async function updateAccountBalanceBox() {
+  try {
+    const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
+    const data = await resp.json();
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    let balance = latest && latest.balance ? latest.balance : '0';
+    document.getElementById('account-balance-info').innerText = balance;
+  } catch (e) {
+    document.getElementById('account-balance-info').innerText = '0';
+  }
+  try {
+    const resp2 = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
+    const data2 = await resp2.json();
+    let smsList2 = Array.isArray(data2) ? data2 : (data2.sms_list || []);
+    let latest2 = smsList2.length > 0 ? smsList2[smsList2.length-1] : null;
+    let balance2 = latest2 && latest2.balance ? latest2.balance : '0';
+    document.getElementById('account-balance-info2').innerText = balance2;
+  } catch (e) {
+    document.getElementById('account-balance-info2').innerText = '0';
+  }
+}
+setInterval(updateAccountBalanceBox, 3000);
+updateAccountBalanceBox();
 // --- ปุ่มเปิด/ปิดโหมดกลางคืน ---
 document.addEventListener('DOMContentLoaded', function() {
   const toggleModeBtn = document.getElementById('toggle-mode');
