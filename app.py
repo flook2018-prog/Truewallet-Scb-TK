@@ -1,14 +1,15 @@
-# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
-# (Moved below config and app = Flask(__name__))
-
-# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
-# (Moved below app = Flask(__name__))
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
 from collections import defaultdict
 from werkzeug.utils import secure_filename
 import pytz
+# -------------------- Account Settings Backend --------------------
+import threading
+accounts_file = "accounts.json"
+accounts_lock = threading.Lock()
+
+
 
 # -------------------- Config --------------------
 UPLOAD_FOLDER = "uploads"
@@ -70,7 +71,7 @@ def generic_truewallet_webhook():
         sender_mobile = decoded.get("sender_mobile","-")
         name = f"{sender_name} / {sender_mobile}" if sender_mobile and sender_mobile != "-" else sender_name
 
-        event_type = decoded.get("event_type","ฝาก").upper()
+        event_type = decoded.get("event_type","d").upper()
         bank_code = (decoded.get("channel") or "").upper()
 
         if event_type=="P2P" or bank_code in ["TRUEWALLET","WALLET"]:
@@ -166,13 +167,13 @@ def get_transactions():
         tx["time_str"] = fmt_time_local(tx.get("time"))
         tx["cancelled_time_str"] = fmt_time_local(tx.get("cancelled_time"))
 
-    # ✅ ส่งค่า customer_user กลับไปด้วยเสมอ
+    # ส่งค่า customer_user กลับไปด้วยเสมอ
     for lst in [new_orders, approved_orders, cancelled_orders]:
         for tx in lst:
             if "customer_user" not in tx:
                 tx["customer_user"] = ""
 
-    # สร้างข้อมูลกราฟยอดฝากรายวัน
+    # สร้างข้อมูลกราฟยอดรายวัน
     daily_user_summary = defaultdict(lambda: defaultdict(int))
     for tx in approved_orders:
         user = tx.get("customer_user")
