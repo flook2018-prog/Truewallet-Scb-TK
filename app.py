@@ -449,7 +449,9 @@ def approve():
             tx["status"] = "approved"
             tx["approver_name"] = approver_name
             tx["approved_time"] = datetime.utcnow().isoformat()
-            tx["customer_user"] = customer_user
+            # รองรับค่าว่าง ไม่บังคับใส่ customer_user
+            if customer_user is not None:
+                tx["customer_user"] = customer_user
             transactions["approved"].append(tx)
             transactions["new"].remove(tx)
             day = tx["time"][:10] if isinstance(tx["time"], str) else tx["time"].strftime("%Y-%m-%d")
@@ -472,6 +474,7 @@ def cancel():
             tx["status"] = "cancelled"
             tx["cancelled_time"] = datetime.utcnow().isoformat()
             tx["canceler_name"] = canceler_name
+            # ไม่บังคับต้องมี customer_user
             transactions["cancelled"].append(tx)
             transactions["new"].remove(tx)
             log_with_time(f"[CANCELLED] {txid} by {canceler_name} ({user_ip})")
