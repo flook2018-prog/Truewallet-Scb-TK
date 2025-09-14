@@ -378,7 +378,7 @@ def api_sms_get():
         date_time = None
         detail = None
         balance = None
-        # พยายามแยกข้อมูลจาก sms_content
+        print(f"[DEBUG] /api/sms GET: tag={tag}, sender={sender}, sms_content={sms_content}")
         m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", sms_content)
         if m:
             date_time = m.group(1)
@@ -392,9 +392,10 @@ def api_sms_get():
                 balance = parts[-1]
         if date_time and detail and balance:
             sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+            print(f"[DEBUG] Saved parsed SMS: tag={tag}, date_time={date_time}, detail={detail}, balance={balance}")
         else:
-            # ถ้าแยกไม่ได้ ให้เก็บ raw
             sms_dict[tag].append({"sender": sender, "sms": sms_content})
+            print(f"[DEBUG] Saved raw SMS: tag={tag}, sender={sender}, sms={sms_content}")
         save_sms_data(sms_dict)
     # รองรับการดึงข้อมูลล่าสุด 7 รายการของ tag นั้น
     sms_list = sms_dict.get(tag, [])
