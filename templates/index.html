@@ -122,9 +122,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
-<!-- โลโก้หัวเว็บ -->
+<!-- โลโก้หัวเว็บ (2 โลโก้, ขนาดเหมาะสม, อยู่กลาง) -->
 <div class="header-logos">
-  <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo">
+  <img src="{{ url_for('static', filename='sk-logo.png') }}" alt="SK Logo" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
+  <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="NGOX Logo" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
 </div>
 <h1>Dashboard(Realtime)</h1>
 
