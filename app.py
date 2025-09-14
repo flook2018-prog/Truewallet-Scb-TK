@@ -1,15 +1,14 @@
-from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
+# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
+# (Moved below config and app = Flask(__name__))
+
+# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
+# (Moved below app = Flask(__name__))
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import os, json, jwt, random
 from datetime import datetime, timedelta
 from collections import defaultdict
 from werkzeug.utils import secure_filename
 import pytz
-# -------------------- Account Settings Backend --------------------
-import threading
-accounts_file = "accounts.json"
-accounts_lock = threading.Lock()
-
-
 
 # -------------------- Config --------------------
 UPLOAD_FOLDER = "uploads"
@@ -27,7 +26,7 @@ LOG_FILE = "transactions.log"
 SECRET_KEY = "defbe102c9f4e9eaad1e16de7f8efe13"
 
 # กำหนด timezone
-TZ = pytz.timezone("Asia/Bangkok")   
+TZ = pytz.timezone("Asia/Bangkok")
 
 BANK_MAP_TH = {
     "BBL": "กรุงเทพ",
@@ -224,25 +223,8 @@ def api_sms_get():
         sms_dict[tag] = []
     # รับ sender และ sms_content จาก GET แล้วบันทึกลง tag ที่ถูกต้อง
     if sender and sms_content:
-        import re
-        date_time = None
-        detail = None
-        balance = None
-        # พยายามแยกข้อมูลจาก sms_content
-        m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", sms_content)
-        if m:
-            date_time = m.group(1)
-            detail = m.group(2) + ' ' + m.group(3)
-            balance = m.group(4) + 'บ'
-        else:
-            parts = sms_content.split()
-            if len(parts) >= 3:
-                date_time = parts[0]
-                detail = ' '.join(parts[1:-1])
-                balance = parts[-1]
-        if date_time and detail and balance:
-            sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
-            save_sms_data(sms_dict)
+        sms_dict[tag].append({"sender": sender, "sms": sms_content})
+        save_sms_data(sms_dict)
     # รองรับการดึงข้อมูลล่าสุด 7 รายการของ tag นั้น
     sms_list = sms_dict.get(tag, [])
     resp = jsonify(sms_list[-7:][::-1])
@@ -462,10 +444,6 @@ def upload_slip(txid):
 @app.route("/slip/<filename>")
 def get_slip(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-@app.route("/account_settings")
-def account_settings_page():
-    return render_template("account_settings.html")
 
 # -------------------- Run --------------------
 if __name__ == "__main__":
