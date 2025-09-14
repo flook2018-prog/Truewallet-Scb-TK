@@ -373,29 +373,33 @@ def api_sms_get():
     if tag not in sms_dict:
         sms_dict[tag] = []
     # รับ sender และ sms_content จาก GET แล้วบันทึกลง tag ที่ถูกต้อง (แปลงเป็น date_time, detail, balance ถ้า pattern ตรง)
-    if sender and sms_content:
+    if sender:
         import re
         date_time = None
         detail = None
         balance = None
         print(f"[DEBUG] /api/sms GET: tag={tag}, sender={sender}, sms_content={sms_content}")
-        m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", sms_content)
-        if m:
-            date_time = m.group(1)
-            detail = m.group(2) + ' ' + m.group(3)
-            balance = m.group(4) + 'บ'
+        if sms_content:
+            m = re.match(r"(\d{2}/\d{2}@\d{2}:\d{2}) (.+) (จาก.+|ถอน/.+|โอนเงิน.+) ใช้ได้([\d,]+\.?\d*)บ", sms_content)
+            if m:
+                date_time = m.group(1)
+                detail = m.group(2) + ' ' + m.group(3)
+                balance = m.group(4) + 'บ'
+            else:
+                parts = sms_content.split()
+                if len(parts) >= 3:
+                    date_time = parts[0]
+                    detail = ' '.join(parts[1:-1])
+                    balance = parts[-1]
+            if date_time and detail and balance:
+                sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
+                print(f"[DEBUG] Saved parsed SMS: tag={tag}, date_time={date_time}, detail={detail}, balance={balance}")
+            else:
+                sms_dict[tag].append({"sender": sender, "sms": sms_content})
+                print(f"[DEBUG] Saved raw SMS: tag={tag}, sender={sender}, sms={sms_content}")
         else:
-            parts = sms_content.split()
-            if len(parts) >= 3:
-                date_time = parts[0]
-                detail = ' '.join(parts[1:-1])
-                balance = parts[-1]
-        if date_time and detail and balance:
-            sms_dict[tag].append({"date_time": date_time, "detail": detail, "balance": balance})
-            print(f"[DEBUG] Saved parsed SMS: tag={tag}, date_time={date_time}, detail={detail}, balance={balance}")
-        else:
-            sms_dict[tag].append({"sender": sender, "sms": sms_content})
-            print(f"[DEBUG] Saved raw SMS: tag={tag}, sender={sender}, sms={sms_content}")
+            sms_dict[tag].append({"sender": sender, "sms": None})
+            print(f"[DEBUG] Saved raw SMS: tag={tag}, sender={sender}, sms=None (no sms_content)")
         save_sms_data(sms_dict)
     # รองรับการดึงข้อมูลล่าสุด 7 รายการของ tag นั้น
     sms_list = sms_dict.get(tag, [])
