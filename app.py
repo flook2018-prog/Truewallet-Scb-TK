@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
@@ -463,6 +462,10 @@ def upload_slip(txid):
 @app.route("/slip/<filename>")
 def get_slip(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route("/account_settings")
+def account_settings_page():
+    return render_template("account_settings.html")
 
 # -------------------- Run --------------------
 if __name__ == "__main__":
