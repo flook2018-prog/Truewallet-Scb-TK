@@ -542,125 +542,146 @@ async function fetchTransactions(){
       data.new_orders.forEach(tx=>{
         let row=newBody.insertRow();
         row.insertCell(0).innerText=tx.event;
-        row.insertCell(1).innerText=tx.amount_str;
-        row.insertCell(2).innerText=tx.name||"-";
+        try {
+          let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
+            method: "GET",
+            headers: {
+              "Authorization": "Bearer defbe102c9f4e9eaad1e16de7f8efe13"
+            }
+          });
+          if (!resp.ok) {
+            let msg = `HTTP ${resp.status} ${resp.statusText}`;
+            throw new Error(msg);
+          }
+          let data;
+          try {
+            data = await resp.json();
+          } catch(jsonErr) {
+            throw new Error("JSON parse error: " + jsonErr.message);
+          }
 
-        let userCell = row.insertCell(3);
-        let inputUser = document.createElement("input");
-        inputUser.className="customer-user";
-        inputUser.value=tempUserData[tx.id] || tx.customer_user || "";
-        inputUser.oninput=()=>{ tempUserData[tx.id] = inputUser.value; };
-        userCell.appendChild(inputUser);
+          // กำหนด wallet_daily_total ถ้ามี
+          if (data.wallet_daily_total !== undefined && document.getElementById("wallet-info")) {
+            document.getElementById("wallet-info").innerText = data.wallet_daily_total;
+          }
 
-        row.insertCell(4).innerText=tx.time_str||"-";
-        row.insertCell(5).innerText=tx.bank||"-";
-        row.insertCell(6).innerHTML=renderSlip(tx);
+          // daily summary
+          let dailyBody = document.querySelector("#daily-summary tbody");
+          if (dailyBody && Array.isArray(data.daily_summary)) {
+            dailyBody.innerHTML="";
+            let last5 = data.daily_summary.slice(-5);
+            last5.forEach(d=>{
+              let row = dailyBody.insertRow();
+              row.insertCell(0).innerText=d.date;
+              row.insertCell(1).innerText=d.total;
+            });
+          }
 
-        let cell=row.insertCell(7);
-        let btnApprove=document.createElement("button");
-        btnApprove.className="approve"; btnApprove.innerText="อนุมัติ";
-        btnApprove.onclick=async ()=>{
-          let customer_user = inputUser.value.trim();
-          if(!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
-          await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id,customer_user})});
-          delete tempUserData[tx.id];
-          fetchTransactions();
-        };
-        let btnCancel=document.createElement("button");
-        btnCancel.className="cancel"; btnCancel.innerText="ยกเลิก";
-        btnCancel.onclick=async ()=>{
-          await fetch("/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});
-          delete tempUserData[tx.id];
-          fetchTransactions();
-        };
-        cell.appendChild(btnApprove);
-        cell.appendChild(btnCancel);
-      });
-    }
+          function renderSlip(tx){
+            let fileInput = `<input type="file" onchange="uploadSlip(event,'${tx.id}')">`;
+            let pasteArea = `<div class="paste-area" contenteditable="true" onpaste="handlePaste(event,'${tx.id}')">วางรูปที่นี่ (Ctrl+V)</div>`;
+            let deleteBtn = tx.slip_filename ? `<button class="delete-slip" onclick="deleteSlip('${tx.id}')">ลบรูป</button>` : "";
+            if(tx.slip_filename){
+              return `<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>` + pasteArea + deleteBtn;
+            } else {
+              return fileInput + pasteArea;
+            }
+          }
 
-    // Approved Orders
-    let approvedBody=document.querySelector("#approved-orders-table tbody");
-    if (approvedBody && Array.isArray(data.approved_orders)) {
-      approvedBody.innerHTML="";
-      data.approved_orders.forEach(tx=>{
-        let row=approvedBody.insertRow();
-        row.insertCell(0).innerText=tx.event;
-        row.insertCell(1).innerText=tx.amount_str;
-        row.insertCell(2).innerText=tx.name||"-";
-        row.insertCell(3).innerText=tx.time_str||"-";
-        row.insertCell(4).innerText=tx.bank||"-";
-        row.insertCell(5).innerText=tx.approver_name||"-";
-        row.insertCell(6).innerText=tx.approved_time_str||"-";
-        row.insertCell(7).innerText=tx.customer_user||"-";
-        row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
-        let restoreBtn=document.createElement("button");
-        restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
-        restoreBtn.onclick=async ()=>{if(!confirm("คุณแน่ใจว่าจะคืนรายการนี้เป็น New?")) return;await fetch("/restore",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});fetchTransactions();};
-        row.insertCell(9).appendChild(restoreBtn);
-      });
-    }
+          // New Orders
+          let newBody = document.querySelector("#new-orders-table tbody");
+          if (newBody && Array.isArray(data.new_orders)) {
+            newBody.innerHTML="";
+            data.new_orders.forEach(tx=>{
+              let row=newBody.insertRow();
+              row.insertCell(0).innerText=tx.event;
+              row.insertCell(1).innerText=tx.amount_str;
+              row.insertCell(2).innerText=tx.name||"-";
 
-    // Cancelled Orders
-    let cancelledBody=document.querySelector("#cancelled-orders-table tbody");
-    if (cancelledBody && Array.isArray(data.cancelled_orders)) {
-      cancelledBody.innerHTML="";
-      data.cancelled_orders.forEach(tx=>{
-        let row=cancelledBody.insertRow();
-        row.insertCell(0).innerText=tx.event;
-        row.insertCell(1).innerText=tx.amount_str;
-        row.insertCell(2).innerText=tx.name||"-";
-        row.insertCell(3).innerText=tx.time_str||"-";
-        row.insertCell(4).innerText=tx.bank||"-";
-        row.insertCell(5).innerText=tx.canceler_name||"-";
-        row.insertCell(6).innerText=tx.cancelled_time_str||"-";
-        row.insertCell(7).innerText=tx.customer_user||"-";
-        row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
-        let restoreBtn=document.createElement("button");
-        restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
-        restoreBtn.onclick=async ()=>{if(!confirm("คุณแน่ใจว่าจะคืนรายการนี้เป็น New?")) return;await fetch("/restore",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});fetchTransactions();};
-        row.insertCell(9).appendChild(restoreBtn);
-      });
-    }
-  } catch (e) {
-    // กรณี error ให้ clear ตารางและแจ้งเตือน
-    let newBody = document.querySelector("#new-orders-table tbody");
-    let approvedBody = document.querySelector("#approved-orders-table tbody");
-    let cancelledBody = document.querySelector("#cancelled-orders-table tbody");
-    if (newBody) newBody.innerHTML = '<tr><td colspan="8">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
-    if (approvedBody) approvedBody.innerHTML = '<tr><td colspan="10">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
-    if (cancelledBody) cancelledBody.innerHTML = '<tr><td colspan="10">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
-  }
-}
+              let userCell = row.insertCell(3);
+              let inputUser = document.createElement("input");
+              inputUser.className="customer-user";
+              inputUser.value=tempUserData[tx.id] || tx.customer_user || "";
+              inputUser.oninput=()=>{ tempUserData[tx.id] = inputUser.value; };
+              userCell.appendChild(inputUser);
 
-async function uploadSlip(event, txid){
-    const file = event.target.files[0];
-    if(!file) return;
-    const formData = new FormData();
-    formData.append("file", file);
-    await fetch(`/upload_slip/${txid}`, {method:"POST", body:formData});
-    fetchTransactions();
-}
+              row.insertCell(4).innerText=tx.time_str||"-";
+              row.insertCell(5).innerText=tx.bank||"-";
+              row.insertCell(6).innerHTML=renderSlip(tx);
 
-function handlePaste(event, txid){
-    const items = (event.clipboardData || event.originalEvent.clipboardData).items;
-    for(let i=0;i<items.length;i++){
-        const item = items[i];
-        if(item.kind === 'file'){
-            const blob = item.getAsFile();
-            const formData = new FormData();
-            formData.append("file", blob, `pasted_${Date.now()}.png`);
-            fetch(`/upload_slip/${txid}`, {method:"POST", body:formData}).then(()=>fetchTransactions());
-            event.preventDefault();
-            break;
+              let cell=row.insertCell(7);
+              let btnApprove=document.createElement("button");
+              btnApprove.className="approve"; btnApprove.innerText="อนุมัติ";
+              btnApprove.onclick=async ()=>{
+                let customer_user = inputUser.value.trim();
+                if(!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
+                await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id,customer_user})});
+                delete tempUserData[tx.id];
+                fetchTransactions();
+              };
+              let btnCancel=document.createElement("button");
+              btnCancel.className="cancel"; btnCancel.innerText="ยกเลิก";
+              btnCancel.onclick=async ()=>{
+                await fetch("/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:tx.id})});
+                delete tempUserData[tx.id];
+                fetchTransactions();
+              };
+              cell.appendChild(btnApprove);
+              cell.appendChild(btnCancel);
+            });
+          }
+
+          // Approved Orders
+          let approvedBody=document.querySelector("#approved-orders-table tbody");
+          if (approvedBody && Array.isArray(data.approved_orders)) {
+            approvedBody.innerHTML="";
+            data.approved_orders.forEach(tx=>{
+              let row=approvedBody.insertRow();
+              row.insertCell(0).innerText=tx.event;
+              row.insertCell(1).innerText=tx.amount_str;
+              row.insertCell(2).innerText=tx.name||"-";
+              row.insertCell(3).innerText=tx.time_str||"-";
+              row.insertCell(4).innerText=tx.bank||"-";
+              row.insertCell(5).innerText=tx.approver_name||"-";
+              row.insertCell(6).innerText=tx.approved_time_str||"-";
+              row.insertCell(7).innerText=tx.customer_user||"-";
+              row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
+              let restoreBtn=document.createElement("button");
+              restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
+              row.insertCell(9).appendChild(restoreBtn);
+            });
+          }
+
+          // Cancelled Orders
+          let cancelledBody=document.querySelector("#cancelled-orders-table tbody");
+          if (cancelledBody && Array.isArray(data.cancelled_orders)) {
+            cancelledBody.innerHTML="";
+            data.cancelled_orders.forEach(tx=>{
+              let row=cancelledBody.insertRow();
+              row.insertCell(0).innerText=tx.event;
+              row.insertCell(1).innerText=tx.amount_str;
+              row.insertCell(2).innerText=tx.name||"-";
+              row.insertCell(3).innerText=tx.time_str||"-";
+              row.insertCell(4).innerText=tx.bank||"-";
+              row.insertCell(5).innerText=tx.canceler_name||"-";
+              row.insertCell(6).innerText=tx.cancelled_time_str||"-";
+              row.insertCell(7).innerText=tx.customer_user||"-";
+              row.insertCell(8).innerHTML=tx.slip_filename?`<a href="/slip/${tx.slip_filename}" target="_blank">ดูรูป</a>`:"-";
+              let restoreBtn=document.createElement("button");
+              restoreBtn.className="restore"; restoreBtn.innerText="คืนเป็น New";
+              row.insertCell(9).appendChild(restoreBtn);
+            });
+          }
+        } catch (e) {
+          // แสดง error message ที่ละเอียดขึ้น
+          let newBody = document.querySelector("#new-orders-table tbody");
+          let approvedBody = document.querySelector("#approved-orders-table tbody");
+          let cancelledBody = document.querySelector("#cancelled-orders-table tbody");
+          let msg = (e && e.message) ? e.message : 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+          if (newBody) newBody.innerHTML = `<tr><td colspan="8">${msg}</td></tr>`;
+          if (approvedBody) approvedBody.innerHTML = `<tr><td colspan="10">${msg}</td></tr>`;
+          if (cancelledBody) cancelledBody.innerHTML = `<tr><td colspan="10">${msg}</td></tr>`;
         }
-    }
-}
-
-async function deleteSlip(txid){
-    if(!confirm("คุณแน่ใจว่าจะลบรูปนี้?")) return;
-    await fetch(`/delete_slip/${txid}`, {method:"POST"});
-    fetchTransactions();
-}
 
 async function resetApproved(){
     if(!confirm("คุณแน่ใจว่าจะรีเซทรายการที่อนุมัติทั้งหมด?")) return;
