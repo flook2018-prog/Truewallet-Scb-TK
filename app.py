@@ -1,6 +1,33 @@
+deposit_wallets = []  # รายการฝากวอเลทใหม่
 
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
+import os, json, jwt, random
+from datetime import datetime, timedelta
+from collections import defaultdict
+from werkzeug.utils import secure_filename
+import pytz
 from models import DepositWallet
 
+# -------------------- Account Settings Backend --------------------
+import threading
+accounts_file = "accounts.json"
+accounts_lock = threading.Lock()
+
+# -------------------- Config --------------------
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+transactions = {"new": [], "approved": [], "cancelled": []}
+daily_summary_history = defaultdict(float)
+ip_approver_map = {}
+
+DATA_FILE = "transactions_data.json"
+LOG_FILE = "transactions.log"
+
+# -------------------- DepositWallet Model & API (ใหม่) --------------------
 deposit_wallets = []  # รายการฝากวอเลทใหม่
 
 # API สำหรับฝากวอเลทใหม่ (ไม่กระทบระบบเก่า)
@@ -52,32 +79,6 @@ def api_deposit_wallet():
 @app.route("/api/deposit_wallet", methods=["GET"])
 def get_deposit_wallets():
     return jsonify([tx.to_dict() for tx in deposit_wallets])
-from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
-import os, json, jwt, random
-from datetime import datetime, timedelta
-from collections import defaultdict
-from werkzeug.utils import secure_filename
-import pytz
-# -------------------- Account Settings Backend --------------------
-import threading
-accounts_file = "accounts.json"
-accounts_lock = threading.Lock()
-
-
-
-# -------------------- Config --------------------
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-transactions = {"new": [], "approved": [], "cancelled": []}
-daily_summary_history = defaultdict(float)
-ip_approver_map = {}
-
-DATA_FILE = "transactions_data.json"
-LOG_FILE = "transactions.log"
 SECRET_KEY = "defbe102c9f4e9eaad1e16de7f8efe13"
 
 # กำหนด timezone
