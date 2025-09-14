@@ -144,7 +144,11 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     </div>
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
-  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;">
+  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
+    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+      <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    </div>
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
     <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
       SCB
@@ -154,7 +158,11 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
-  <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;">
+  <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;position:relative;">
+    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="scb2-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    </div>
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
     <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
       SCB
@@ -164,16 +172,28 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่อง Truewallet BB ENJ -->
-  <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;">
+  <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;position:relative;">
+    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+      <span id="tw-bb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="tw-bb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    </div>
     <h2>🪙 Truewallet BB ENJ</h2>
     <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
     <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
+        <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+          <span id="tw-bb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="tw-bb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+        </div>
       <span id="tw-bb-mobile">-</span><br>
       <span id="tw-bb-updated">-</span>
     </div>
   </div>
   <!-- กล่อง Truewallet BP -->
-  <div class="summary-card" id="tw-bp-box" style="max-width:420px;min-width:180px;">
+  <div class="summary-card" id="tw-bp-box" style="max-width:420px;min-width:180px;position:relative;">
+    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+      <span id="tw-bp-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="tw-bp-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    </div>
     <h2>🧧 Truewallet BP</h2>
     <span id="tw-bp-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
     <div id="tw-bp-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
