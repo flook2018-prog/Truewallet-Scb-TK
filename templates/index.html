@@ -4,19 +4,21 @@
 <title>THKBot168 Dashboard</title>
 <style>
 /* โลโก้หัวเว็บ */
+/* โลโก้หัวเว็บ (ขนาดใหญ่ 3 เท่าและอยู่กลาง) */
 .header-logos {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 8px;
+  gap: 48px;
+  margin-bottom: 16px;
+  margin-top: 16px;
 }
 .header-logos img {
-  height: 48px;
+  height: 144px;
   width: auto;
   object-fit: contain;
   background: transparent !important;
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: none;
 }
 .header-logos .sk-logo {
@@ -118,7 +120,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <body>
 <div class="header-logos">
   <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="Ngox Logo">
-  <img src="{{ url_for('static', filename='sk-logo.png') }}" alt="SK Logo" class="sk-logo">
+  <img src="{{ url_for('static', filename='5e9e7571-ef8d-4e7c-9e51-6b50221aceec.png') }}" alt="SK Logo" class="sk-logo">
 </div>
 <h1>Dashboard(Realtime)</h1>
 
