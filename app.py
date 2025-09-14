@@ -1,4 +1,10 @@
-from flask import send_file
+
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
+import os, json, jwt, random
+from datetime import datetime, timedelta
+from collections import defaultdict
+from werkzeug.utils import secure_filename
+import pytz
 # -------------------- Account Settings Backend --------------------
 import threading
 accounts_file = "accounts.json"
@@ -45,17 +51,6 @@ def api_accounts():
             save_accounts(accounts)
             return jsonify({"status": "deleted"})
         return jsonify({"error": "ไม่พบบัญชี"}), 404
-# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
-# (Moved below config and app = Flask(__name__))
-
-# -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
-# (Moved below app = Flask(__name__))
-from flask import Flask, request, jsonify, render_template, send_from_directory
-import os, json, jwt, random
-from datetime import datetime, timedelta
-from collections import defaultdict
-from werkzeug.utils import secure_filename
-import pytz
 
 # -------------------- Config --------------------
 UPLOAD_FOLDER = "uploads"
