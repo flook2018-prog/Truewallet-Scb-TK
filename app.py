@@ -27,7 +27,7 @@ LOG_FILE = "transactions.log"
 SECRET_KEY = "defbe102c9f4e9eaad1e16de7f8efe13"
 
 # กำหนด timezone
-TZ = pytz.timezone("Asia/Bangkok")   
+TZ = pytz.timezone("Asia/Bangkok")
 
 BANK_MAP_TH = {
     "BBL": "กรุงเทพ",
