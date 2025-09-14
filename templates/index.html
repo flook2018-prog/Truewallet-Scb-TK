@@ -149,10 +149,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
   <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
-      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-      <span id="scb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
-    </div>
+    <!-- ไฟและสถานะด้านบนขวาถูกลบตามคำขอ -->
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
     <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
       SCB
@@ -163,10 +160,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
   <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
-      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-      <span id="scb2-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
-    </div>
+    <!-- ไฟและสถานะด้านบนขวาถูกลบตามคำขอ -->
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
     <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
       SCB
@@ -177,10 +171,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่อง Truewallet BB ENJ -->
   <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
-      <span id="tw-bb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-      <span id="tw-bb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
-    </div>
+    <!-- ไฟและสถานะด้านบนขวาถูกลบตามคำขอ -->
     <h2>🪙 Truewallet BB ENJ</h2>
     <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
     <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
@@ -354,12 +345,17 @@ async function updateStatusLights() {
     let data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    const scbStatusText = document.getElementById('scb-status-text');
     if (resp.ok && latest && latest.balance) {
       document.getElementById('scb-status-light').style.background = '#28a745';
-      document.getElementById('scb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+      if (scbStatusText.innerText !== 'เชื่อมต่อสำเร็จ') {
+        scbStatusText.innerText = 'เชื่อมต่อสำเร็จ';
+      }
     } else {
       document.getElementById('scb-status-light').style.background = '#ccc';
-      document.getElementById('scb-status-text').innerText = '';
+      if (scbStatusText.innerText !== '') {
+        scbStatusText.innerText = '';
+      }
     }
   } catch (e) {
     document.getElementById('scb-status-light').style.background = '#ccc';
@@ -371,12 +367,17 @@ async function updateStatusLights() {
     let data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    const scb2StatusText = document.getElementById('scb2-status-text');
     if (resp.ok && latest && latest.balance) {
       document.getElementById('scb2-status-light').style.background = '#28a745';
-      document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+      if (scb2StatusText.innerText !== 'เชื่อมต่อสำเร็จ') {
+        scb2StatusText.innerText = 'เชื่อมต่อสำเร็จ';
+      }
     } else {
       document.getElementById('scb2-status-light').style.background = '#ccc';
-      document.getElementById('scb2-status-text').innerText = '';
+      if (scb2StatusText.innerText !== '') {
+        scb2StatusText.innerText = '';
+      }
     }
   } catch (e) {
     document.getElementById('scb2-status-light').style.background = '#ccc';

@@ -398,7 +398,28 @@ def api_sms_get():
         save_sms_data(sms_dict)
     # รองรับการดึงข้อมูลล่าสุด 7 รายการของ tag นั้น
     sms_list = sms_dict.get(tag, [])
-    resp = jsonify(sms_list[-7:][::-1])
+    # Determine connection status: connected if any SMS in last 24h
+    status = "disconnected"
+    now = datetime.now(TZ)
+    for sms in sms_list[::-1]:
+        dt_str = sms.get("date_time")
+        try:
+            # Try to parse date_time in format 'DD/MM@HH:MM'
+            if dt_str and "/" in dt_str and "@" in dt_str:
+                day, rest = dt_str.split("/")
+                month, timepart = rest.split("@")
+                hour, minute = timepart.split(":")
+                sms_dt = now.replace(day=int(day), month=int(month), hour=int(hour), minute=int(minute), second=0, microsecond=0)
+                # If SMS is within last 24 hours, consider connected
+                if (now - sms_dt).total_seconds() < 86400:
+                    status = "connected"
+                    break
+        except Exception:
+            continue
+    resp = jsonify({
+        "sms": sms_list[-7:][::-1],
+        "status": status
+    })
     resp.headers.add('Access-Control-Allow-Origin', '*')
     return resp
 
