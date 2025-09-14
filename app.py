@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
@@ -66,35 +67,6 @@ LOG_FILE = "transactions.log"
 
 deposit_wallets = []  # รายการฝากวอเลทใหม่
 
-from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
-import os, json, jwt, random
-from datetime import datetime, timedelta
-from collections import defaultdict
-from werkzeug.utils import secure_filename
-import pytz
-from models import DepositWallet
-
-# -------------------- Account Settings Backend --------------------
-import threading
-accounts_file = "accounts.json"
-accounts_lock = threading.Lock()
-
-# -------------------- Config --------------------
-UPLOAD_FOLDER = "uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-transactions = {"new": [], "approved": [], "cancelled": []}
-daily_summary_history = defaultdict(float)
-ip_approver_map = {}
-
-DATA_FILE = "transactions_data.json"
-LOG_FILE = "transactions.log"
-
-# -------------------- DepositWallet Model & API (ใหม่) --------------------
-deposit_wallets = []  # รายการฝากวอเลทใหม่
 
 # API สำหรับฝากวอเลทใหม่ (ไม่กระทบระบบเก่า)
 @app.route("/api/deposit_wallet", methods=["POST"])
