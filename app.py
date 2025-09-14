@@ -1,3 +1,14 @@
+# Proxy endpoint สำหรับ wallet deposit (แก้ปัญหา CORS)
+import requests
+@app.route('/api/proxy_wallet_deposit')
+def proxy_wallet_deposit():
+    try:
+        url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
+        headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
+        resp = requests.get(url, headers=headers, timeout=10)
+        return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
+    except Exception as e:
+        return {'error': str(e)}, 500
 deposit_wallets = []  # รายการฝากวอเลทใหม่
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file

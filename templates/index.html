@@ -511,15 +511,10 @@ setInterval(() => {
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
 
-// ดึงข้อมูลฝากวอเลทใหม่จาก API กลางและแสดงในตาราง wallet-deposit-table
+// ดึงข้อมูลฝากวอเลทใหม่จาก backend proxy และแสดงในตาราง wallet-deposit-table
 async function fetchDepositWallets() {
   try {
-    let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer defbe102c9f4e9eaad1e16de7f8efe13"
-      }
-    });
+    let resp = await fetch("/api/proxy_wallet_deposit");
     let data = await resp.json();
     let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
     let walletBody = document.querySelector("#wallet-deposit-table tbody");
