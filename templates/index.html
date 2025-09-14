@@ -699,12 +699,7 @@ window.addEventListener('DOMContentLoaded', () => { fetchDepositWallets(); });
 
 async function fetchTransactions(){
   try {
-    let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer defbe102c9f4e9eaad1e16de7f8efe13"
-      }
-    });
+    let resp = await fetch("/get_transactions");
     let data = await resp.json();
 
     // กำหนด wallet_daily_total ถ้ามี
