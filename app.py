@@ -16,6 +16,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+
 # Proxy endpoint สำหรับ wallet deposit (GET ข้อมูลจาก API กลาง + decode JWT)
 @app.route('/api/wallet_deposit_data')
 def wallet_deposit_data():
@@ -33,7 +34,6 @@ def wallet_deposit_data():
             token = data["message"]
             try:
                 decoded = jwt.decode(token, "defbe102c9f4e9eaad1e16de7f8efe13", algorithms=["HS256"], options={"verify_iat": False})
-                # แปลงข้อมูลให้อยู่ในรูปแบบที่ frontend ใช้
                 tx = {
                     "id": decoded.get("transaction_id", ""),
                     "event": decoded.get("event_type", ""),
