@@ -25,7 +25,12 @@ def wallet_deposit_data():
         url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
         headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
         resp = requests.get(url, headers=headers, timeout=10)
-        data = resp.json()
+        try:
+            data = resp.json()
+        except Exception as json_err:
+            print("WALLET DEPOSIT ERROR: JSON decode", json_err)
+            print("RESPONSE TEXT:", resp.text)
+            return jsonify({'error': f'JSON decode error: {json_err}', 'resp_text': resp.text}), 500
         # ถ้า data เป็น list (อนาคต), return ได้เลย
         if isinstance(data, list):
             return jsonify({"new_orders": data})
@@ -48,9 +53,13 @@ def wallet_deposit_data():
                 }
                 return jsonify({"new_orders": [tx]})
             except Exception as e:
-                return jsonify({"error": f"JWT decode error: {str(e)}"}), 500
-        return jsonify({"error": "No data"}), 500
+                print("WALLET DEPOSIT ERROR: JWT decode", e)
+                print("RAW MESSAGE:", token)
+                return jsonify({"error": f"JWT decode error: {str(e)}", "raw_message": token}), 500
+        print("WALLET DEPOSIT ERROR: No data", data)
+        return jsonify({"error": "No data", "data": data}), 500
     except Exception as e:
+        print("WALLET DEPOSIT ERROR: Outer", e)
         return jsonify({'error': str(e)}), 500
 
 accounts_file = "accounts.json"
