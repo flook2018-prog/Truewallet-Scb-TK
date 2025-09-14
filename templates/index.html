@@ -3,6 +3,25 @@
 <head>
 <title>THKBot168 Dashboard</title>
 <style>
+/* โลโก้หัวเว็บ */
+.header-logos {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.header-logos img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  background: transparent !important;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.header-logos .sk-logo {
+  background: transparent !important;
+}
 /* ปุ่มตั้งค่าระบบบัญชี */
 .account-settings-btn {
   background: #007bff;
@@ -97,6 +116,10 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </style>
 </head>
 <body>
+<div class="header-logos">
+  <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="Ngox Logo">
+  <img src="{{ url_for('static', filename='sk-logo.png') }}" alt="SK Logo" class="sk-logo">
+</div>
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
