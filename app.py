@@ -1,4 +1,12 @@
 # -------------------- SCB SMS PAGE --------------------
+
+# (ต้องอยู่หลัง app = Flask(__name__))
+
+
+# -------------------- SCB SMS PAGE --------------------
+
+# (ต้องอยู่หลัง app = Flask(__name__))
+
 @app.route("/scb_sms")
 def scb_sms_page():
     return render_template("scb_sms.html")
@@ -28,6 +36,10 @@ def wallet_deposit_data():
     try:
         url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
         headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
+
+@app.route("/scb_sms")
+def scb_sms_page():
+    return render_template("scb_sms.html")
         resp = requests.get(url, headers=headers, timeout=10)
         try:
             data = resp.json()
