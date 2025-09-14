@@ -1,8 +1,20 @@
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
 import os, json, jwt, random
 from datetime import datetime, timedelta
-# Proxy endpoint สำหรับ wallet deposit (แก้ปัญหา CORS)
 import requests
+import threading
+
+# -------------------- Config --------------------
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+accounts_file = "accounts.json"
+accounts_lock = threading.Lock()
+
+# Proxy endpoint สำหรับ wallet deposit (แก้ปัญหา CORS)
 @app.route('/api/proxy_wallet_deposit')
 def proxy_wallet_deposit():
     try:
@@ -12,12 +24,6 @@ def proxy_wallet_deposit():
         return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
     except Exception as e:
         return {'error': str(e)}, 500
-import threading
-accounts_file = "accounts.json"
-accounts_lock = threading.Lock()
-
-# -------------------- Config --------------------
-UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
