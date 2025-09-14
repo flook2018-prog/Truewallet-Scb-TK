@@ -341,40 +341,46 @@ async function updateStatusLights() {
       document.getElementById('tw-tk-status-light').style.background = '#28a745';
       document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      document.getElementById('tw-tk-status-light').style.background = '#dc3545';
-      document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+      document.getElementById('tw-tk-status-light').style.background = '#ccc';
+      document.getElementById('tw-tk-status-text').innerText = '';
     }
   } catch (e) {
-    document.getElementById('tw-tk-status-light').style.background = '#dc3545';
-    document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    document.getElementById('tw-tk-status-light').style.background = '#ccc';
+    document.getElementById('tw-tk-status-text').innerText = '';
   }
   // SCB สุมิธร์
   try {
     const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
-    if (resp.ok) {
+    let data = await resp.json();
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    if (resp.ok && latest && latest.balance) {
       document.getElementById('scb-status-light').style.background = '#28a745';
       document.getElementById('scb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      document.getElementById('scb-status-light').style.background = '#dc3545';
-      document.getElementById('scb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+      document.getElementById('scb-status-light').style.background = '#ccc';
+      document.getElementById('scb-status-text').innerText = '';
     }
   } catch (e) {
-    document.getElementById('scb-status-light').style.background = '#dc3545';
-    document.getElementById('scb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    document.getElementById('scb-status-light').style.background = '#ccc';
+    document.getElementById('scb-status-text').innerText = '';
   }
   // SCB พลอยไพริน
   try {
     const resp = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
-    if (resp.ok) {
+    let data = await resp.json();
+    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
+    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    if (resp.ok && latest && latest.balance) {
       document.getElementById('scb2-status-light').style.background = '#28a745';
       document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      document.getElementById('scb2-status-light').style.background = '#dc3545';
-      document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+      document.getElementById('scb2-status-light').style.background = '#ccc';
+      document.getElementById('scb2-status-text').innerText = '';
     }
   } catch (e) {
-    document.getElementById('scb2-status-light').style.background = '#dc3545';
-    document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    document.getElementById('scb2-status-light').style.background = '#ccc';
+    document.getElementById('scb2-status-text').innerText = '';
   }
   // Truewallet BB ENJ
   try {
@@ -386,12 +392,12 @@ async function updateStatusLights() {
       document.getElementById('tw-bb-status-light').style.background = '#28a745';
       document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      document.getElementById('tw-bb-status-light').style.background = '#dc3545';
-      document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+      document.getElementById('tw-bb-status-light').style.background = '#ccc';
+      document.getElementById('tw-bb-status-text').innerText = '';
     }
   } catch (e) {
-    document.getElementById('tw-bb-status-light').style.background = '#dc3545';
-    document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    document.getElementById('tw-bb-status-light').style.background = '#ccc';
+    document.getElementById('tw-bb-status-text').innerText = '';
   }
   // Truewallet BP
   try {
@@ -403,12 +409,12 @@ async function updateStatusLights() {
       document.getElementById('tw-bp-status-light').style.background = '#28a745';
       document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อสำเร็จ';
     } else {
-      document.getElementById('tw-bp-status-light').style.background = '#dc3545';
-      document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+      document.getElementById('tw-bp-status-light').style.background = '#ccc';
+      document.getElementById('tw-bp-status-text').innerText = '';
     }
   } catch (e) {
-    document.getElementById('tw-bp-status-light').style.background = '#dc3545';
-    document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    document.getElementById('tw-bp-status-light').style.background = '#ccc';
+    document.getElementById('tw-bp-status-text').innerText = '';
   }
 }
 setInterval(updateStatusLights, 3000);
