@@ -497,6 +497,61 @@ setInterval(() => {
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
 
+// ดึงข้อมูลฝากวอเลทใหม่และแสดงใน New Orders
+async function fetchDepositWallets() {
+  try {
+    let resp = await fetch("/api/deposit_wallet");
+    let data = await resp.json();
+    if (!Array.isArray(data)) return;
+    let newBody = document.querySelector("#new-orders-table tbody");
+    if (!newBody) return;
+    // แทรกข้อมูลฝากวอเลทไว้ด้านบนสุด
+    data.forEach(tx => {
+      let row = newBody.insertRow(0);
+      row.insertCell(0).innerText = tx.event;
+      row.insertCell(1).innerText = tx.amount_str;
+      row.insertCell(2).innerText = tx.name || "-";
+      let userCell = row.insertCell(3);
+      let inputUser = document.createElement("input");
+      inputUser.className = "customer-user";
+      inputUser.value = tempUserData[tx.id] || tx.customer_user || "";
+      inputUser.oninput = () => { tempUserData[tx.id] = inputUser.value; };
+      userCell.appendChild(inputUser);
+      row.insertCell(4).innerText = tx.time || "-";
+      row.insertCell(5).innerText = tx.bank || "-";
+      row.insertCell(6).innerText = "-"; // ไม่มีสลิป
+      let cell = row.insertCell(7);
+      let btnApprove = document.createElement("button");
+      btnApprove.className = "approve"; btnApprove.innerText = "อนุมัติ";
+      btnApprove.onclick = async () => {
+        let customer_user = inputUser.value.trim();
+        if (!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
+        // TODO: เพิ่ม API สำหรับอนุมัติฝากวอเลท ถ้าต้องการ
+        alert("(Demo) กดอนุมัติ: " + tx.id + " | user: " + customer_user);
+        delete tempUserData[tx.id];
+        fetchDepositWallets();
+      };
+      let btnCancel = document.createElement("button");
+      btnCancel.className = "cancel"; btnCancel.innerText = "ยกเลิก";
+      btnCancel.onclick = async () => {
+        // TODO: เพิ่ม API สำหรับยกเลิกฝากวอเลท ถ้าต้องการ
+        alert("(Demo) กดยกเลิก: " + tx.id);
+        delete tempUserData[tx.id];
+        fetchDepositWallets();
+      };
+      cell.appendChild(btnApprove);
+      cell.appendChild(btnCancel);
+    });
+  } catch (e) {
+    let newBody = document.querySelector("#new-orders-table tbody");
+    if (newBody) newBody.innerHTML = '<tr><td colspan="8">เกิดข้อผิดพลาดในการโหลดข้อมูลฝากวอเลท</td></tr>';
+  }
+}
+
+// เรียกฟังก์ชันนี้หลัง fetchTransactions() ทุกครั้ง
+setInterval(() => { fetchTransactions(); fetchDepositWallets(); }, 3000);
+window.addEventListener('DOMContentLoaded', () => { fetchTransactions(); fetchDepositWallets(); });
+
 async function fetchTransactions(){
   try {
     let resp = await fetch("https://xinonshow789-production.up.railway.app/truewallet/webhook", {
