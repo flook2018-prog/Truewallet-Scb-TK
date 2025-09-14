@@ -15,14 +15,40 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Proxy endpoint สำหรับ wallet deposit (GET ข้อมูลจาก API กลาง)
+
+# Proxy endpoint สำหรับ wallet deposit (GET ข้อมูลจาก API กลาง + decode JWT)
 @app.route('/api/wallet_deposit_data')
 def wallet_deposit_data():
     try:
         url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
         headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
         resp = requests.get(url, headers=headers, timeout=10)
-        return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
+        data = resp.json()
+        # ถ้า data เป็น list (อนาคต), return ได้เลย
+        if isinstance(data, list):
+            return jsonify({"new_orders": data})
+        # ถ้า data เป็น dict ที่มี message (JWT)
+        if "message" in data:
+            import jwt
+            token = data["message"]
+            try:
+                decoded = jwt.decode(token, "defbe102c9f4e9eaad1e16de7f8efe13", algorithms=["HS256"], options={"verify_iat": False})
+                # แปลงข้อมูลให้อยู่ในรูปแบบที่ frontend ใช้
+                tx = {
+                    "id": decoded.get("transaction_id", ""),
+                    "event": decoded.get("event_type", ""),
+                    "amount": decoded.get("amount", 0),
+                    "amount_str": f"{decoded.get('amount',0)/100:,.2f}",
+                    "name": f"{decoded.get('sender_name','-')} / {decoded.get('sender_mobile','-')}",
+                    "bank": decoded.get("channel", "-"),
+                    "status": "new",
+                    "time": decoded.get("received_time", ""),
+                    "slip_filename": None
+                }
+                return jsonify({"new_orders": [tx]})
+            except Exception as e:
+                return jsonify({"error": f"JWT decode error: {str(e)}"}), 500
+        return jsonify({"error": "No data"}), 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
