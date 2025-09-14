@@ -531,7 +531,22 @@ async function fetchDepositWallets() {
       inputUser.value = tempUserData[tx.id] || tx.customer_user || "";
       inputUser.oninput = () => { tempUserData[tx.id] = inputUser.value; };
       userCell.appendChild(inputUser);
-      row.insertCell(4).innerText = tx.time_str || tx.time || "-";
+      // Format time: 'วัน/เดือน/ปี เวลา' (remove +07:00 but keep timezone logic)
+      let rawTime = tx.time_str || tx.time || "-";
+      let displayTime = rawTime;
+      if (rawTime && rawTime !== "-") {
+        // Remove timezone part if present
+        let t = rawTime.replace(/\+\d{2}:?\d{2}$/, "");
+        // Try to parse and format as DD/MM/YYYY HH:mm:ss
+        let d = new Date(t);
+        if (!isNaN(d.getTime())) {
+          let pad = n => n.toString().padStart(2, '0');
+          displayTime = `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        } else {
+          displayTime = t;
+        }
+      }
+      row.insertCell(4).innerText = displayTime;
       row.insertCell(5).innerText = tx.bank || "-";
       row.insertCell(6).innerText = "-"; // ไม่มีสลิป
       let cell = row.insertCell(7);
@@ -539,8 +554,7 @@ async function fetchDepositWallets() {
       btnApprove.className = "approve"; btnApprove.innerText = "อนุมัติ";
       btnApprove.onclick = async () => {
         let customer_user = inputUser.value.trim();
-        if (!customer_user) return alert("ต้องใส่ยูสเซอร์ลูกค้าก่อนอนุมัติ");
-        alert("(Demo) กดอนุมัติ: " + tx.id + " | user: " + customer_user);
+        alert("(Demo) กดอนุมัติ: " + tx.id + (customer_user ? " | user: " + customer_user : ""));
         delete tempUserData[tx.id];
         fetchDepositWallets();
       };
