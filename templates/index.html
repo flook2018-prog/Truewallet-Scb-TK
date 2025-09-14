@@ -131,8 +131,12 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
-  <div class="summary-card">
-    <h2>💰 Truewallet TK</h2>
+  <div class="summary-card" style="position:relative;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
+      <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    </div>
+    <h2 style="margin-top:32px;">💰 Truewallet TK</h2>
     <span id="tw-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
     <div id="tw-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
       <span id="tw-mobile">-</span><br>
@@ -145,9 +149,9 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
   <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
-      <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-      <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
+      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="scb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
     </div>
     <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
     <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
@@ -159,7 +163,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
   <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
       <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
       <span id="scb2-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
     </div>
@@ -173,7 +177,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่อง Truewallet BB ENJ -->
   <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
       <span id="tw-bb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
       <span id="tw-bb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
     </div>
@@ -190,7 +194,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่อง Truewallet BP -->
   <div class="summary-card" id="tw-bp-box" style="max-width:420px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
       <span id="tw-bp-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
       <span id="tw-bp-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
     </div>
@@ -325,6 +329,90 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 
 <script>
+// --- อัปเดตสถานะไฟและข้อความทุกกล่อง summary-card ---
+async function updateStatusLights() {
+  // Truewallet TK
+  try {
+    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer dce99fdf74189d0854c0eeb627c1f4d8' }
+    });
+    if (resp.ok) {
+      document.getElementById('tw-tk-status-light').style.background = '#28a745';
+      document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      document.getElementById('tw-tk-status-light').style.background = '#dc3545';
+      document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    }
+  } catch (e) {
+    document.getElementById('tw-tk-status-light').style.background = '#dc3545';
+    document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+  }
+  // SCB สุมิธร์
+  try {
+    const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
+    if (resp.ok) {
+      document.getElementById('scb-status-light').style.background = '#28a745';
+      document.getElementById('scb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      document.getElementById('scb-status-light').style.background = '#dc3545';
+      document.getElementById('scb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    }
+  } catch (e) {
+    document.getElementById('scb-status-light').style.background = '#dc3545';
+    document.getElementById('scb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+  }
+  // SCB พลอยไพริน
+  try {
+    const resp = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
+    if (resp.ok) {
+      document.getElementById('scb2-status-light').style.background = '#28a745';
+      document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      document.getElementById('scb2-status-light').style.background = '#dc3545';
+      document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    }
+  } catch (e) {
+    document.getElementById('scb2-status-light').style.background = '#dc3545';
+    document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+  }
+  // Truewallet BB ENJ
+  try {
+    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer 4cb88e53852339a9257c6fa1dccdb6af' }
+    });
+    if (resp.ok) {
+      document.getElementById('tw-bb-status-light').style.background = '#28a745';
+      document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      document.getElementById('tw-bb-status-light').style.background = '#dc3545';
+      document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    }
+  } catch (e) {
+    document.getElementById('tw-bb-status-light').style.background = '#dc3545';
+    document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+  }
+  // Truewallet BP
+  try {
+    const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer 2ecade3f36166b2b9858e281e95c8560' }
+    });
+    if (resp.ok) {
+      document.getElementById('tw-bp-status-light').style.background = '#28a745';
+      document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อสำเร็จ';
+    } else {
+      document.getElementById('tw-bp-status-light').style.background = '#dc3545';
+      document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+    }
+  } catch (e) {
+    document.getElementById('tw-bp-status-light').style.background = '#dc3545';
+    document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อขัดข้อง';
+  }
+}
+setInterval(updateStatusLights, 3000);
+window.addEventListener('DOMContentLoaded', updateStatusLights);
 // --- ดึงยอด Truewallet BP ผ่าน API แล้วแสดงผล ---
 async function fetchTruewalletBPBalance() {
   try {
