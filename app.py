@@ -1,3 +1,6 @@
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
+import os, json, jwt, random
+from datetime import datetime, timedelta
 # Proxy endpoint สำหรับ wallet deposit (แก้ปัญหา CORS)
 import requests
 @app.route('/api/proxy_wallet_deposit')
@@ -9,6 +12,35 @@ def proxy_wallet_deposit():
         return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
     except Exception as e:
         return {'error': str(e)}, 500
+import threading
+accounts_file = "accounts.json"
+accounts_lock = threading.Lock()
+
+# -------------------- Config --------------------
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+transactions = {"new": [], "approved": [], "cancelled": []}
+daily_summary_history = defaultdict(float)
+ip_approver_map = {}
+
+DATA_FILE = "transactions_data.json"
+LOG_FILE = "transactions.log"
+
+# Proxy endpoint สำหรับ wallet deposit (แก้ปัญหา CORS)
+@app.route('/api/proxy_wallet_deposit')
+def proxy_wallet_deposit():
+    try:
+        url = 'https://xinonshow789-production.up.railway.app/truewallet/webhook'
+        headers = {'Authorization': 'Bearer defbe102c9f4e9eaad1e16de7f8efe13'}
+        resp = requests.get(url, headers=headers, timeout=10)
+        return (resp.text, resp.status_code, {'Content-Type': resp.headers.get('Content-Type', 'application/json')})
+    except Exception as e:
+        return {'error': str(e)}, 500
+
 deposit_wallets = []  # รายการฝากวอเลทใหม่
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
