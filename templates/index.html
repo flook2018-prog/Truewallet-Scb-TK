@@ -343,45 +343,36 @@ async function updateStatusLights() {
   try {
     const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
     let data = await resp.json();
-    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    // Use new status field from backend
+    const status = data.status || '';
     const scbStatusText = document.getElementById('scb-status-text');
-    if (resp.ok && latest && latest.balance) {
+    if (status === 'connected') {
       document.getElementById('scb-status-light').style.background = '#28a745';
-      if (scbStatusText.innerText !== 'เชื่อมต่อสำเร็จ') {
-        scbStatusText.innerText = 'เชื่อมต่อสำเร็จ';
-      }
+      scbStatusText.innerText = 'เชื่อมต่อสำเร็จ';
     } else {
       document.getElementById('scb-status-light').style.background = '#ccc';
-      if (scbStatusText.innerText !== '') {
-        scbStatusText.innerText = '';
-      }
+      scbStatusText.innerText = 'เชื่อมต่อ...';
     }
   } catch (e) {
     document.getElementById('scb-status-light').style.background = '#ccc';
-    document.getElementById('scb-status-text').innerText = '';
+    document.getElementById('scb-status-text').innerText = 'เชื่อมต่อ...';
   }
   // SCB พลอยไพริน
   try {
     const resp = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
     let data = await resp.json();
-    let smsList = Array.isArray(data) ? data : (data.sms_list || []);
-    let latest = smsList.length > 0 ? smsList[smsList.length-1] : null;
+    const status2 = data.status || '';
     const scb2StatusText = document.getElementById('scb2-status-text');
-    if (resp.ok && latest && latest.balance) {
+    if (status2 === 'connected') {
       document.getElementById('scb2-status-light').style.background = '#28a745';
-      if (scb2StatusText.innerText !== 'เชื่อมต่อสำเร็จ') {
-        scb2StatusText.innerText = 'เชื่อมต่อสำเร็จ';
-      }
+      scb2StatusText.innerText = 'เชื่อมต่อสำเร็จ';
     } else {
       document.getElementById('scb2-status-light').style.background = '#ccc';
-      if (scb2StatusText.innerText !== '') {
-        scb2StatusText.innerText = '';
-      }
+      scb2StatusText.innerText = 'เชื่อมต่อ...';
     }
   } catch (e) {
     document.getElementById('scb2-status-light').style.background = '#ccc';
-    document.getElementById('scb2-status-text').innerText = '';
+    document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อ...';
   }
   // Truewallet BB ENJ
   try {
