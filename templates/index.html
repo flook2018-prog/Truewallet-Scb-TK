@@ -149,24 +149,24 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
   <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
-    <!-- ไฟและสถานะด้านบนขวาถูกลบตามคำขอ -->
-    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
-      SCB
-      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:2;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:24px;width:auto;vertical-align:middle;">
+      <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;margin-left:4px;"></span>
+      <span id="scb-status-text" style="font-size:0.95em;color:#555;margin-left:4px;">เชื่อมต่อ...</span>
     </div>
-  <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
+    <h2 style="margin-top:32px;font-size:1.1em;margin-bottom:8px;">SCB สุมิธร์ คิมภิรานนท์</h2>
+    <span id="account-balance-info" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (SCB พลอยไพริน นามโคตร) -->
   <div class="summary-card" id="account-balance-box2" style="max-width:320px;min-width:180px;position:relative;">
-    <!-- ไฟและสถานะด้านบนขวาถูกลบตามคำขอ -->
-    <h2 style="font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
-    <div style="font-size:1.5em;font-weight:bold;color:#8000ff;display:flex;align-items:center;justify-content:center;gap:8px;">
-      SCB
-      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:2;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:24px;width:auto;vertical-align:middle;">
+      <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;margin-left:4px;"></span>
+      <span id="scb2-status-text" style="font-size:0.95em;color:#555;margin-left:4px;">เชื่อมต่อ...</span>
     </div>
-  <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
+    <h2 style="margin-top:32px;font-size:1.1em;margin-bottom:8px;">SCB พลอยไพริน นามโคตร</h2>
+    <span id="account-balance-info2" style="display:block;font-size:2em;font-weight:bold;color:#ff9800;text-align:center;margin-top:10px;">0 บาท</span>
     <div style="font-size:0.95em;color:#888;text-align:center;margin-top:2px;">ยอดคงเหลือล่าสุด</div>
   </div>
   <!-- กล่อง Truewallet BB ENJ -->
@@ -175,7 +175,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <h2>🪙 Truewallet BB ENJ</h2>
     <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
     <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
-        <div style="position:absolute;top:10px;right:10px;display:flex;align-items:center;gap:6px;">
+        <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:2;">
           <span id="tw-bb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
           <span id="tw-bb-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
         </div>
