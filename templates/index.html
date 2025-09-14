@@ -673,14 +673,26 @@ async function fetchDepositWallets() {
       btnApprove.className = "approve"; btnApprove.innerText = "อนุมัติ";
       btnApprove.onclick = async () => {
         let customer_user = inputUser.value.trim();
+        await fetch("/approve", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: tx.id, customer_user })
+        });
         delete tempUserData[tx.id];
         fetchDepositWallets();
+        fetchTransactions();
       };
       let btnCancel = document.createElement("button");
       btnCancel.className = "cancel"; btnCancel.innerText = "ยกเลิก";
       btnCancel.onclick = async () => {
+        await fetch("/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: tx.id })
+        });
         delete tempUserData[tx.id];
         fetchDepositWallets();
+        fetchTransactions();
       };
       cell.appendChild(btnApprove);
       cell.appendChild(btnCancel);
