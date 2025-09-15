@@ -61,6 +61,20 @@ h2{margin:10px 0}
   display:flex;
   justify-content:flex-start;
   align-items:flex-start;
+
+  <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
+  <div class="upload-slip-box">
+    <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
+      <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
+    </h2>
+    <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
+      <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
+      <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
+    </form>
+    <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
+  </div>
+
   flex-wrap:wrap;
   margin-bottom:20px;
   gap:10px;
@@ -120,6 +134,62 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 ::-webkit-scrollbar{width:8px}
 ::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,0.2);border-radius:4px}
 ::-webkit-scrollbar-track{background:transparent}
+</style>
+<style>
+/* กล่องอัพโหลดสลิป */
+.upload-slip-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(108,52,131,0.10);
+  padding: 18px 20px 16px 20px;
+  margin: 18px auto 0 auto;
+  max-width: 340px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e0e0e0;
+}
+.upload-slip-box h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  color: #6c3483;
+}
+.upload-slip-box input[type="file"] {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fafafa;
+  padding: 6px 8px;
+  width: 100%;
+  font-size: 1em;
+  transition: border 0.2s;
+}
+.upload-slip-box input[type="file"]:focus {
+  border: 1.5px solid #6c3483;
+  outline: none;
+}
+.upload-slip-btn {
+  background: linear-gradient(90deg,#6c3483 60%,#ff9800 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108,52,131,0.08);
+  transition: background 0.2s;
+}
+.upload-slip-btn:hover {
+  background: linear-gradient(90deg,#ff9800 60%,#6c3483 100%);
+}
+.upload-slip-hint {
+  font-size: 0.92em;
+  color: #888;
+  margin-top: 2px;
+  text-align: center;
+}
 </style>
 </head>
 <body>
