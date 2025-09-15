@@ -133,26 +133,41 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 <h1>Dashboard(Realtime)</h1>
 
-<div id="top-bar">
-  <div class="summary-card" style="position:relative;">
-    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
-      <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-      <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
-    </div>
-    <h2 style="margin-top:32px;">💰 Truewallet TK</h2>
-    <span id="tw-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
-    <div id="tw-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
-      <span id="tw-mobile">-</span><br>
-      <span id="tw-updated">-</span>
-    </div>
-    <div style="margin-top:10px;text-align:center;">
-      <button onclick="resetApproved()">รีเซทรายการอนุมัติ</button>
-      <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
+<div id="dashboard">
+  <div id="wallet-deposit-section">
+    <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+    <div class="scroll-box">
+      <table id="wallet-deposit-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
-  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
-  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
-    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:2;">
+  <div id="right-column">
+    <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
+    <div class="scroll-box">
+      <table id="approved-orders-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+        <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
+    <div class="scroll-box">
+      <table id="cancelled-orders-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+        <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
       <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:24px;width:auto;vertical-align:middle;">
       <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;margin-left:4px;"></span>
       <span id="scb-status-text" style="font-size:0.95em;color:#555;margin-left:4px;">เชื่อมต่อ...</span>
