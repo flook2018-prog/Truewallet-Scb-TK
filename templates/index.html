@@ -277,38 +277,39 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <div id="dashboard">
   <!-- ลบกล่อง New Orders ออก -->
   <!--
-  <div id="left-column">
-  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการใหม่ (New Orders)</h2>
-    <div class="scroll-box">
-      <table id="new-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <div id="dashboard">
+    <!-- ...existing code... -->
+
+    <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
+    <div class="upload-slip-box">
+      <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
+        <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
+      </h2>
+      <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+        <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
+        <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
+        <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
+      </form>
+      <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
+    </div>
+
+    <!-- Section ใหม่: รายการฝากวอเลท -->
+    <div id="wallet-deposit-section">
+      <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+      <div class="scroll-box">
+        <table id="wallet-deposit-table">
+          <thead>
+          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="right-column">
+      <!-- ...existing code... -->
     </div>
   </div>
-  -->
-  <!-- Section ใหม่: รายการฝากวอเลท -->
-  <div id="wallet-deposit-section">
-  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
-    <div class="scroll-box">
-      <table id="wallet-deposit-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-  <!-- /Section ใหม่ -->
-  <div id="right-column">
-  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
-    <div class="scroll-box">
-      <table id="approved-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-        <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
         </thead>
         <tbody></tbody>
       </table>
