@@ -1,4 +1,3 @@
-</style>
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,6 +62,18 @@ h2{margin:10px 0}
   justify-content:flex-start;
   align-items:flex-start;
 
+  <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
+  <div class="upload-slip-box">
+    <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
+      <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
+    </h2>
+    <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
+      <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
+      <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
+    </form>
+    <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
+  </div>
 
   flex-wrap:wrap;
   margin-bottom:20px;
@@ -124,6 +135,62 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 ::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,0.2);border-radius:4px}
 ::-webkit-scrollbar-track{background:transparent}
 </style>
+<style>
+/* กล่องอัพโหลดสลิป */
+.upload-slip-box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(108,52,131,0.10);
+  padding: 18px 20px 16px 20px;
+  margin: 18px auto 0 auto;
+  max-width: 340px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px solid #e0e0e0;
+}
+.upload-slip-box h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  color: #6c3483;
+}
+.upload-slip-box input[type="file"] {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #fafafa;
+  padding: 6px 8px;
+  width: 100%;
+  font-size: 1em;
+  transition: border 0.2s;
+}
+.upload-slip-box input[type="file"]:focus {
+  border: 1.5px solid #6c3483;
+  outline: none;
+}
+.upload-slip-btn {
+  background: linear-gradient(90deg,#6c3483 60%,#ff9800 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(108,52,131,0.08);
+  transition: background 0.2s;
+}
+.upload-slip-btn:hover {
+  background: linear-gradient(90deg,#ff9800 60%,#6c3483 100%);
+}
+.upload-slip-hint {
+  font-size: 0.92em;
+  color: #888;
+  margin-top: 2px;
+  text-align: center;
+}
+</style>
 </head>
 <body>
 <!-- โลโก้หัวเว็บ (2 โลโก้, ขนาดเหมาะสม, อยู่กลาง, ซ่อนหลัง 5 นาที) -->
@@ -133,92 +200,26 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 <h1>Dashboard(Realtime)</h1>
 
-  <div id="dashboard">
-    <div id="wallet-deposit-section">
-      <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
-      <div class="scroll-box">
-        <table id="wallet-deposit-table">
-          <thead>
-          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+<div id="top-bar">
+  <div class="summary-card" style="position:relative;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
+      <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+      <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
     </div>
-    <div id="right-column">
-      <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
-      <div class="scroll-box">
-        <table id="approved-orders-table">
-          <thead>
-          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-          <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
-      <div class="scroll-box">
-        <table id="cancelled-orders-table">
-          <thead>
-          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-          <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <h2 style="margin-top:32px;">💰 Truewallet TK</h2>
+    <span id="tw-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
+    <div id="tw-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
+      <span id="tw-mobile">-</span><br>
+      <span id="tw-updated">-</span>
+    </div>
+    <div style="margin-top:10px;text-align:center;">
+      <button onclick="resetApproved()">รีเซทรายการอนุมัติ</button>
+      <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
     </div>
   </div>
-
-  <div id="bottom-row">
-    <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 24px;">
-      <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ -->
-      <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-          <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-          <span id="scb-status-text">เชื่อมต่อ...</span>
-        </div>
-        <div style="margin-bottom:8px;">
-          <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
-        </div>
-        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-          <table id="scb-sms-table" style="width:100%;border:none">
-            <thead>
-              <tr>
-                <th>วันที่/เวลา</th>
-                <th>รายละเอียด</th>
-                <th>ยอดคงเหลือ</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-      <!-- กล่องขวา: พลอยไพริน นามโคตร -->
-      <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-          <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-          <span id="scb2-status-text">เชื่อมต่อ...</span>
-        </div>
-        <div style="margin-bottom:8px;">
-          <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร</span>
-        </div>
-        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-          <table id="scb2-sms-table" style="width:100%;border:none">
-            <thead>
-              <tr>
-                <th>วันที่/เวลา</th>
-                <th>รายละเอียด</th>
-                <th>ยอดคงเหลือ</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- กล่องแสดงชื่อบัญชี ธนาคาร และยอดคงเหลือ (ไม่เอาปุ่ม) -->
+  <div class="summary-card" id="account-balance-box" style="max-width:320px;min-width:180px;position:relative;">
+    <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;z-index:2;">
       <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:24px;width:auto;vertical-align:middle;">
       <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;margin-left:4px;"></span>
       <span id="scb-status-text" style="font-size:0.95em;color:#555;margin-left:4px;">เชื่อมต่อ...</span>
@@ -276,23 +277,90 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 <div id="dashboard">
   <!-- ลบกล่อง New Orders ออก -->
   <!--
-  <div id="dashboard">
-    <!-- ...existing code... -->
+  <div id="left-column">
+  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการใหม่ (New Orders)</h2>
+    <div class="scroll-box">
+      <table id="new-orders-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  -->
+  <!-- Section ใหม่: รายการฝากวอเลท -->
+  <div id="wallet-deposit-section">
+  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+    <div class="scroll-box">
+      <table id="wallet-deposit-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /Section ใหม่ -->
+  <div id="right-column">
+  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
+    <div class="scroll-box">
+      <table id="approved-orders-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+        <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
+    <div class="scroll-box">
+      <table id="cancelled-orders-table">
+        <thead>
+        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+        <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="bottom-row">
 
 
-    <!-- Section ใหม่: รายการฝากวอเลท -->
-    <div id="wallet-deposit-section">
-      <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
-      <div class="scroll-box">
-        <table id="wallet-deposit-table">
+  <div style="display: flex; gap: 20px; align-items: flex-start;">
+    <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ -->
+    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+        <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="scb-status-text">เชื่อมต่อ...</span>
+      </div>
+      <div style="margin-bottom:8px;">
+  <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
+      </div>
+      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+        <table id="scb-sms-table" style="width:100%;border:none">
           <thead>
-          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+            <tr>
+              <th>วันที่/เวลา</th>
+              <th>รายละเอียด</th>
+              <th>ยอดคงเหลือ</th>
+            </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
     </div>
-
+    <!-- กล่องขวา: พลอยไพริน นามโคตร -->
+    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+        <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="scb2-status-text">เชื่อมต่อ...</span>
+      </div>
       <div style="margin-bottom:8px;">
   <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร </span>
       </div>
