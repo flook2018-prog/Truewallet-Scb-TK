@@ -212,18 +212,6 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   <div id="dashboard">
     <!-- ...existing code... -->
 
-    <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
-    <div class="upload-slip-box">
-      <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
-        <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
-      </h2>
-      <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-        <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
-        <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
-        <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
-      </form>
-      <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
-    </div>
 
     <!-- Section ใหม่: รายการฝากวอเลท -->
     <div id="wallet-deposit-section">
@@ -238,62 +226,6 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       </div>
     </div>
 
-    <div id="right-column">
-      <!-- ...existing code... -->
-    </div>
-  </div>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
-    <div class="scroll-box">
-      <table id="cancelled-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-        <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div id="bottom-row">
-
-
-  <div style="display: flex; gap: 20px; align-items: flex-start;">
-    <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ -->
-    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-        <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-        <span id="scb-status-text">เชื่อมต่อ...</span>
-      </div>
-      <div style="margin-bottom:8px;">
-  <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
-      </div>
-      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-        <table id="scb-sms-table" style="width:100%;border:none">
-          <thead>
-            <tr>
-              <th>วันที่/เวลา</th>
-              <th>รายละเอียด</th>
-              <th>ยอดคงเหลือ</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-    <!-- กล่องขวา: พลอยไพริน นามโคตร -->
-    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-      <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-        <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-        <span id="scb2-status-text">เชื่อมต่อ...</span>
-      </div>
       <div style="margin-bottom:8px;">
   <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร </span>
       </div>
