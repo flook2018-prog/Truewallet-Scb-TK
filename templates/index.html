@@ -78,9 +78,10 @@
 }
 .header-logos .sk-logo {
 /* ปุ่ม toggle ยกเลิกแล้ว (แดง) - อยู่ใน <style> */
+/* Toggle Cancelled Button (Red) */
 .toggle-cancelled {
-  background: linear-gradient(90deg, #e74c3c 60%, #ff7675 100%) !important;
-  color: #fff;
+  background: #eee;
+  color: #e74c3c;
   border: none;
   border-radius: 10px;
   font-weight: bold;
@@ -89,10 +90,16 @@
   margin: 18px 10px 24px 0;
   box-shadow: 0 2px 8px rgba(231,76,60,0.10);
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s, color 0.18s;
+}
+.toggle-cancelled.active,
+.toggle-cancelled:active {
+  background: linear-gradient(90deg, #e74c3c 60%, #ff7675 100%) !important;
+  color: #fff;
 }
 .toggle-cancelled:hover {
   background: linear-gradient(90deg, #c0392b 60%, #ffb3b3 100%) !important;
+  color: #fff;
   box-shadow: 0 4px 16px rgba(231,76,60,0.18);
   transform: translateY(-2px) scale(1.03);
 }
@@ -130,12 +137,46 @@
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .toggle-approved {
+  background: #eee;
+  color: #27ae60;
+}
+.toggle-approved.active,
+.toggle-approved:active {
   background: linear-gradient(90deg,#27ae60 60%,#8fd19e 100%);
   color: #fff;
 }
 .toggle-approved:hover {
   background: linear-gradient(90deg,#219150 60%,#6fcf97 100%);
+  color: #fff;
 }
+
+</style>
+
+<!-- ...rest of HTML... -->
+
+<script>
+// Toggle active class for Approved/Cancelled buttons
+document.addEventListener('DOMContentLoaded', function() {
+  const btnApproved = document.getElementById('show-approved');
+  const btnCancelled = document.getElementById('show-cancelled');
+  const approvedSection = document.getElementById('approved-section');
+  const cancelledSection = document.getElementById('cancelled-section');
+  function setActive(btnActive, btnInactive, sectionShow, sectionHide) {
+    btnActive.classList.add('active');
+    btnInactive.classList.remove('active');
+    sectionShow.style.display = '';
+    sectionHide.style.display = 'none';
+  }
+  btnApproved.addEventListener('click', function() {
+    setActive(btnApproved, btnCancelled, approvedSection, cancelledSection);
+  });
+  btnCancelled.addEventListener('click', function() {
+    setActive(btnCancelled, btnApproved, cancelledSection, approvedSection);
+  });
+  // Set initial state
+  setActive(btnApproved, btnCancelled, approvedSection, cancelledSection);
+});
+</script>
 .logout-btn {
   background: #dc3545;
   color: #fff;
