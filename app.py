@@ -120,13 +120,18 @@ def kbiz_notifications_api():
         }
         data = {k: v for k, v in data.items() if v is not None}
 
-        # ถ้า amount มีข้อความยาวผิดปกติ (ไม่ใช่ตัวเลข) เช่น "ทำรายการสำเร็จ ..." ให้ parse ใหม่
-        if 'amount' in data and (not data['amount'] or not data['amount'].replace(",", "").replace(".", "").isdigit()):
-            # ลอง parse ข้อความจาก amount
-            parsed = parse_kbiz_message(data['amount'])
-            # ถ้า desc, amount, time ยังไม่มีใน args ให้เติมจาก parsed
+        # ถ้า amount, desc, time ทั้งหมดว่างหรือผิดปกติ (หรือเหมือนกันหมด) ให้ parse ใหม่จาก amount หรือ desc
+        def is_invalid(val):
+            return (not val) or (isinstance(val, str) and val.strip() in ('-', 'None', 'null', 'undefined'))
+
+        all_fields = [data.get('amount'), data.get('desc'), data.get('time')]
+        # ถ้า amount, desc, time เป็นข้อความเดียวกันหมด หรือว่างหมด หรือ amount ไม่ใช่ตัวเลข
+        if (len(set([v for v in all_fields if v])) == 1 and all_fields[0]) or all(is_invalid(v) for v in all_fields) or ('amount' in data and (not data['amount'] or not data['amount'].replace(",", "").replace(".", "").isdigit())):
+            # ลอง parse ข้อความจาก amount ก่อน ถ้าไม่มีลอง desc
+            msg = data.get('amount') or data.get('desc') or ''
+            parsed = parse_kbiz_message(msg)
             for k in ['amount', 'desc', 'time']:
-                if not data.get(k) and parsed.get(k):
+                if parsed.get(k):
                     data[k] = parsed[k]
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
