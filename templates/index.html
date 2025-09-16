@@ -53,14 +53,17 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 8px 18px;
+  padding: 10px 22px;
   font-size: 1em;
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(220,53,69,0.08);
-  margin-top: 10px;
-  margin-left: 10px;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
+  position: fixed;
+  top: 28px;
+  right: 38px;
+  z-index: 9999;
+  margin: 0;
 }
 .logout-btn:hover {
   background: #b52a37;
@@ -290,7 +293,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
   <button class="account-settings-btn" onclick="window.location.href='/account_settings'">⚙️ ตั้งค่าระบบบัญชี</button>
-  <button class="logout-btn" onclick="window.location.href='/logout'">ออกจากระบบ</button>
+<button class="logout-btn" onclick="window.location.href='/logout'">ออกจากระบบ</button>
     <div id="toggle-mode">🌞</div>
   </div>
 </div>
