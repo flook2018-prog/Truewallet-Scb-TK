@@ -1,5 +1,5 @@
 
-from flask import Flask, request, jsonify, render_template, send_from_directory, send_file
+from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, redirect, url_for, session
 import os, json, jwt, random
 from datetime import datetime, timedelta
 import requests
@@ -13,8 +13,10 @@ from models import DepositWallet
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
 
 
 
@@ -292,8 +294,27 @@ def fmt_amount(a):
     return f"{a/100:,.2f}" if isinstance(a,(int,float)) else str(a)
 
 # -------------------- Flask Endpoints --------------------
+
+# -------------------- Login --------------------
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # ตัวอย่าง: username=admin, password=1234 (ควรเปลี่ยนเป็นระบบจริง)
+        if username == 'admin' and password == '1234':
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('index'))
+        else:
+            error = 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง'
+    return render_template('login.html', error=error)
+
 @app.route("/")
 def index():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
     user_ip = request.remote_addr or "unknown"
     return render_template("index.html", user_ip=user_ip)
 

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | THKBot168 Dashboard</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons8-lion-head-64.png') }}">
+    <style>
+        body {
+            background: linear-gradient(120deg, #f0f2f5 60%, #ffe082 100%);
+            font-family: 'Segoe UI', 'Prompt', 'Kanit', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-box {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(108,52,131,0.13), 0 1.5px 8px rgba(255,152,0,0.08);
+            padding: 38px 32px 32px 32px;
+            min-width: 340px;
+            max-width: 95vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: none; }
+        }
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(108,52,131,0.10);
+        }
+        h2 {
+            text-align: center;
+            color: #6c3483;
+            margin-bottom: 18px;
+            font-size: 1.6em;
+            letter-spacing: 1px;
+        }
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #333;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .input-group {
+            width: 100%;
+            margin-bottom: 18px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #e0e0e0;
+            font-size: 1.08em;
+            background: #fafafa;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border: 1.5px solid #6c3483;
+            outline: none;
+            background: #fffbe7;
+        }
+        button {
+            width: 100%;
+            background: linear-gradient(90deg,#6c3483 60%,#ff9800 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 0;
+            font-size: 1.15em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(108,52,131,0.08);
+            transition: background 0.2s, transform 0.1s;
+        }
+        button:hover {
+            background: linear-gradient(90deg,#ff9800 60%,#6c3483 100%);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .error {
+            color: #c0392b;
+            text-align: center;
+            margin-bottom: 14px;
+            background: #ffeaea;
+            border-radius: 6px;
+            padding: 7px 0;
+            font-size: 1em;
+        }
+        .login-hint {
+            color: #888;
+            font-size: 0.98em;
+            text-align: center;
+            margin-top: 10px;
+        }
+        @media (max-width: 480px) {
+            .login-box { min-width: 90vw; padding: 22px 6vw; }
+            h2 { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+    <form class="login-box" method="post" action="/login" autocomplete="on">
+        <img src="{{ url_for('static', filename='icons8-lion-head-64.png') }}" alt="Logo" class="login-logo">
+        <h2>เข้าสู่ระบบ THKBot168</h2>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <div class="input-group">
+            <label for="username">ชื่อผู้ใช้</label>
+            <input type="text" id="username" name="username" required autofocus placeholder="กรอกชื่อผู้ใช้...">
+        </div>
+        <div class="input-group">
+            <label for="password">รหัสผ่าน</label>
+            <input type="password" id="password" name="password" required placeholder="กรอกรหัสผ่าน...">
+        </div>
+        <button type="submit">เข้าสู่ระบบ</button>
+        <div class="login-hint">สำหรับผู้ดูแลระบบเท่านั้น</div>
+    </form>
+</body>
+</html>
