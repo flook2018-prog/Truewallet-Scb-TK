@@ -1,3 +1,4 @@
+
 # -------------------- Logout --------------------
 
 # -------------------- Logout --------------------
@@ -21,6 +22,27 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
+
+# -------------------- Kbiz Withdraw Notification (เฟซใหม่) --------------------
+from threading import Lock
+kbiz_notifications = []
+kbiz_lock = Lock()
+
+# POST: รับแจ้งเตือนใหม่, GET: ดึงรายการแจ้งเตือนล่าสุด (max 10)
+@app.route('/api/kbiz_notifications', methods=['GET', 'POST'])
+def kbiz_notifications_api():
+    global kbiz_notifications
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        # ตัวอย่าง payload: {"amount": 1234.56, "time": "2025-09-16 12:34:56", "desc": "ถอนเงิน Kbiz", ...}
+        with kbiz_lock:
+            kbiz_notifications.insert(0, data)
+            kbiz_notifications = kbiz_notifications[:10]  # เก็บแค่ 10 รายการล่าสุด
+        return jsonify({"status": "ok"})
+    else:
+        # GET: ส่งรายการแจ้งเตือนล่าสุด
+        with kbiz_lock:
+            return jsonify({"notifications": kbiz_notifications[:10]})
 
 # -------------------- Logout --------------------
 @app.route('/logout')
