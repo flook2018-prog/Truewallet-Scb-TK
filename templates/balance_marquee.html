@@ -1,75 +1,33 @@
-<style>
-#balance-marquee {
-  background: #fffbe7;
-  color: #333;
-  font-weight: bold;
-  font-size: 1.1rem;
-  padding: 8px 0;
-  border-bottom: 1px solid #ffe082;
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-  z-index: 100;
-}
-#marquee-text {
-  white-space: nowrap;
-  display: inline-block;
-  position: relative;
-}
-</style>
-<div id="balance-marquee">
-  <span id="marquee-text"></span>
-</div>
 <script>
-const balanceColors = [
-  "#27ae60", // Truewallet TK - เขียว
-  "#8e44ad", // SCB สุมิธร์ - ม่วง
-  "#e67e22", // SCB พลอยไพริน - ส้ม
-  "#2980b9", // Truewallet BB ENJ - น้ำเงิน
-  "#c0392b"  // Truewallet BP - แดง
-];
-function getBalances() {
-  function getAmount(id) {
-    let el = parent.document.getElementById(id);
-    if (!el) return 0;
-    let txt = el.innerText.replace(/[^0-9.,]/g, '').replace(/,/g, '');
-    let num = parseFloat(txt);
-    return isNaN(num) ? 0 : num;
-  }
-  return [
-    { name: "Truewallet TK", amount: getAmount('tw-balance') },
-    { name: "SCB สุมิธร์ คิมภิรานนท์", amount: getAmount('account-balance-info') },
-    { name: "SCB พลอยไพริน นามโคตร", amount: getAmount('account-balance-info2') },
-    { name: "Truewallet BB ENJ", amount: getAmount('tw-bb-balance') },
-    { name: "Truewallet BP", amount: getAmount('tw-bp-balance') }
+// ดึงยอดเงินจริงจาก DOM (id ของแต่ละยอดเงิน)
+function getAmountById(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  const txt = el.innerText.replace(/[^0-9.,]/g, '').replace(/,/g, '');
+  const num = parseFloat(txt);
+  return isNaN(num) ? 0 : num;
+}
+
+function getMarqueeTitle() {
+  const balances = [
+    { name: "Truewallet TK", id: "tw-balance" },
+    { name: "SCB สุมัจิรี คิมภิรานนท์", id: "account-balance-info" },
+    { name: "SCB พลอยไพริน นามโคตร", id: "account-balance-info2" },
+    { name: "Truewallet BB ENJ", id: "tw-bb-balance" },
+    { name: "Truewallet BP", id: "tw-bp-balance" }
   ];
+  return balances.map(b => `${b.name}: ${getAmountById(b.id).toLocaleString()} บาท`).join(' | ');
 }
-function setMarqueeText() {
-  const balances = getBalances();
-  const html = balances.map((b, i) =>
-    `<span style="color:${balanceColors[i]};">${b.name}: ${b.amount.toLocaleString()} บาท</span>`
-  ).join(`<span style="color:#888;"> | </span>`);
-  document.getElementById("marquee-text").innerHTML = html;
+
+let marqueeTitle = getMarqueeTitle() + ' ';
+let marqueePos = 0;
+
+function marqueeTitleTick() {
+  // อัปเดตยอดเงินใหม่ทุกครั้ง
+  marqueeTitle = getMarqueeTitle() + ' ';
+  document.title = marqueeTitle.substring(marqueePos) + " " + marqueeTitle.substring(0, marqueePos);
+  marqueePos = (marqueePos + 1) % marqueeTitle.length;
+  setTimeout(marqueeTitleTick, 200); // ปรับความเร็วได้
 }
-setMarqueeText();
-const marquee = document.getElementById('balance-marquee');
-const text = document.getElementById('marquee-text');
-function resetMarquee() {
-  text.style.left = marquee.offsetWidth + 'px';
-}
-resetMarquee();
-function animateMarquee() {
-  let left = parseInt(text.style.left, 10);
-  left--;
-  if (left < -text.offsetWidth) {
-    left = marquee.offsetWidth;
-  }
-  text.style.left = left + 'px';
-  requestAnimationFrame(animateMarquee);
-}
-animateMarquee();
-setInterval(() => {
-  setMarqueeText();
-  resetMarquee();
-}, 5000);
+marqueeTitleTick();
 </script>
