@@ -446,6 +446,29 @@ function toggleSection(sectionId) {
           <tbody></tbody>
         </table>
       </div>
+      <!-- กล่องแจ้งเตือน Kbiz (ปฏิพล วงค์สุวรรณ 1192211510) -->
+      <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px; margin-top:12px;">
+        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="Kbiz Logo" style="height:32px;max-width:80px;width:auto;">
+          <span id="kbiz-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="kbiz-status-text">ไม่มีข้อมูล</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="font-weight:bold;">รายการเงินออก Kbiz ปฏิพล วงค์สุวรรณ 1192211510</span>
+        </div>
+        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+          <table id="kbiz-notify-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>จำนวนเงิน</th>
+              </tr>
+            </thead>
+            <tbody id="kbiz-notify-tbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
     <!-- กล่องขวา: พลอยไพริน นามโคตร -->
     <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
@@ -1073,6 +1096,29 @@ async function fetchKbizNotifications() {
 }
 setInterval(fetchKbizNotifications, 4000);
 fetchKbizNotifications();
+
+// --- Kbiz Notify Table ---
+async function renderKbizNotifyTable() {
+  try {
+    const res = await fetch('/api/kbiz_notifications');
+    const data = await res.json();
+    const tbody = document.getElementById('kbiz-notify-tbody');
+    tbody.innerHTML = '';
+    if (data.notifications && data.notifications.length > 0) {
+      data.notifications.forEach(n => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${n.time || '-'}</td><td>${n.desc || '-'}</td><td>${n.amount !== undefined ? n.amount.toLocaleString('th-TH', {minimumFractionDigits:2}) : '-'}</td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="3">ไม่มีข้อมูลแจ้งเตือน</td></tr>';
+    }
+  } catch (e) {
+    document.getElementById('kbiz-notify-tbody').innerHTML = '<tr><td colspan="3">โหลดข้อมูลผิดพลาด</td></tr>';
+  }
+}
+setInterval(renderKbizNotifyTable, 4000);
+renderKbizNotifyTable();
 </script>
 </body>
 </html>
