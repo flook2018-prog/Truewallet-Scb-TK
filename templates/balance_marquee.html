@@ -8,26 +8,33 @@ function getAmountById(id) {
   return isNaN(num) ? 0 : num;
 }
 
+// ใช้ emoji/สัญลักษณ์แทนสี (เพราะ title ไม่รองรับสี)
+const balanceInfos = [
+  { name: "Truewallet TK", id: "tw-balance", icon: "🟢" },
+  { name: "SCB สุมัจิรี คิมภิรานนท์", id: "account-balance-info", icon: "🟣" },
+  { name: "SCB พลอยไพริน นามโคตร", id: "account-balance-info2", icon: "🟠" },
+  { name: "Truewallet BB ENJ", id: "tw-bb-balance", icon: "🔵" },
+  { name: "Truewallet BP", id: "tw-bp-balance", icon: "🔴" }
+];
+
 function getMarqueeTitle() {
-  const balances = [
-    { name: "Truewallet TK", id: "tw-balance" },
-    { name: "SCB สุมัจิรี คิมภิรานนท์", id: "account-balance-info" },
-    { name: "SCB พลอยไพริน นามโคตร", id: "account-balance-info2" },
-    { name: "Truewallet BB ENJ", id: "tw-bb-balance" },
-    { name: "Truewallet BP", id: "tw-bp-balance" }
-  ];
-  return balances.map(b => `${b.name}: ${getAmountById(b.id).toLocaleString()} บาท`).join(' | ');
+  return balanceInfos.map(b => `${b.icon} ${b.name}: ${getAmountById(b.id).toLocaleString()} บาท`).join(' | ');
 }
 
-let marqueeTitle = getMarqueeTitle() + ' ';
+let marqueeTitle = getMarqueeTitle() + '   ';
 let marqueePos = 0;
 
 function marqueeTitleTick() {
-  // อัปเดตยอดเงินใหม่ทุกครั้ง
-  marqueeTitle = getMarqueeTitle() + ' ';
-  document.title = marqueeTitle.substring(marqueePos) + " " + marqueeTitle.substring(0, marqueePos);
-  marqueePos = (marqueePos + 1) % marqueeTitle.length;
-  setTimeout(marqueeTitleTick, 200); // ปรับความเร็วได้
+  // อัปเดตยอดเงินใหม่ทุก 10 รอบ (ลดการกระตุก)
+  if (marqueePos % 10 === 0) {
+    marqueeTitle = getMarqueeTitle() + '   ';
+  }
+  // ใช้ slice เพื่อให้ smooth
+  let t = marqueeTitle + marqueeTitle;
+  let len = marqueeTitle.length;
+  document.title = t.slice(marqueePos, marqueePos + len);
+  marqueePos = (marqueePos + 1) % len;
+  setTimeout(marqueeTitleTick, 80); // ปรับความเร็วได้ (80ms = smooth)
 }
 marqueeTitleTick();
 </script>
