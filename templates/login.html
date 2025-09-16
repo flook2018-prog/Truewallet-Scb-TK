@@ -53,13 +53,27 @@
             color: #333;
             font-weight: 500;
             letter-spacing: 0.5px;
+            text-align: left;
+            width: 60%;
+            min-width: 120px;
+            max-width: 220px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 2px;
         }
         .input-group {
             width: 100%;
             margin-bottom: 18px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
+            justify-content: flex-start;
+            position: relative;
+            /* label and input will be aligned left */
+            margin-left: 0;
+            margin-right: 0;
+            padding-left: 0;
+            padding-right: 0;
         }
         input[type="text"], input[type="password"] {
             width: 60%;
@@ -71,7 +85,7 @@
             font-size: 1.08em;
             background: #fafafa;
             transition: border 0.2s;
-            margin: 0 auto;
+            margin: 0 auto 0 auto;
             display: block;
         }
         input[type="text"]:focus, input[type="password"]:focus {
