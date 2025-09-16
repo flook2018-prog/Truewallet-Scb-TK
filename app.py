@@ -1,3 +1,8 @@
+# -------------------- Logout --------------------
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, redirect, url_for, session
 import os, json, jwt, random
