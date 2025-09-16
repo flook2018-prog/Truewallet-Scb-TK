@@ -29,6 +29,7 @@ kbiz_notifications = []
 kbiz_lock = Lock()
 
 # POST: รับแจ้งเตือนใหม่, GET: ดึงรายการแจ้งเตือนล่าสุด (max 10)
+
 @app.route('/api/kbiz_notifications', methods=['GET', 'POST'])
 def kbiz_notifications_api():
     global kbiz_notifications
@@ -39,6 +40,20 @@ def kbiz_notifications_api():
             kbiz_notifications.insert(0, data)
             kbiz_notifications = kbiz_notifications[:10]  # เก็บแค่ 10 รายการล่าสุด
         return jsonify({"status": "ok"})
+    elif request.method == 'GET' and any(k in request.args for k in ['amount','desc','time','image']):
+        # รับแจ้งเตือนผ่าน HTTP GET (เช่นจาก MacroDroid หรือ webhook)
+        data = {
+            'amount': request.args.get('amount'),
+            'desc': request.args.get('desc'),
+            'time': request.args.get('time'),
+            'image': request.args.get('image')
+        }
+        # กรอง None ออก
+        data = {k: v for k, v in data.items() if v is not None}
+        with kbiz_lock:
+            kbiz_notifications.insert(0, data)
+            kbiz_notifications = kbiz_notifications[:10]
+        return jsonify({"status": "ok", "via": "GET"})
     else:
         # GET: ส่งรายการแจ้งเตือนล่าสุด
         with kbiz_lock:
