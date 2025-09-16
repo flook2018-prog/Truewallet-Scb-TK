@@ -36,21 +36,24 @@ def parse_kbiz_message(msg):
     time = None
     desc = None
 
-    # ดึงยอดเงิน (ตรง "จำนวน ... บาท" หรือ "จำนวน...บาท")
+    # 1. พยายามดึงยอดเงิน ("จำนวน ... บาท" หรือ "จำนวน...บาท")
     m = re.search(r'จำนวน\s*([\d,]+\.\d{2})\s*บาท', msg)
     if m:
         amount = m.group(1).replace(',', '')
         desc = msg[:m.start()].strip()
     else:
-        # ถ้าไม่มี 'จำนวน ... บาท' ให้หาเลขยอดเงินในข้อความ
+        # 2. ถ้าไม่มี 'จำนวน ... บาท' ให้หาเลขยอดเงินในข้อความ (เช่น 100.00)
         m2 = re.search(r'([\d,]+\.\d{2})', msg)
         if m2:
             amount = m2.group(1).replace(',', '')
+            # ลบเลขยอดเงินออกจาก desc
             desc = msg.replace(m2.group(0), '').replace('จำนวน', '').replace('บาท', '').strip()
         else:
+            # 3. ไม่เจอเลขเลย amount=None, desc=เต็มข้อความ
+            amount = None
             desc = msg.strip()
 
-    # ดึงเวลา (รูปแบบ dd/mm/yyyy hh:mm:ss หรือ hh:mm)
+    # 4. ดึงเวลา (dd/mm/yyyy hh:mm:ss หรือ hh:mm)
     t = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})', msg)
     if t:
         time = t.group(1)
@@ -58,6 +61,23 @@ def parse_kbiz_message(msg):
         t2 = re.search(r'(\d{2}:\d{2})', msg)
         if t2:
             time = t2.group(1)
+        else:
+            time = None
+
+    # 5. ถ้า desc ยาวเกิน 60 ตัวอักษร ให้ตัด ...
+    if desc and len(desc) > 60:
+        desc = desc[:57] + '...'
+
+    # 6. ถ้า amount ไม่ใช่ตัวเลข ให้ None
+    try:
+        if amount is not None:
+            float(amount)
+    except Exception:
+        amount = None
+
+    # 7. ถ้า desc เป็นค่าว่าง ให้ desc = "-"
+    if not desc:
+        desc = "-"
 
     return {
         'amount': amount,
