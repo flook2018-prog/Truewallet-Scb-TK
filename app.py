@@ -104,7 +104,18 @@ def kbiz_notifications_api():
         # ถ้ามี field 'raw_message' ให้แยกส่วน
         if 'raw_message' in data:
             parsed = parse_kbiz_message(data['raw_message'])
+            # ถ้า field 'time' ไม่ถูกส่งมาด้วย ให้ใช้เวลาจาก parsed หรือเวลาปัจจุบัน
+            if not data.get('time'):
+                if parsed.get('time'):
+                    data['time'] = parsed['time']
+                else:
+                    # fallback: เวลาปัจจุบัน (Asia/Bangkok)
+                    data['time'] = datetime.now(pytz.timezone('Asia/Bangkok')).strftime('%d/%m/%Y %H:%M:%S')
             data.update(parsed)
+        else:
+            # ถ้าไม่มี raw_message แต่มี time ใน data ให้ใช้เลย, ถ้าไม่มีให้ fallback
+            if not data.get('time'):
+                data['time'] = datetime.now(pytz.timezone('Asia/Bangkok')).strftime('%d/%m/%Y %H:%M:%S')
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
             kbiz_notifications = kbiz_notifications[:10]
@@ -113,6 +124,9 @@ def kbiz_notifications_api():
         # รับข้อความรวมผ่าน GET
         msg = request.args.get('raw_message')
         parsed = parse_kbiz_message(msg)
+        # ถ้าไม่มี time ใน parsed ให้ fallback เป็นเวลาปัจจุบัน
+        if not parsed.get('time'):
+            parsed['time'] = datetime.now(pytz.timezone('Asia/Bangkok')).strftime('%d/%m/%Y %H:%M:%S')
         with kbiz_lock:
             kbiz_notifications.insert(0, parsed)
             kbiz_notifications = kbiz_notifications[:10]
@@ -127,7 +141,6 @@ def kbiz_notifications_api():
         }
         data = {k: v for k, v in data.items() if v is not None}
 
-        # ถ้า amount, desc, time ทั้งหมดว่างหรือผิดปกติ (หรือเหมือนกันหมด) ให้ parse ใหม่จาก amount หรือ desc
         def is_invalid(val):
             return (not val) or (isinstance(val, str) and val.strip() in ('-', 'None', 'null', 'undefined'))
 
@@ -140,6 +153,9 @@ def kbiz_notifications_api():
             for k in ['amount', 'desc', 'time']:
                 if parsed.get(k):
                     data[k] = parsed[k]
+        # ถ้าไม่มี time ใน data ให้ fallback เป็นเวลาปัจจุบัน
+        if not data.get('time'):
+            data['time'] = datetime.now(pytz.timezone('Asia/Bangkok')).strftime('%d/%m/%Y %H:%M:%S')
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
             kbiz_notifications = kbiz_notifications[:10]
