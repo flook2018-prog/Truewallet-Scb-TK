@@ -169,9 +169,37 @@ h2{margin:10px 0}
 body.night .summary-card span#wallet-info::after{
     color:#eee;
 }
-#dashboard{display:flex;gap:20px;flex-wrap:wrap}
-#left-column,#right-column{flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px}
-#bottom-row{margin-top:20px}
+/* ปรับ layout กล่อง summary-card ให้เว้นระยะห่างเหมาะสม */
+#dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+#dashboard .summary-card {
+  margin-bottom: 0;
+  margin-right: 0;
+}
+#left-column, #right-column {
+  flex: 1;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+#bottom-row {
+  margin-top: 28px;
+}
+@media (max-width: 1100px) {
+  #dashboard { gap: 18px; }
+  #left-column, #right-column { min-width: 220px; gap: 14px; }
+}
+@media (max-width: 800px) {
+  #dashboard { flex-direction: column; gap: 12px; }
+  #left-column, #right-column { min-width: 0; gap: 10px; }
+}
 .scroll-box{max-height:400px;overflow-y:auto;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:10px;scroll-behavior:smooth;transition:all 0.3s}
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px;text-align:center;font-size:0.95em;border-bottom:1px solid #ddd;}
