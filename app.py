@@ -5,6 +5,7 @@
 # (Moved to after app = Flask(__name__))
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, redirect, url_for, session
+import re
 import os, json, jwt, random
 from datetime import datetime, timedelta
 import requests
@@ -28,34 +29,75 @@ from threading import Lock
 kbiz_notifications = []
 kbiz_lock = Lock()
 
+# --- ฟังก์ชันแยกข้อความแจ้งเตือน Kbiz ---
+def parse_kbiz_message(msg):
+    # ตัวอย่างข้อความ: "ทำรายการสำเร็จ โอนเงินให้ นายณัฐวุฒิ สงวนทรัพย์ บช x-9702x จำนวน 100.00 บาท"
+    amount = None
+    time = None
+    desc = None
+
+    # ดึงยอดเงิน
+    m = re.search(r'จำนวน\s*([\d,]+\.\d{2})\s*บาท', msg)
+    if m:
+        amount = m.group(1).replace(',', '')
+
+    # ดึงเวลา (รูปแบบ dd/mm/yyyy hh:mm:ss หรือ hh:mm)
+    t = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})', msg)
+    if t:
+        time = t.group(1)
+    else:
+        t2 = re.search(r'(\d{2}:\d{2})', msg)
+        if t2:
+            time = t2.group(1)
+
+    # ดึงรายละเอียด (ตัดยอดเงินและเวลาทิ้ง)
+    desc = re.sub(r'จำนวน\s*[\d,]+\.\d{2}\s*บาท.*', '', msg).strip()
+
+    return {
+        'amount': amount,
+        'desc': desc,
+        'time': time
+    }
+
 # POST: รับแจ้งเตือนใหม่, GET: ดึงรายการแจ้งเตือนล่าสุด (max 10)
 
+
+# --- API รับแจ้งเตือน Kbiz (รองรับข้อความรวม) ---
 @app.route('/api/kbiz_notifications', methods=['GET', 'POST'])
 def kbiz_notifications_api():
     global kbiz_notifications
     if request.method == 'POST':
         data = request.get_json(force=True)
-        # ตัวอย่าง payload: {"amount": 1234.56, "time": "2025-09-16 12:34:56", "desc": "ถอนเงิน Kbiz", ...}
+        # ถ้ามี field 'raw_message' ให้แยกส่วน
+        if 'raw_message' in data:
+            parsed = parse_kbiz_message(data['raw_message'])
+            data.update(parsed)
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
-            kbiz_notifications = kbiz_notifications[:10]  # เก็บแค่ 10 รายการล่าสุด
+            kbiz_notifications = kbiz_notifications[:10]
         return jsonify({"status": "ok"})
+    elif request.method == 'GET' and 'raw_message' in request.args:
+        # รับข้อความรวมผ่าน GET
+        msg = request.args.get('raw_message')
+        parsed = parse_kbiz_message(msg)
+        with kbiz_lock:
+            kbiz_notifications.insert(0, parsed)
+            kbiz_notifications = kbiz_notifications[:10]
+        return jsonify({"status": "ok", "via": "GET"})
     elif request.method == 'GET' and any(k in request.args for k in ['amount','desc','time','image']):
-        # รับแจ้งเตือนผ่าน HTTP GET (เช่นจาก MacroDroid หรือ webhook)
+        # รับแจ้งเตือนแบบแยก field เดิม
         data = {
             'amount': request.args.get('amount'),
             'desc': request.args.get('desc'),
             'time': request.args.get('time'),
             'image': request.args.get('image')
         }
-        # กรอง None ออก
         data = {k: v for k, v in data.items() if v is not None}
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
             kbiz_notifications = kbiz_notifications[:10]
         return jsonify({"status": "ok", "via": "GET"})
     else:
-        # GET: ส่งรายการแจ้งเตือนล่าสุด
         with kbiz_lock:
             return jsonify({"notifications": kbiz_notifications[:10]})
 
