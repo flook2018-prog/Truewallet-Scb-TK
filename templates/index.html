@@ -4,6 +4,11 @@
 <title>THKBot168 Dashboard</title>
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons8-lion-head-64.png') }}">
 <style>
+/* บังคับตารางในกล่อง SCB/Kbiz ใช้ table-layout: fixed เพื่อให้ max-width มีผลจริง */
+.scb-account-box .scroll-box table {
+  table-layout: fixed;
+  width: 100%;
+}
 /* จำกัดความกว้างคอลัมน์ในกล่อง SCB ทั้ง 3 กล่อง ไม่ให้ล้น */
 .scb-account-box .scroll-box th:nth-child(1),
 .scb-account-box .scroll-box td:nth-child(1) {
