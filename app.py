@@ -119,6 +119,15 @@ def kbiz_notifications_api():
             'image': request.args.get('image')
         }
         data = {k: v for k, v in data.items() if v is not None}
+
+        # ถ้า amount มีข้อความยาวผิดปกติ (ไม่ใช่ตัวเลข) เช่น "ทำรายการสำเร็จ ..." ให้ parse ใหม่
+        if 'amount' in data and (not data['amount'] or not data['amount'].replace(",", "").replace(".", "").isdigit()):
+            # ลอง parse ข้อความจาก amount
+            parsed = parse_kbiz_message(data['amount'])
+            # ถ้า desc, amount, time ยังไม่มีใน args ให้เติมจาก parsed
+            for k in ['amount', 'desc', 'time']:
+                if not data.get(k) and parsed.get(k):
+                    data[k] = parsed[k]
         with kbiz_lock:
             kbiz_notifications.insert(0, data)
             kbiz_notifications = kbiz_notifications[:10]
