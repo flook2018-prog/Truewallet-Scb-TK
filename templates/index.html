@@ -142,11 +142,11 @@ h2{margin:10px 0}
 .summary-card{
   background:#fff;
   border-radius:12px;
-  padding:15px 24px 15px 24px;
+  padding:8px 10px 8px 10px;
   box-shadow:0 4px 12px rgba(0,0,0,0.08);
-  min-width:0;
-  width:auto;
-  max-width:420px;
+  min-width:100px;
+  width:130px;
+  max-width:150px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -290,7 +290,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 <div id="top-bar">
   <div id="left-column" style="display:flex;flex-direction:column;gap:20px;min-width:320px;flex:1;">
-    <div class="summary-card" style="position:relative;">
+  <div class="summary-card" style="position:relative;max-width:150px;min-width:100px;">
       <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
         <span id="tw-tk-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
         <span id="tw-tk-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
@@ -306,7 +306,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <button onclick="resetCancelled()">รีเซทรายการยกเลิก</button>
       </div>
     </div>
-    <div class="summary-card" id="tw-bb-box" style="max-width:420px;min-width:180px;position:relative;">
+  <div class="summary-card" id="tw-bb-box" style="max-width:150px;min-width:100px;position:relative;">
       <h2>🪙 Truewallet BB ENJ</h2>
       <span id="tw-bb-balance" style="display:block;font-size:2em;font-weight:bold;color:#28a745;text-align:center;margin-top:10px;">-</span>
       <div id="tw-bb-info" style="font-size:1em;color:#555;text-align:center;margin-top:4px;">
@@ -318,7 +318,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="tw-bb-updated">-</span>
       </div>
     </div>
-    <div class="summary-card" id="tw-bp-box" style="max-width:420px;min-width:180px;position:relative;">
+  <div class="summary-card" id="tw-bp-box" style="max-width:150px;min-width:100px;position:relative;">
       <div style="position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;">
         <span id="tw-bp-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
         <span id="tw-bp-status-text" style="font-size:0.95em;color:#555;">สถานะ: -</span>
