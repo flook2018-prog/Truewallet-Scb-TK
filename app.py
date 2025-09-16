@@ -1,8 +1,7 @@
 # -------------------- Logout --------------------
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
+
+# -------------------- Logout --------------------
+# (Moved to after app = Flask(__name__))
 
 from flask import Flask, request, jsonify, render_template, send_from_directory, send_file, redirect, url_for, session
 import os, json, jwt, random
@@ -22,6 +21,12 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
+
+# -------------------- Logout --------------------
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 
 
