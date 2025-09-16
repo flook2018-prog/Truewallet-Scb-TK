@@ -213,18 +213,6 @@ h2{margin:10px 0}
   justify-content:flex-start;
   align-items:flex-start;
 
-  <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
-  <div class="upload-slip-box">
-    <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
-      <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
-    </h2>
-    <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-      <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
-      <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
-      <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
-    </form>
-    <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
-  </div>
 
   flex-wrap:wrap;
   margin-bottom:20px;
@@ -1211,5 +1199,5 @@ async function renderKbizNotifyTable() {
 setInterval(renderKbizNotifyTable, 4000);
 renderKbizNotifyTable();
 </script>
-</body>
+<body>
 </html>
