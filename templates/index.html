@@ -4,6 +4,28 @@
 <title>THKBot168 Dashboard</title>
 <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons8-lion-head-64.png') }}">
 <style>
+/* จำกัดความกว้างคอลัมน์ในกล่อง SCB ทั้ง 3 กล่อง ไม่ให้ล้น */
+.scb-account-box .scroll-box th:nth-child(1),
+.scb-account-box .scroll-box td:nth-child(1) {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.scb-account-box .scroll-box th:nth-child(2),
+.scb-account-box .scroll-box td:nth-child(2) {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.scb-account-box .scroll-box th:nth-child(3),
+.scb-account-box .scroll-box td:nth-child(3) {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .header-logos img:first-child {
   height: 216px;
 }
