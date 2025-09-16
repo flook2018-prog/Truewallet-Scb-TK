@@ -420,73 +420,62 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <div id="dashboard">
-  <!-- ลบกล่อง New Orders ออก -->
-  <!--
-  <div id="left-column">
-  <h2><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการใหม่ (New Orders)</h2>
-    <div class="scroll-box">
-      <table id="new-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <!-- Section ใหม่: รายการฝากวอเลท + ปุ่ม toggle + approved/cancelled (stacked, centered) -->
+  <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+    <div id="wallet-deposit-section">
+      <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
+      <div class="scroll-box">
+        <table id="wallet-deposit-table">
+          <thead>
+          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  -->
-  <!-- Section ใหม่: รายการฝากวอเลท -->
-  <div id="wallet-deposit-section">
-  <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
     <!-- ปุ่ม toggle แสดง/ซ่อน section -->
-    <div style="margin-bottom: 0;">
-      <button class="toggle-section-btn toggle-approved" type="button" onclick="toggleSection('approved-section')">ดูรายการที่อนุมัติแล้ว</button>
-  <button class="toggle-section-btn toggle-cancelled" type="button" onclick="toggleSection('cancelled-section')" style="background: linear-gradient(90deg, #e74c3c 60%, #ff7675 100%) !important; color: #fff;">ดูรายการที่ยกเลิกแล้ว</button>
+    <div style="margin: 18px 0 0 0; display: flex; gap: 16px; justify-content: center; width: 100%;">
+      <button class="toggle-section-btn toggle-approved" type="button" id="show-approved">ดูรายการที่อนุมัติแล้ว</button>
+      <button class="toggle-section-btn toggle-cancelled" type="button" id="show-cancelled">ดูรายการที่ยกเลิกแล้ว</button>
     </div>
-    <div class="scroll-box">
-      <table id="wallet-deposit-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div id="approved-section" style="display:none;">
+      <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
+      <div class="scroll-box">
+        <table id="approved-orders-table">
+          <thead>
+          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+          <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <!-- /Section ใหม่ -->
-  <div id="approved-section" style="display:none;">
-    <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
-    <div class="scroll-box">
-      <table id="approved-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-        <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-  <div id="cancelled-section" style="display:none;">
-    <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
-    <div class="scroll-box">
-      <table id="cancelled-orders-table">
-        <thead>
-        <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-        <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <div id="cancelled-section" style="display:none;">
+      <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
+      <div class="scroll-box">
+        <table id="cancelled-orders-table">
+          <thead>
+          <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
+          <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </style>
 <script>
-function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (section.style.display === 'none' || section.style.display === '') {
-    section.style.display = 'block';
-    window.scrollTo({top: section.offsetTop-60, behavior: 'smooth'});
-  } else {
-    section.style.display = 'none';
-  }
-}
+// ปุ่ม toggle แสดง/ซ่อน Approved/Cancelled ใต้ wallet deposit
+document.getElementById('show-approved').addEventListener('click', function() {
+  document.getElementById('approved-section').style.display = 'block';
+  document.getElementById('cancelled-section').style.display = 'none';
+  document.getElementById('approved-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+document.getElementById('show-cancelled').addEventListener('click', function() {
+  document.getElementById('approved-section').style.display = 'none';
+  document.getElementById('cancelled-section').style.display = 'block';
+  document.getElementById('cancelled-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 </script>
   </div>
 </div>
