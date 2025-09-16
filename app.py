@@ -40,6 +40,15 @@ def parse_kbiz_message(msg):
     m = re.search(r'จำนวน\s*([\d,]+\.\d{2})\s*บาท', msg)
     if m:
         amount = m.group(1).replace(',', '')
+        desc = msg[:m.start()].strip()
+    else:
+        # ถ้าไม่มี 'จำนวน ... บาท' ให้หาเลขยอดเงินในข้อความ
+        m2 = re.search(r'([\d,]+\.\d{2})', msg)
+        if m2:
+            amount = m2.group(1).replace(',', '')
+            desc = msg.replace(m2.group(0), '').replace('จำนวน', '').replace('บาท', '').strip()
+        else:
+            desc = msg.strip()
 
     # ดึงเวลา (รูปแบบ dd/mm/yyyy hh:mm:ss หรือ hh:mm)
     t = re.search(r'(\d{2}/\d{2}/\d{4}\s+\d{2}:\d{2}:\d{2})', msg)
@@ -49,14 +58,6 @@ def parse_kbiz_message(msg):
         t2 = re.search(r'(\d{2}:\d{2})', msg)
         if t2:
             time = t2.group(1)
-
-    # ดึงรายละเอียด (ตัด "จำนวน ... บาท" ออก)
-    desc = msg
-    if m:
-        desc = msg[:m.start()].strip()
-
-    # ถ้า desc ลงท้ายด้วย "เติมเงิน ไปยัง ..." หรือ "โอนเงินให้ ..." ให้คงไว้
-    # (ไม่ตัดเวลาหรือข้อมูลอื่นที่ไม่ใช่รายละเอียด)
 
     return {
         'amount': amount,
