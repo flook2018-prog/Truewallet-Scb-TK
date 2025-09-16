@@ -32,10 +32,14 @@ kbiz_lock = Lock()
 # --- ฟังก์ชันแยกข้อความแจ้งเตือน Kbiz ---
 def parse_kbiz_message(msg):
     # ตัวอย่างข้อความ: "ทำรายการสำเร็จ โอนเงินให้ นายณัฐวุฒิ สงวนทรัพย์ บช x-9702x จำนวน 100.00 บาท"
+    import urllib.parse
     amount = None
     time = None
     desc = None
-
+    # 0. Clean msg: decode %20, remove trailing timestamp (ถ้ามี)
+    msg = urllib.parse.unquote(msg)
+    # Remove trailing numbers (timestamp) after "บาท" (เช่น ...บาท1758027469330)
+    msg = re.sub(r'(บาท)\d{10,}$', r'\1', msg)
     # 1. พยายามดึงยอดเงิน ("จำนวน ... บาท" หรือ "จำนวน...บาท")
     m = re.search(r'จำนวน\s*([\d,]+\.\d{2})\s*บาท', msg)
     if m:
@@ -79,11 +83,14 @@ def parse_kbiz_message(msg):
     if not desc:
         desc = "-"
 
-    return {
+    # 8. รองรับ field ใหม่: ถ้ามีข้อมูลอื่นที่ไม่ใช่ amount/desc/time ให้เพิ่มใน dict
+    result = {
         'amount': amount,
         'desc': desc,
         'time': time
     }
+    # ถ้าเจอ field อื่นในข้อความ (เช่น "wallet_type" หรืออื่นๆ ในอนาคต) สามารถเพิ่ม logic ตรงนี้ได้
+    return result
 
 # POST: รับแจ้งเตือนใหม่, GET: ดึงรายการแจ้งเตือนล่าสุด (max 10)
 

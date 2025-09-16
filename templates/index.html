@@ -1155,10 +1155,13 @@ async function renderKbizNotifyTable() {
     tbody.innerHTML = '';
     if (data.notifications && data.notifications.length > 0) {
       data.notifications.forEach(n => {
-        // กรณี amount เป็น null หรือ desc เป็นยอดเงิน ให้แสดงถูกคอลัมน์
         let showAmount = n.amount || '';
         let showDesc = n.desc || '';
         let showTime = n.time || '';
+        // ถ้าไม่มีเวลา ให้ใช้เวลาปัจจุบัน
+        if (!showTime) {
+          showTime = new Date().toLocaleString('th-TH');
+        }
         // ถ้า amount ว่าง แต่ desc มีตัวเลขยอดเงิน ให้แยกยอดเงินออกมา
         if (!showAmount && showDesc) {
           const m = showDesc.match(/([\d,]+\.\d{2})/);
@@ -1167,19 +1170,19 @@ async function renderKbizNotifyTable() {
             showDesc = showDesc.replace(m[0], '').replace('จำนวน', '').replace('บาท', '').trim();
           }
         }
-        // ถ้า desc เป็นยอดเงิน ให้ย้ายไป amount
         if (!showDesc && showAmount) {
           showDesc = '-';
         }
-        // แปลง amount เป็นเลข format
+        // amount format
         let amountDisplay = '-';
         if (showAmount && !isNaN(Number(showAmount))) {
           amountDisplay = Number(showAmount).toLocaleString('th-TH', {minimumFractionDigits:2});
         } else if (showAmount) {
           amountDisplay = showAmount;
         }
+        // แสดงรายละเอียดเต็ม ไม่ตัด ...
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${showTime || '-'}</td><td>${showDesc || '-'}</td><td>${amountDisplay}</td>`;
+        tr.innerHTML = `<td>${showTime || '-'}</td><td style="white-space:normal;max-width:400px;">${showDesc || '-'}</td><td>${amountDisplay}</td>`;
         tbody.appendChild(tr);
       });
     } else {
