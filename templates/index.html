@@ -78,10 +78,9 @@
 }
 .header-logos .sk-logo {
 /* ปุ่ม toggle ยกเลิกแล้ว (แดง) - อยู่ใน <style> */
-/* Toggle Cancelled Button (Red) */
 .toggle-cancelled {
-  background: #eee;
-  color: #e74c3c;
+  background: linear-gradient(90deg, #e74c3c 60%, #ff7675 100%) !important;
+  color: #fff;
   border: none;
   border-radius: 10px;
   font-weight: bold;
@@ -90,16 +89,10 @@
   margin: 18px 10px 24px 0;
   box-shadow: 0 2px 8px rgba(231,76,60,0.10);
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.18s, transform 0.12s, color 0.18s;
-}
-.toggle-cancelled.active,
-.toggle-cancelled:active {
-  background: linear-gradient(90deg, #e74c3c 60%, #ff7675 100%) !important;
-  color: #fff;
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
 }
 .toggle-cancelled:hover {
   background: linear-gradient(90deg, #c0392b 60%, #ffb3b3 100%) !important;
-  color: #fff;
   box-shadow: 0 4px 16px rgba(231,76,60,0.18);
   transform: translateY(-2px) scale(1.03);
 }
@@ -137,46 +130,12 @@
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 .toggle-approved {
-  background: #eee;
-  color: #27ae60;
-}
-.toggle-approved.active,
-.toggle-approved:active {
   background: linear-gradient(90deg,#27ae60 60%,#8fd19e 100%);
   color: #fff;
 }
 .toggle-approved:hover {
   background: linear-gradient(90deg,#219150 60%,#6fcf97 100%);
-  color: #fff;
 }
-
-</style>
-
-<!-- ...rest of HTML... -->
-
-<script>
-// Toggle active class for Approved/Cancelled buttons
-document.addEventListener('DOMContentLoaded', function() {
-  const btnApproved = document.getElementById('show-approved');
-  const btnCancelled = document.getElementById('show-cancelled');
-  const approvedSection = document.getElementById('approved-section');
-  const cancelledSection = document.getElementById('cancelled-section');
-  function setActive(btnActive, btnInactive, sectionShow, sectionHide) {
-    btnActive.classList.add('active');
-    btnInactive.classList.remove('active');
-    sectionShow.style.display = '';
-    sectionHide.style.display = 'none';
-  }
-  btnApproved.addEventListener('click', function() {
-    setActive(btnApproved, btnCancelled, approvedSection, cancelledSection);
-  });
-  btnCancelled.addEventListener('click', function() {
-    setActive(btnCancelled, btnApproved, cancelledSection, approvedSection);
-  });
-  // Set initial state
-  setActive(btnApproved, btnCancelled, approvedSection, cancelledSection);
-});
-</script>
 .logout-btn {
   background: #dc3545;
   color: #fff;
@@ -213,6 +172,18 @@ h2{margin:10px 0}
   justify-content:flex-start;
   align-items:flex-start;
 
+  <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
+  <div class="upload-slip-box">
+    <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
+      <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
+    </h2>
+    <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
+      <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
+      <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
+    </form>
+    <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
+  </div>
 
   flex-wrap:wrap;
   margin-bottom:20px;
@@ -582,7 +553,90 @@ document.getElementById('show-cancelled').addEventListener('click', function() {
   </div>
 </div>
 
+<div id="bottom-row" style="margin-top: -60px;">
 
+  <div style="display: flex; gap: 20px; align-items: flex-start; margin-top: 0;">
+    <!-- กล่องซ้าย: สุมิธร์ คิมภิรานนท์ + พลอยไพริน นามโคตร (ย้ายมาอยู่ใต้กัน) -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:16px;">
+      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+          <span id="scb-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="scb-status-text">เชื่อมต่อ...</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="font-weight:bold;">SCB สุมิธร์ คิมภิรานนท์</span>
+        </div>
+        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+          <table id="scb-sms-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>ยอดคงเหลือ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+          <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="scb2-status-text">เชื่อมต่อ...</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="font-weight:bold;">SCB พลอยไพริน นามโคตร </span>
+        </div>
+        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+          <table id="scb2-sms-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>ยอดคงเหลือ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- กล่องขวา: Kbiz (แทนที่กล่อง SCB พลอยไพริน) -->
+    <div class="scb-account-box" style="flex:1; background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+        <img src="{{ url_for('static', filename='kbiz.png') }}" alt="Kbiz Logo" style="height:32px;max-width:80px;width:auto;">
+        <span id="kbiz-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+        <span id="kbiz-status-text">ไม่มีข้อมูล</span>
+      </div>
+      <div style="margin-bottom:8px;">
+        <span style="font-weight:bold;">รายการเงินออก Kbiz ปฏิพล วงค์สุวรรณ 1192211510</span>
+      </div>
+      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+        <table id="kbiz-notify-table" style="width:100%;border:none">
+          <thead>
+            <tr>
+              <th>วันที่/เวลา</th>
+              <th>รายละเอียด</th>
+              <th>จำนวนเงิน</th>
+            </tr>
+          </thead>
+          <tbody id="kbiz-notify-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h2>สรุปยอดรายวัน (5 วันล่าสุด)</h2>
+  <div class="scroll-box" style="max-height:180px;overflow-y:auto;">
+    <table id="daily-summary" style="width:100%;border:none">
+      <thead><tr><th>วันที่</th><th>รวมอนุมัติ</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+</div>
 
 
 
@@ -1152,7 +1206,7 @@ renderDemoApprovedCancelled();
 // --- Kbiz Withdraw Notification Realtime ---
 async function fetchKbizNotifications() {
   try {
-  const res = await fetch('https://xinon1565.up.railway.app/api/kbiz_notifications');
+    const res = await fetch('/api/kbiz_notifications');
     const data = await res.json();
     if (data.notifications && data.notifications.length > 0) {
       const latest = data.notifications[0];
@@ -1179,7 +1233,7 @@ fetchKbizNotifications();
 // --- Kbiz Notify Table ---
 async function renderKbizNotifyTable() {
   try {
-  const res = await fetch('https://xinon1565.up.railway.app/api/kbiz_notifications');
+    const res = await fetch('/api/kbiz_notifications');
     const data = await res.json();
     const tbody = document.getElementById('kbiz-notify-tbody');
     tbody.innerHTML = '';
@@ -1199,5 +1253,5 @@ async function renderKbizNotifyTable() {
 setInterval(renderKbizNotifyTable, 4000);
 renderKbizNotifyTable();
 </script>
-<body>
+</body>
 </html>
