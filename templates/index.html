@@ -1164,7 +1164,7 @@ renderDemoApprovedCancelled();
 // --- Kbiz Withdraw Notification Realtime ---
 async function fetchKbizNotifications() {
   try {
-    const res = await fetch('/api/kbiz_notifications');
+  const res = await fetch('https://xinon1565.up.railway.app/api/kbiz_notifications');
     const data = await res.json();
     if (data.notifications && data.notifications.length > 0) {
       const latest = data.notifications[0];
@@ -1191,7 +1191,7 @@ fetchKbizNotifications();
 // --- Kbiz Notify Table ---
 async function renderKbizNotifyTable() {
   try {
-    const res = await fetch('/api/kbiz_notifications');
+  const res = await fetch('https://xinon1565.up.railway.app/api/kbiz_notifications');
     const data = await res.json();
     const tbody = document.getElementById('kbiz-notify-tbody');
     tbody.innerHTML = '';
