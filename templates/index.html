@@ -55,6 +55,23 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* สำหรับตาราง OTP SCB กฤษฏา (4 คอลัมน์) */
+#scb3-sms-table th:nth-child(1), #scb3-sms-table td:nth-child(1) {
+  max-width: 70px;
+}
+#scb3-sms-table th:nth-child(2), #scb3-sms-table td:nth-child(2) {
+  max-width: 80px;
+  font-weight: bold;
+  color: #e74c3c;
+}
+#scb3-sms-table th:nth-child(3), #scb3-sms-table td:nth-child(3) {
+  max-width: 120px;
+}
+#scb3-sms-table th:nth-child(4), #scb3-sms-table td:nth-child(4) {
+  max-width: 80px;
+  font-weight: bold;
+  color: #27ae60;
+}
 .header-logos img:first-child {
   height: 216px;
 }
@@ -171,20 +188,6 @@ h2{margin:10px 0}
   display:flex;
   justify-content:flex-start;
   align-items:flex-start;
-
-  <!-- กล่องอัพโหลดสลิป (Upload Slip Box) -->
-  <div class="upload-slip-box">
-    <h2 style="font-size:1.1em;margin-bottom:10px;color:#6c3483;display:flex;align-items:center;gap:8px;">
-      <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Slip Icon" style="height:24px;width:auto;vertical-align:middle;"> อัพโหลดสลิปเพื่อตรวจสอบ
-    </h2>
-    <form action="https://slip.ngoxgame.com/api/check_slip.php" method="POST" enctype="multipart/form-data" target="_blank" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-      <input type="hidden" name="keyapi" value="API-41d2c6027558634c4f059b6867f368e3">
-      <input type="file" name="slip_image" accept="image/*" required style="padding:6px 0;">
-      <button type="submit" class="upload-slip-btn">ตรวจสอบสลิป</button>
-    </form>
-    <div class="upload-slip-hint">รองรับไฟล์รูปภาพเท่านั้น ผลลัพธ์จะแสดงในแท็บใหม่</div>
-  </div>
-
   flex-wrap:wrap;
   margin-bottom:20px;
   gap:10px;
@@ -546,15 +549,16 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           <span id="scb3-status-text">เชื่อมต่อ...</span>
         </div>
         <div style="margin-bottom:8px;">
-          <span style="font-weight:bold;">SCB กฤษฏา สุดแม่ง</span>
+          <span style="font-weight:bold;">SCB กฤษฏา สุดแม่ง - OTP การตัดบัตร</span>
         </div>
         <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
           <table id="scb3-sms-table" style="width:100%;border:none">
             <thead>
               <tr>
-                <th>วันที่/เวลา</th>
-                <th>รายละเอียด</th>
-                <th>ยอดคงเหลือ</th>
+                <th>เวลา</th>
+                <th>OTP Code</th>
+                <th>รายการ/ร้านค้า</th>
+                <th>ยอดเงิน</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -640,7 +644,7 @@ async function updateStatusLights() {
   }
   // SCB กฤษฏา สุดแม่ง
   try {
-    const resp = await fetch(`/api/sms?tag=kritsadasudmaeng&sender=027777777`);
+    const resp = await fetch(`http://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`);
     let data = await resp.json();
     const status3 = data.status || '';
     const scb3StatusText = document.getElementById('scb3-status-text');
@@ -861,9 +865,18 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
   const statusLight = document.getElementById(statusLightId);
   const statusText = document.getElementById(statusTextId);
   try {
-    // URL ของ API ใหม่ (เช่น http://localhost:5001/api/sms หรือ URL ที่ deploy)
-  const apiBase = 'https://xinon1565.up.railway.app'; // production API
-    const resp = await fetch(`${apiBase}/api/sms?tag=${tag}&sender=027777777`);
+    let apiUrl, apiBase;
+    
+    // ตรวจสอบว่าเป็น SCB กฤษฏา สุดแม่ง (scb3) หรือไม่
+    if (tableId === 'scb3-sms-table') {
+      apiUrl = `http://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`;
+    } else {
+      // URL ของ API ปกติสำหรับ SCB อื่นๆ
+      apiBase = 'https://xinon1565.up.railway.app'; // production API
+      apiUrl = `${apiBase}/api/sms?tag=${tag}&sender=027777777`;
+    }
+    
+    const resp = await fetch(apiUrl);
     const data = await resp.json();
     if (data.status === 'connected') {
       statusLight.style.background = '#28a745';
@@ -875,17 +888,63 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
     let smsList = Array.isArray(data.sms) ? data.sms : [];
     const tbody = document.querySelector(`#${tableId} tbody`);
     tbody.innerHTML = '';
-    smsList.forEach(sms => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${sms.date_time || '-'}<\/td><td>${sms.detail || sms.sms || '-'}<\/td><td>${sms.balance || '-'}<\/td>`;
-      tbody.appendChild(tr);
-    });
+    
+    // ตรวจสอบว่าเป็นตาราง OTP (scb3) หรือ SMS ธรรมดา
+    if (tableId === 'scb3-sms-table') {
+      // แสดงข้อมูล OTP สำหรับ SCB กฤษฏา สุดแม่ง
+      smsList.forEach(sms => {
+        const otpData = parseOtpMessage(sms.sms || sms.detail || '');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${sms.date_time || new Date().toLocaleString('th-TH')}</td><td style="font-weight:bold;color:#e74c3c;">${otpData.otp || '-'}</td><td>${otpData.merchant || '-'}</td><td style="font-weight:bold;color:#27ae60;">${otpData.amount || '-'}</td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      // แสดงข้อมูล SMS ธรรมดาสำหรับ SCB อื่นๆ
+      smsList.forEach(sms => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${sms.date_time || '-'}<\/td><td>${sms.detail || sms.sms || '-'}<\/td><td>${sms.balance || '-'}<\/td>`;
+        tbody.appendChild(tr);
+      });
+    }
   } catch (e) {
     statusLight.style.background = '#dc3545';
     statusText.innerText = 'เชื่อมต่อขัดข้อง';
     const tbody = document.querySelector(`#${tableId} tbody`);
-    tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้<\/td></tr>';
+    if (tableId === 'scb3-sms-table') {
+      tbody.innerHTML = '<tr><td colspan="4">ไม่สามารถโหลดข้อมูล OTP ได้<\/td></tr>';
+    } else {
+      tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้<\/td></tr>';
+    }
   }
+}
+
+// ฟังก์ชันแยกข้อมูล OTP จากข้อความ
+function parseOtpMessage(message) {
+  const result = {
+    otp: null,
+    merchant: null,
+    amount: null
+  };
+  
+  // แยก OTP Code (OTP=123456)
+  const otpMatch = message.match(/OTP=(\d+)/);
+  if (otpMatch) {
+    result.otp = otpMatch[1];
+  }
+  
+  // แยกร้านค้า/รายการ (@TikTok Ads, @LP LINEPAY)
+  const merchantMatch = message.match(/@([^A-Z]*[A-Z][^@]*?)(?=\s+Amount)/);
+  if (merchantMatch) {
+    result.merchant = merchantMatch[1].trim();
+  }
+  
+  // แยกยอดเงิน (Amount 10.00 USD, Amount 1.00 THB)
+  const amountMatch = message.match(/Amount\s+([\d,]+\.?\d*)\s+([A-Z]{3})/);
+  if (amountMatch) {
+    result.amount = `${amountMatch[1]} ${amountMatch[2]}`;
+  }
+  
+  return result;
 }
 
 
@@ -899,14 +958,14 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
 window.addEventListener('DOMContentLoaded', () => {
   fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
   fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
-  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', 'kritsadasudmaeng');
+  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', '168');
   fetchScbSummaryBox();
 });
 
 setInterval(() => {
   fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
   fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
-  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', 'kritsadasudmaeng');
+  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', '168');
   fetchScbSummaryBox();
 }, 3000);
 
