@@ -342,6 +342,162 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   margin-top: 2px;
   text-align: center;
 }
+
+/* เครื่องคิดเลข Windows 11 Style */
+.calculator-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.calculator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #f3f3f3;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.calculator-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.calculator-title {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #333;
+}
+
+.calculator-close {
+  background: #e81123;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calculator-close:hover {
+  background: #d10e26;
+}
+
+.calculator-display {
+  background: white;
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: right;
+  font-size: 2em;
+  font-weight: 300;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  word-break: break-all;
+}
+
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.calc-btn {
+  background: #ffffff;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  padding: 15px;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+}
+
+.calc-btn:hover {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.calc-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.calc-btn.operator {
+  background: #0078d4;
+  color: white;
+}
+
+.calc-btn.operator:hover {
+  background: #106ebe;
+}
+
+.calc-btn.equals {
+  background: #0078d4;
+  color: white;
+}
+
+.calc-btn.equals:hover {
+  background: #106ebe;
+}
+
+.calc-btn.clear {
+  background: #e81123;
+  color: white;
+}
+
+.calc-btn.clear:hover {
+  background: #d10e26;
+}
+
+.calculator-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #0078d4;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 120, 212, 0.3);
+  transition: all 0.3s ease;
+  z-index: 9998;
+}
+
+.calculator-btn:hover {
+  background: #106ebe;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
 </style>
 </head>
 <body>
@@ -425,6 +581,46 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <div id="toggle-mode">🌞</div>
   </div>
 </div>
+
+<!-- เครื่องคิดเลข Windows 11 -->
+<div class="calculator-overlay" id="calculator-overlay">
+  <div class="calculator">
+    <div class="calculator-header">
+      <div class="calculator-title">เครื่องคิดเลข</div>
+      <button class="calculator-close" onclick="closeCalculator()">×</button>
+    </div>
+    <div class="calculator-display" id="calc-display">0</div>
+    <div class="calculator-buttons">
+      <button class="calc-btn clear" onclick="clearCalculator()">C</button>
+      <button class="calc-btn clear" onclick="clearEntry()">CE</button>
+      <button class="calc-btn" onclick="backspace()">⌫</button>
+      <button class="calc-btn operator" onclick="inputOperator('/')">÷</button>
+      
+      <button class="calc-btn" onclick="inputNumber('7')">7</button>
+      <button class="calc-btn" onclick="inputNumber('8')">8</button>
+      <button class="calc-btn" onclick="inputNumber('9')">9</button>
+      <button class="calc-btn operator" onclick="inputOperator('*')">×</button>
+      
+      <button class="calc-btn" onclick="inputNumber('4')">4</button>
+      <button class="calc-btn" onclick="inputNumber('5')">5</button>
+      <button class="calc-btn" onclick="inputNumber('6')">6</button>
+      <button class="calc-btn operator" onclick="inputOperator('-')">−</button>
+      
+      <button class="calc-btn" onclick="inputNumber('1')">1</button>
+      <button class="calc-btn" onclick="inputNumber('2')">2</button>
+      <button class="calc-btn" onclick="inputNumber('3')">3</button>
+      <button class="calc-btn operator" onclick="inputOperator('+')">+</button>
+      
+      <button class="calc-btn" onclick="toggleSign()">±</button>
+      <button class="calc-btn" onclick="inputNumber('0')">0</button>
+      <button class="calc-btn" onclick="inputDecimal()">.</button>
+      <button class="calc-btn equals" onclick="calculate()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- ปุ่มเปิดเครื่องคิดเลข -->
+<button class="calculator-btn" onclick="openCalculator()" title="เครื่องคิดเลข">🔢</button>
 
 <div id="dashboard">
   <!-- กล่อง SCB SMS, Kbiz, Wallet Deposits ขึ้นมาอยู่แถวเดียวกัน -->
@@ -1313,6 +1509,157 @@ async function renderKbizNotifyTable() {
 }
 setInterval(renderKbizNotifyTable, 4000);
 renderKbizNotifyTable();
+</script>
+
+<script>
+// === เครื่องคิดเลข Windows 11 ===
+let calcDisplay = '0';
+let calcOperator = null;
+let calcPrevNumber = null;
+let calcWaitingForNext = false;
+
+function openCalculator() {
+  document.getElementById('calculator-overlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCalculator() {
+  document.getElementById('calculator-overlay').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function updateDisplay() {
+  const display = document.getElementById('calc-display');
+  display.textContent = calcDisplay;
+}
+
+function inputNumber(num) {
+  if (calcWaitingForNext || calcDisplay === '0') {
+    calcDisplay = num;
+    calcWaitingForNext = false;
+  } else {
+    calcDisplay = calcDisplay === '0' ? num : calcDisplay + num;
+  }
+  updateDisplay();
+}
+
+function inputOperator(op) {
+  const inputValue = parseFloat(calcDisplay);
+  
+  if (calcPrevNumber === null) {
+    calcPrevNumber = inputValue;
+  } else if (calcOperator) {
+    const currentValue = calcPrevNumber || 0;
+    const newValue = performCalculation(currentValue, inputValue, calcOperator);
+    
+    calcDisplay = String(newValue);
+    calcPrevNumber = newValue;
+    updateDisplay();
+  }
+  
+  calcWaitingForNext = true;
+  calcOperator = op;
+}
+
+function calculate() {
+  const inputValue = parseFloat(calcDisplay);
+  
+  if (calcPrevNumber !== null && calcOperator) {
+    const newValue = performCalculation(calcPrevNumber, inputValue, calcOperator);
+    calcDisplay = String(newValue);
+    calcPrevNumber = null;
+    calcOperator = null;
+    calcWaitingForNext = true;
+    updateDisplay();
+  }
+}
+
+function performCalculation(prev, current, operator) {
+  switch (operator) {
+    case '+': return prev + current;
+    case '-': return prev - current;
+    case '*': return prev * current;
+    case '/': return current !== 0 ? prev / current : 0;
+    default: return current;
+  }
+}
+
+function clearCalculator() {
+  calcDisplay = '0';
+  calcOperator = null;
+  calcPrevNumber = null;
+  calcWaitingForNext = false;
+  updateDisplay();
+}
+
+function clearEntry() {
+  calcDisplay = '0';
+  updateDisplay();
+}
+
+function backspace() {
+  if (calcDisplay.length > 1) {
+    calcDisplay = calcDisplay.slice(0, -1);
+  } else {
+    calcDisplay = '0';
+  }
+  updateDisplay();
+}
+
+function inputDecimal() {
+  if (calcWaitingForNext) {
+    calcDisplay = '0.';
+    calcWaitingForNext = false;
+  } else if (calcDisplay.indexOf('.') === -1) {
+    calcDisplay += '.';
+  }
+  updateDisplay();
+}
+
+function toggleSign() {
+  if (calcDisplay !== '0') {
+    calcDisplay = calcDisplay.startsWith('-') ? 
+      calcDisplay.substring(1) : 
+      '-' + calcDisplay;
+    updateDisplay();
+  }
+}
+
+// ปิดเครื่องคิดเลขเมื่อคลิกนอกกล่อง
+document.getElementById('calculator-overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeCalculator();
+  }
+});
+
+// รองรับ keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('calculator-overlay').style.display === 'block') {
+    e.preventDefault();
+    
+    if (e.key >= '0' && e.key <= '9') {
+      inputNumber(e.key);
+    } else if (e.key === '+') {
+      inputOperator('+');
+    } else if (e.key === '-') {
+      inputOperator('-');
+    } else if (e.key === '*') {
+      inputOperator('*');
+    } else if (e.key === '/') {
+      inputOperator('/');
+    } else if (e.key === 'Enter' || e.key === '=') {
+      calculate();
+    } else if (e.key === 'Escape') {
+      closeCalculator();
+    } else if (e.key === 'Backspace') {
+      backspace();
+    } else if (e.key === '.') {
+      inputDecimal();
+    } else if (e.key.toLowerCase() === 'c') {
+      clearCalculator();
+    }
+  }
+});
 </script>
 </body>
 </html>
