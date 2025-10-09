@@ -1513,8 +1513,11 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
       smsList.forEach(sms => {
         const otpData = parseOtpMessage(sms.sms || sms.detail || '');
         const tr = document.createElement('tr');
-        // ใช้เวลาจาก SMS หากมี หรือใช้เวลาที่เก็บไว้ ไม่ใช้เวลาปัจจุบัน
-        const displayTime = sms.date_time || sms.time || '-';
+        // ใช้เวลาจาก SMS หากมี หรือแสดง "รอข้อมูล" หากไม่มี (ไม่ใช้เวลาปัจจุบัน)
+        let displayTime = sms.date_time || sms.time || sms.timestamp;
+        if (!displayTime) {
+          displayTime = 'รอข้อมูลเวลา';
+        }
         tr.innerHTML = `<td>${displayTime}</td><td style="font-weight:bold;color:#e74c3c;">${otpData.otp || '-'}</td><td>${otpData.merchant || '-'}</td><td style="font-weight:bold;color:#27ae60;">${otpData.amount || '-'}</td>`;
         tbody.appendChild(tr);
       });
@@ -2117,6 +2120,7 @@ async function loadNotes(page = 1) {
       currentPage = result.pagination.current_page;
       totalPages = result.pagination.pages;
       updatePaginationInfo(result.pagination);
+      renderNotes(); // เรียก renderNotes อัตโนมัติ
     }
   } catch (error) {
     console.error('Error loading notes:', error);
@@ -2150,8 +2154,7 @@ async function openNotes() {
   });
   document.getElementById('note-datetime').value = thaiDateTime;
   
-  await loadNotes();
-  renderNotes();
+  await loadNotes(); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
 }
 
 // ปิดหน้าต่างโน้ต
@@ -2197,8 +2200,7 @@ async function addNote() {
     const result = await response.json();
     
     if (result.status === 'success') {
-      await loadNotes(currentPage);
-      renderNotes();
+      await loadNotes(currentPage); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
       clearNoteForm();
       
       // ตั้งเวลาใหม่
@@ -2264,8 +2266,7 @@ async function deleteNote(id) {
     const result = await response.json();
     
     if (result.status === 'success') {
-      await loadNotes(currentPage);
-      renderNotes();
+      await loadNotes(currentPage); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
     } else {
       alert('เกิดข้อผิดพลาด: ' + result.message);
     }
@@ -2320,8 +2321,7 @@ async function updateNote(id) {
     const result = await response.json();
     
     if (result.status === 'success') {
-      await loadNotes(currentPage);
-      renderNotes();
+      await loadNotes(currentPage); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
       clearNoteForm();
       
       // เปลี่ยนปุ่มกลับเป็น "เพิ่มโน้ต"
