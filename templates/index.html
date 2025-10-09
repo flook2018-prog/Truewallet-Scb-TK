@@ -498,6 +498,285 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
 }
+
+.notes-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 100px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
+  transition: all 0.3s ease;
+  z-index: 9998;
+}
+
+.notes-btn:hover {
+  background: #218838;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* กระดาษโน้ต Sticky Notes */
+.notes-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10001;
+  backdrop-filter: blur(4px);
+}
+
+.notes-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.notes-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-close {
+  background: #e81123;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notes-close:hover {
+  background: #d10e26;
+}
+
+.new-note-form {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95em;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.add-note-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.add-note-btn:hover {
+  background: #218838;
+}
+
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.note-item {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.note-meta {
+  display: flex;
+  gap: 15px;
+}
+
+.note-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.edit-note-btn, .delete-note-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.edit-note-btn:hover {
+  background: #ffc107;
+  color: white;
+}
+
+.delete-note-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.note-content {
+  font-size: 0.95em;
+  line-height: 1.4;
+  color: #333;
+  word-wrap: break-word;
+}
+
+.note-amount {
+  font-weight: bold;
+  color: #28a745;
+}
+
+.note-item {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: box-shadow 0.2s;
+}
+
+.note-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #f1f3f4;
+  padding-bottom: 8px;
+}
+
+.note-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.note-meta span {
+  font-size: 0.85em;
+  color: #666;
+  background: #f8f9fa;
+  padding: 3px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.note-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.notes-btn {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  background: #ffc107;
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3);
+  transition: all 0.3s ease;
+  z-index: 9998;
+}
+
+.notes-btn:hover {
+  background: #e0a800;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+}
 </style>
 </head>
 <body>
@@ -621,6 +900,47 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 
 <!-- ปุ่มเปิดเครื่องคิดเลข -->
 <button class="calculator-btn" onclick="openCalculator()" title="เครื่องคิดเลข">🔢</button>
+
+<!-- ปุ่มเปิดกระดาษโน้ต -->
+<button class="notes-btn" onclick="openNotes()" title="กระดาษโน้ต">📝</button>
+
+<!-- กระดาษโน้ต -->
+<div class="notes-overlay" id="notes-overlay">
+  <div class="notes-container">
+    <div class="notes-header">
+      <div class="notes-title">📝 กระดาษโน้ต</div>
+      <button class="notes-close" onclick="closeNotes()">×</button>
+    </div>
+    
+    <div class="new-note-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>วันที่/เวลา</label>
+          <input type="text" id="note-datetime" readonly>
+        </div>
+        <div class="form-group">
+          <label>ยอดเงิน</label>
+          <input type="text" id="note-amount" placeholder="เช่น 1,000.00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>ผู้เขียน</label>
+          <input type="text" id="note-author" placeholder="ชื่อผู้เขียน">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>รายละเอียด</label>
+        <textarea id="note-details" placeholder="รายละเอียดการทำรายการ..."></textarea>
+      </div>
+      <button class="add-note-btn" onclick="addNote()">เพิ่มโน้ต</button>
+    </div>
+    
+    <div class="notes-list" id="notes-list">
+      <!-- โน้ตจะแสดงที่นี่ -->
+    </div>
+  </div>
+</div>
 
 <div id="dashboard">
   <!-- กล่อง SCB SMS, Kbiz, Wallet Deposits ขึ้นมาอยู่แถวเดียวกัน -->
@@ -1659,6 +1979,208 @@ document.addEventListener('keydown', function(e) {
       clearCalculator();
     }
   }
+});
+
+// === กระดาษโน้ต Sticky Notes ===
+let notes = [];
+
+// โหลดโน้ตจาก localStorage
+function loadNotes() {
+  const savedNotes = localStorage.getItem('dashboard-notes');
+  if (savedNotes) {
+    notes = JSON.parse(savedNotes);
+  }
+}
+
+// บันทึกโน้ตลง localStorage
+function saveNotes() {
+  localStorage.setItem('dashboard-notes', JSON.stringify(notes));
+}
+
+// เปิดหน้าต่างโน้ต
+function openNotes() {
+  document.getElementById('notes-overlay').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  
+  // ตั้งเวลาปัจจุบัน
+  const now = new Date();
+  const thaiDateTime = now.toLocaleString('th-TH', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  document.getElementById('note-datetime').value = thaiDateTime;
+  
+  renderNotes();
+}
+
+// ปิดหน้าต่างโน้ต
+function closeNotes() {
+  document.getElementById('notes-overlay').style.display = 'none';
+  document.body.style.overflow = 'auto';
+  clearNoteForm();
+}
+
+// ล้างฟอร์ม
+function clearNoteForm() {
+  document.getElementById('note-amount').value = '';
+  document.getElementById('note-author').value = '';
+  document.getElementById('note-details').value = '';
+}
+
+// เพิ่มโน้ตใหม่
+function addNote() {
+  const datetime = document.getElementById('note-datetime').value;
+  const amount = document.getElementById('note-amount').value;
+  const author = document.getElementById('note-author').value;
+  const details = document.getElementById('note-details').value;
+  
+  if (!details.trim()) {
+    alert('กรุณากรอกรายละเอียด');
+    return;
+  }
+  
+  const newNote = {
+    id: Date.now(),
+    datetime: datetime,
+    amount: amount,
+    author: author || 'ไม่ระบุ',
+    details: details,
+    createdAt: new Date().toISOString()
+  };
+  
+  notes.unshift(newNote); // เพิ่มที่ด้านบน
+  saveNotes();
+  renderNotes();
+  clearNoteForm();
+  
+  // ตั้งเวลาใหม่
+  const now = new Date();
+  const thaiDateTime = now.toLocaleString('th-TH', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  document.getElementById('note-datetime').value = thaiDateTime;
+}
+
+// แสดงรายการโน้ต
+function renderNotes() {
+  const notesList = document.getElementById('notes-list');
+  notesList.innerHTML = '';
+  
+  if (notes.length === 0) {
+    notesList.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">ยังไม่มีโน้ต</div>';
+    return;
+  }
+  
+  notes.forEach(note => {
+    const noteDiv = document.createElement('div');
+    noteDiv.className = 'note-item';
+    noteDiv.innerHTML = `
+      <div class="note-header">
+        <div class="note-meta">
+          <span>📅 ${note.datetime}</span>
+          <span>👤 ${note.author}</span>
+          ${note.amount ? `<span class="note-amount">💰 ${note.amount}</span>` : ''}
+        </div>
+        <div class="note-actions">
+          <button class="edit-note-btn" onclick="editNote(${note.id})" title="แก้ไข">✏️</button>
+          <button class="delete-note-btn" onclick="deleteNote(${note.id})" title="ลบ">🗑️</button>
+        </div>
+      </div>
+      <div class="note-content">${note.details}</div>
+    `;
+    notesList.appendChild(noteDiv);
+  });
+}
+
+// ลบโน้ต
+function deleteNote(id) {
+  if (!confirm('คุณแน่ใจว่าต้องการลบโน้ตนี้?')) return;
+  
+  notes = notes.filter(note => note.id !== id);
+  saveNotes();
+  renderNotes();
+}
+
+// แก้ไขโน้ต
+function editNote(id) {
+  const note = notes.find(note => note.id === id);
+  if (!note) return;
+  
+  document.getElementById('note-datetime').value = note.datetime;
+  document.getElementById('note-amount').value = note.amount;
+  document.getElementById('note-author').value = note.author;
+  document.getElementById('note-details').value = note.details;
+  
+  // เปลี่ยนปุ่มเป็น "อัปเดตโน้ต"
+  const addBtn = document.querySelector('.add-note-btn');
+  addBtn.textContent = 'อัปเดตโน้ต';
+  addBtn.onclick = () => updateNote(id);
+}
+
+// อัปเดตโน้ต
+function updateNote(id) {
+  const datetime = document.getElementById('note-datetime').value;
+  const amount = document.getElementById('note-amount').value;
+  const author = document.getElementById('note-author').value;
+  const details = document.getElementById('note-details').value;
+  
+  if (!details.trim()) {
+    alert('กรุณากรอกรายละเอียด');
+    return;
+  }
+  
+  const noteIndex = notes.findIndex(note => note.id === id);
+  if (noteIndex !== -1) {
+    notes[noteIndex] = {
+      ...notes[noteIndex],
+      datetime: datetime,
+      amount: amount,
+      author: author || 'ไม่ระบุ',
+      details: details
+    };
+    
+    saveNotes();
+    renderNotes();
+    clearNoteForm();
+    
+    // เปลี่ยนปุ่มกลับเป็น "เพิ่มโน้ต"
+    const addBtn = document.querySelector('.add-note-btn');
+    addBtn.textContent = 'เพิ่มโน้ต';
+    addBtn.onclick = addNote;
+    
+    // ตั้งเวลาใหม่
+    const now = new Date();
+    const thaiDateTime = now.toLocaleString('th-TH', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    document.getElementById('note-datetime').value = thaiDateTime;
+  }
+}
+
+// ปิดโน้ตเมื่อคลิกนอกกล่อง
+document.getElementById('notes-overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeNotes();
+  }
+});
+
+// โหลดโน้ตเมื่อเริ่มต้น
+document.addEventListener('DOMContentLoaded', function() {
+  loadNotes();
 });
 </script>
 </body>
