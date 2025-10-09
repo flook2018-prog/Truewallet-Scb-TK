@@ -644,7 +644,7 @@ async function updateStatusLights() {
   }
   // SCB กฤษฏา สุดแม่ง
   try {
-    const resp = await fetch(`http://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`);
+    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`);
     let data = await resp.json();
     const status3 = data.status || '';
     const scb3StatusText = document.getElementById('scb3-status-text');
@@ -869,7 +869,7 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
     
     // ตรวจสอบว่าเป็น SCB กฤษฏา สุดแม่ง (scb3) หรือไม่
     if (tableId === 'scb3-sms-table') {
-      apiUrl = `http://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`;
+      apiUrl = `https://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`;
     } else {
       // URL ของ API ปกติสำหรับ SCB อื่นๆ
       apiBase = 'https://xinon1565.up.railway.app'; // production API
@@ -926,20 +926,30 @@ function parseOtpMessage(message) {
     amount: null
   };
   
+  if (!message) return result;
+  
   // แยก OTP Code (OTP=123456)
-  const otpMatch = message.match(/OTP=(\d+)/);
+  const otpMatch = message.match(/OTP[=:]\s*(\d+)/i);
   if (otpMatch) {
     result.otp = otpMatch[1];
   }
   
-  // แยกร้านค้า/รายการ (@TikTok Ads, @LP LINEPAY)
-  const merchantMatch = message.match(/@([^A-Z]*[A-Z][^@]*?)(?=\s+Amount)/);
+  // แยกร้านค้า/รายการ (@TikTok Ads, @LP LINEPAY, หรือหลัง SCB Card)
+  let merchantMatch = message.match(/@([^@]*?)(?=\s+Amount)/i);
+  if (!merchantMatch) {
+    // ลองหาจาก SCB Card XX-xxxx @ร้านค้า
+    merchantMatch = message.match(/SCB\s+Card\s+[^@]*@([^A][^m]*?)(?=\s+Amount)/i);
+  }
+  if (!merchantMatch) {
+    // ลองหาชื่อร้านค้าแบบอื่น
+    merchantMatch = message.match(/(TikTok|LINEPAY|LP\s+LINEPAY|Test\s+Store)/i);
+  }
   if (merchantMatch) {
     result.merchant = merchantMatch[1].trim();
   }
   
   // แยกยอดเงิน (Amount 10.00 USD, Amount 1.00 THB)
-  const amountMatch = message.match(/Amount\s+([\d,]+\.?\d*)\s+([A-Z]{3})/);
+  const amountMatch = message.match(/Amount\s+([\d,]+\.?\d*)\s+([A-Z]{3})/i);
   if (amountMatch) {
     result.amount = `${amountMatch[1]} ${amountMatch[2]}`;
   }
