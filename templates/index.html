@@ -1015,8 +1015,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     
     <!-- Export/Import Controls -->
     <div class="notes-controls">
-      <button class="export-btn" onclick="exportNotes()" title="ส่งออกโน้ต">📤 ส่งออก</button>
-      <button class="import-btn" onclick="importNotes()" title="นำเข้าโน้ต">📥 นำเข้า</button>
+      <button class="export-btn" onclick="exportNotes()" title="ส่งออก CSV สำหรับ Google Sheets">📊 ส่งออก CSV</button>
+      <button class="import-btn" onclick="importNotes()" title="นำเข้าไฟล์ CSV จาก Google Sheets">📥 นำเข้า CSV</button>
     </div>
     
     <div class="notes-list" id="notes-list">
@@ -1447,12 +1447,18 @@ document.addEventListener('DOMContentLoaded', function() {
 // --- ดึงข้อมูล SCB สุมิธร์ มาแสดงในกล่อง SCB พลอยไพริน (copy data) ---
 async function fetchScbSummaryBox() {
   try {
-  const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
+    const tbody = document.querySelector('#scb-summary-table tbody');
+    if (!tbody) {
+      console.log('SCB summary table not found, skipping...');
+      return;
+    }
+    
+    const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
     const data = await resp.json();
     let smsList = Array.isArray(data) ? data : (data.sms_list || []);
     if (smsList.length > 5) smsList = smsList.slice(-5);
     smsList = smsList.reverse();
-    const tbody = document.querySelector('#scb-summary-table tbody');
+    
     tbody.innerHTML = '';
     smsList.forEach(sms => {
       const tr = document.createElement('tr');
@@ -1461,7 +1467,9 @@ async function fetchScbSummaryBox() {
     });
   } catch (e) {
     const tbody = document.querySelector('#scb-summary-table tbody');
-    tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้</td></tr>';
+    }
   }
 }
 setInterval(fetchScbSummaryBox, 3000);
@@ -1847,25 +1855,39 @@ renderDemoApprovedCancelled();
 // --- Kbiz Withdraw Notification Realtime ---
 async function fetchKbizNotifications() {
   try {
+    // ตรวจสอบว่า elements มีอยู่จริงก่อนใช้งาน
+    const kbizInfo = document.getElementById('kbiz-withdraw-info');
+    const kbizLight = document.getElementById('kbiz-status-light');
+    const kbizText = document.getElementById('kbiz-status-text');
+    
+    if (!kbizInfo || !kbizLight || !kbizText) {
+      console.log('Kbiz elements not found, skipping...');
+      return;
+    }
+    
     const res = await fetch('/api/kbiz_notifications');
     const data = await res.json();
     if (data.notifications && data.notifications.length > 0) {
       const latest = data.notifications[0];
       // ตัวอย่าง: { amount, time, desc }
-      document.getElementById('kbiz-withdraw-info').textContent =
+      kbizInfo.textContent =
         (latest.amount !== undefined ? latest.amount.toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท' : '-') +
         (latest.desc ? ' | ' + latest.desc : '');
-      document.getElementById('kbiz-status-light').style.background = '#4caf50';
-      document.getElementById('kbiz-status-text').textContent = 'อัปเดต: ' + (latest.time || '-');
+      kbizLight.style.background = '#4caf50';
+      kbizText.textContent = 'อัปเดต: ' + (latest.time || '-');
     } else {
-      document.getElementById('kbiz-withdraw-info').textContent = '-';
-      document.getElementById('kbiz-status-light').style.background = '#ccc';
-      document.getElementById('kbiz-status-text').textContent = 'ไม่มีข้อมูล';
+      kbizInfo.textContent = '-';
+      kbizLight.style.background = '#ccc';
+      kbizText.textContent = 'ไม่มีข้อมูล';
     }
   } catch (e) {
-    document.getElementById('kbiz-withdraw-info').textContent = '-';
-    document.getElementById('kbiz-status-light').style.background = '#ccc';
-    document.getElementById('kbiz-status-text').textContent = 'โหลดข้อมูลผิดพลาด';
+    const kbizInfo = document.getElementById('kbiz-withdraw-info');
+    const kbizLight = document.getElementById('kbiz-status-light');
+    const kbizText = document.getElementById('kbiz-status-text');
+    
+    if (kbizInfo) kbizInfo.textContent = '-';
+    if (kbizLight) kbizLight.style.background = '#ccc';
+    if (kbizText) kbizText.textContent = 'โหลดข้อมูลผิดพลาด';
   }
 }
 setInterval(fetchKbizNotifications, 4000);
@@ -1874,9 +1896,14 @@ fetchKbizNotifications();
 // --- Kbiz Notify Table ---
 async function renderKbizNotifyTable() {
   try {
+    const tbody = document.getElementById('kbiz-notify-tbody');
+    if (!tbody) {
+      console.log('Kbiz notify table not found, skipping...');
+      return;
+    }
+    
     const res = await fetch('/api/kbiz_notifications');
     const data = await res.json();
-    const tbody = document.getElementById('kbiz-notify-tbody');
     tbody.innerHTML = '';
     if (data.notifications && data.notifications.length > 0) {
       data.notifications.forEach(n => {
@@ -2342,28 +2369,27 @@ async function nextPage() {
   }
 }
 
-// ฟังก์ชัน Export โน้ต
+// ฟังก์ชัน Export โน้ต (CSV เท่านั้น)
 async function exportNotes() {
   try {
+    // Export CSV สำหรับ Google Sheets
     const response = await fetch('/api/notes/export');
-    const result = await response.json();
     
-    if (result.status === 'success') {
-      const dataStr = JSON.stringify(result, null, 2);
-      const dataBlob = new Blob([dataStr], {type: 'application/json'});
-      const url = URL.createObjectURL(dataBlob);
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
       
       const link = document.createElement('a');
       link.href = url;
-      link.download = `notes_export_${new Date().toISOString().split('T')[0]}.json`;
+      link.download = `notes_export_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       
-      alert('ส่งออกโน้ตเรียบร้อยแล้ว!');
+      alert('ส่งออกไฟล์ CSV เรียบร้อยแล้ว! สามารถเปิดใน Google Sheets ได้');
     } else {
-      alert('เกิดข้อผิดพลาด: ' + result.message);
+      alert('เกิดข้อผิดพลาดในการส่งออก CSV');
     }
   } catch (error) {
     console.error('Error exporting notes:', error);
@@ -2371,45 +2397,41 @@ async function exportNotes() {
   }
 }
 
-// ฟังก์ชัน Import โน้ต
+// ฟังก์ชัน Import โน้ต (CSV เท่านั้น)
 function importNotes() {
   const input = document.createElement('input');
   input.type = 'file';
-  input.accept = '.json';
+  input.accept = '.csv';
   
   input.onchange = async function(event) {
     const file = event.target.files[0];
     if (!file) return;
     
     try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      // ตรวจสอบรูปแบบข้อมูล
-      if (!data.data || !Array.isArray(data.data)) {
-        alert('รูปแบบไฟล์ไม่ถูกต้อง');
+      if (!file.name.endsWith('.csv')) {
+        alert('รองรับเฉพาะไฟล์ .csv เท่านั้น');
         return;
       }
       
+      // Import CSV
+      const formData = new FormData();
+      formData.append('file', file);
+      
       const response = await fetch('/api/notes/import', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          notes: data.data
-        })
+        body: formData
       });
       
       const result = await response.json();
       
       if (result.status === 'success') {
-        alert(`นำเข้าโน้ตเรียบร้อย: ${result.imported_count}/${result.total_count} รายการ`);
+        alert(`นำเข้าไฟล์ CSV เรียบร้อย: ${result.imported_count}/${result.total_count} รายการ`);
         await loadNotes(1);
         renderNotes();
       } else {
         alert('เกิดข้อผิดพลาด: ' + result.message);
       }
+      
     } catch (error) {
       console.error('Error importing notes:', error);
       alert('เกิดข้อผิดพลาดในการนำเข้าโน้ต: ' + error.message);

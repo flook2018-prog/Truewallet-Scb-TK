@@ -941,48 +941,90 @@ def delete_note(note_id):
 @app.route('/api/notes/export', methods=['GET'])
 def export_notes():
     try:
+        # Export เป็น CSV สำหรับ Google Sheets เท่านั้น
         notes = Note.query.order_by(Note.created_at.desc()).all()
-        data = [note.to_dict() for note in notes]
         
-        return jsonify({
-            'status': 'success',
-            'data': data,
-            'exported_at': datetime.utcnow().isoformat()
-        })
+        import io
+        import csv
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Header
+        writer.writerow(['วันที่เวลา', 'ยอดเงิน', 'ผู้เขียน', 'รายละเอียด', 'วันที่สร้าง'])
+        
+        # Data
+        for note in notes:
+            writer.writerow([
+                note.datetime,
+                note.amount or '',
+                note.author,
+                note.details,
+                note.created_at.strftime('%Y-%m-%d %H:%M:%S') if note.created_at else ''
+            ])
+        
+        output.seek(0)
+        
+        from flask import Response
+        return Response(
+            output.getvalue(),
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': f'attachment; filename=notes_export_{datetime.utcnow().strftime("%Y%m%d_%H%M%S")}.csv'
+            }
+        )
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/api/notes/import', methods=['POST'])
 def import_notes():
     try:
-        data = request.get_json()
-        notes_data = data.get('notes', [])
+        # รองรับเฉพาะไฟล์ CSV
+        if 'file' not in request.files:
+            return jsonify({'status': 'error', 'message': 'ไม่มีไฟล์'}), 400
+            
+        file = request.files['file']
+        if not file.filename:
+            return jsonify({'status': 'error', 'message': 'ไม่มีไฟล์'}), 400
+        
+        if not file.filename.endswith('.csv'):
+            return jsonify({'status': 'error', 'message': 'รองรับเฉพาะไฟล์ .csv เท่านั้น'}), 400
+        
+        file_content = file.read().decode('utf-8')
+        
+        # Import CSV
+        import csv
+        import io
+        
+        csv_data = csv.reader(io.StringIO(file_content))
+        headers = next(csv_data)  # ข้าม header
         
         imported_count = 0
-        for note_data in notes_data:
-            # ตรวจสอบว่ามี note ที่ซ้ำหรือไม่
-            existing = Note.query.filter_by(
-                datetime=note_data.get('datetime'),
-                details=note_data.get('details')
-            ).first()
-            
-            if not existing:
-                new_note = Note(
-                    datetime=note_data.get('datetime'),
-                    amount=note_data.get('amount', ''),
-                    author=note_data.get('author', 'ไม่ระบุ'),
-                    details=note_data.get('details')
-                )
-                db.session.add(new_note)
-                imported_count += 1
+        for row in csv_data:
+            if len(row) >= 4:  # ต้องมีอย่างน้อย 4 คอลัมน์
+                # ตรวจสอบว่ามี note ที่ซ้ำหรือไม่
+                existing = Note.query.filter_by(
+                    datetime=row[0],
+                    details=row[3]
+                ).first()
+                
+                if not existing:
+                    new_note = Note(
+                        datetime=row[0],
+                        amount=row[1] if len(row) > 1 else '',
+                        author=row[2] if len(row) > 2 else 'ไม่ระบุ',
+                        details=row[3]
+                    )
+                    db.session.add(new_note)
+                    imported_count += 1
         
         db.session.commit()
-        
         return jsonify({
             'status': 'success',
             'imported_count': imported_count,
-            'total_count': len(notes_data)
+            'total_count': sum(1 for line in io.StringIO(file_content)) - 1  # ลบ header
         })
+            
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
