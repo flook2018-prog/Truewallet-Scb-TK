@@ -1513,7 +1513,9 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
       smsList.forEach(sms => {
         const otpData = parseOtpMessage(sms.sms || sms.detail || '');
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${sms.date_time || new Date().toLocaleString('th-TH')}</td><td style="font-weight:bold;color:#e74c3c;">${otpData.otp || '-'}</td><td>${otpData.merchant || '-'}</td><td style="font-weight:bold;color:#27ae60;">${otpData.amount || '-'}</td>`;
+        // ใช้เวลาจาก SMS หากมี หรือใช้เวลาที่เก็บไว้ ไม่ใช้เวลาปัจจุบัน
+        const displayTime = sms.date_time || sms.time || '-';
+        tr.innerHTML = `<td>${displayTime}</td><td style="font-weight:bold;color:#e74c3c;">${otpData.otp || '-'}</td><td>${otpData.merchant || '-'}</td><td style="font-weight:bold;color:#27ae60;">${otpData.amount || '-'}</td>`;
         tbody.appendChild(tr);
       });
     } else {
