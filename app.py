@@ -29,13 +29,14 @@ app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นค�
 # ใช้ PostgreSQL เฉพาะสำหรับระบบโน้ต
 import os
 
-# PostgreSQL สำหรับระบบโน้ต (ใช้ external URL สำหรับ local testing)
+# PostgreSQL สำหรับระบบโน้ต
 if os.environ.get('RAILWAY_ENVIRONMENT'):
     # Production - Railway internal URL
     NOTES_DB_URL = "postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway"
 else:
-    # Local development - External URL (ต้องหา external URL จาก Railway Dashboard)
-    # หากไม่มี external URL ให้ใช้ SQLite แทน
+    # Local development - ใช้ SQLite แทน (หรือใส่ External URL จาก Railway Dashboard)
+    # หากต้องการใช้ PostgreSQL จริง ให้ไปที่ Railway Dashboard > Database > Connect
+    # และคัดลอก External URL มาใส่ที่นี่
     NOTES_DB_URL = "sqlite:///notes.db"
 
 # ตั้งค่าฐานข้อมูลเฉพาะโน้ต
