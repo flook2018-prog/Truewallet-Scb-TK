@@ -26,8 +26,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
 
 # -------------------- Database Configuration --------------------
-# ใช้ SQLite สำหรับการทดสอบท้องถิ่น
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
+# ใช้ PostgreSQL สำหรับ Railway, SQLite สำหรับ local testing
+import os
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    # Production - Railway PostgreSQL
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway'
+else:
+    # Local development - SQLite
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -990,7 +997,10 @@ if __name__ == "__main__":
                 transactions.update(json.load(f))
             except:
                 pass
-    app.run(host="0.0.0.0", port=8080, debug=True)
+    
+    # ใช้ PORT จาก environment variable สำหรับ Railway
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host="0.0.0.0", port=port, debug=False)
 
 
 
