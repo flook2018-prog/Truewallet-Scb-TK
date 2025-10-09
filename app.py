@@ -14,15 +14,44 @@ from collections import defaultdict
 from werkzeug.utils import secure_filename
 import pytz
 from models import DepositWallet
+from flask_sqlalchemy import SQLAlchemy
+import urllib.parse
 
 # -------------------- Config --------------------
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
+
+# -------------------- Database Configuration --------------------
+# ใช้ SQLite สำหรับการทดสอบท้องถิ่น
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# -------------------- Note Model --------------------
+class Note(db.Model):
+    __tablename__ = 'notes'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.String(50), nullable=False)
+    amount = db.Column(db.String(100))
+    author = db.Column(db.String(100), default='ไม่ระบุ')
+    details = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.utcnow())
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.utcnow(), onupdate=lambda: datetime.utcnow())
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'datetime': self.datetime,
+            'amount': self.amount,
+            'author': self.author,
+            'details': self.details,
+            'createdAt': self.created_at.isoformat() if self.created_at else None
+        }
 
 # -------------------- Kbiz Withdraw Notification (เฟซใหม่) --------------------
 from threading import Lock
@@ -814,8 +843,147 @@ def upload_slip(txid):
 def get_slip(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+# -------------------- Notes API --------------------
+@app.route('/api/notes', methods=['GET'])
+def get_notes():
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        
+        notes = Note.query.order_by(Note.created_at.desc()).paginate(
+            page=page, per_page=per_page, error_out=False
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'data': [note.to_dict() for note in notes.items],
+            'pagination': {
+                'total': notes.total,
+                'pages': notes.pages,
+                'current_page': notes.page,
+                'per_page': notes.per_page,
+                'has_next': notes.has_next,
+                'has_prev': notes.has_prev
+            }
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/notes', methods=['POST'])
+def create_note():
+    try:
+        data = request.get_json()
+        
+        new_note = Note(
+            datetime=data.get('datetime'),
+            amount=data.get('amount', ''),
+            author=data.get('author', 'ไม่ระบุ'),
+            details=data.get('details')
+        )
+        
+        db.session.add(new_note)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'data': new_note.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/notes/<int:note_id>', methods=['PUT'])
+def update_note(note_id):
+    try:
+        note = Note.query.get_or_404(note_id)
+        data = request.get_json()
+        
+        note.datetime = data.get('datetime', note.datetime)
+        note.amount = data.get('amount', note.amount)
+        note.author = data.get('author', note.author)
+        note.details = data.get('details', note.details)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'data': note.to_dict()
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/notes/<int:note_id>', methods=['DELETE'])
+def delete_note(note_id):
+    try:
+        note = Note.query.get_or_404(note_id)
+        db.session.delete(note)
+        db.session.commit()
+        
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/notes/export', methods=['GET'])
+def export_notes():
+    try:
+        notes = Note.query.order_by(Note.created_at.desc()).all()
+        data = [note.to_dict() for note in notes]
+        
+        return jsonify({
+            'status': 'success',
+            'data': data,
+            'exported_at': datetime.utcnow().isoformat()
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/api/notes/import', methods=['POST'])
+def import_notes():
+    try:
+        data = request.get_json()
+        notes_data = data.get('notes', [])
+        
+        imported_count = 0
+        for note_data in notes_data:
+            # ตรวจสอบว่ามี note ที่ซ้ำหรือไม่
+            existing = Note.query.filter_by(
+                datetime=note_data.get('datetime'),
+                details=note_data.get('details')
+            ).first()
+            
+            if not existing:
+                new_note = Note(
+                    datetime=note_data.get('datetime'),
+                    amount=note_data.get('amount', ''),
+                    author=note_data.get('author', 'ไม่ระบุ'),
+                    details=note_data.get('details')
+                )
+                db.session.add(new_note)
+                imported_count += 1
+        
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'imported_count': imported_count,
+            'total_count': len(notes_data)
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 # -------------------- Run --------------------
 if __name__ == "__main__":
+    # สร้างตารางฐานข้อมูล
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully!")
+        except Exception as e:
+            print(f"Error creating database tables: {e}")
+    
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:

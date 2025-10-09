@@ -778,6 +778,82 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   transform: scale(1.1);
   box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
 }
+
+/* Notes Controls - Export/Import */
+.notes-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 15px 0;
+  padding: 10px;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.export-btn, .import-btn {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1.4em;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.export-btn:hover {
+  background: #138496;
+}
+
+.import-btn {
+  background: #6f42c1;
+}
+
+.import-btn:hover {
+  background: #5a32a3;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 15px;
+  border-top: 1px solid #e9ecef;
+}
+
+.page-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1.4em;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.page-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-info {
+  font-size: 1.5em;
+  font-weight: 500;
+  color: #495057;
+  padding: 0 10px;
+}
 </style>
 </head>
 <body>
@@ -937,8 +1013,21 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
       <button class="add-note-btn" onclick="addNote()">เพิ่มโน้ต</button>
     </div>
     
+    <!-- Export/Import Controls -->
+    <div class="notes-controls">
+      <button class="export-btn" onclick="exportNotes()" title="ส่งออกโน้ต">📤 ส่งออก</button>
+      <button class="import-btn" onclick="importNotes()" title="นำเข้าโน้ต">📥 นำเข้า</button>
+    </div>
+    
     <div class="notes-list" id="notes-list">
       <!-- โน้ตจะแสดงที่นี่ -->
+    </div>
+    
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <button id="prev-page" class="page-btn" onclick="prevPage()">◀ ก่อนหน้า</button>
+      <span id="page-info" class="page-info">หน้า 1 จาก 1</span>
+      <button id="next-page" class="page-btn" onclick="nextPage()">ถัดไป ▶</button>
     </div>
   </div>
 </div>
@@ -1982,24 +2071,41 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// === กระดาษโน้ต Sticky Notes ===
+// === กระดาษโน้ต Sticky Notes with Database ===
 let notes = [];
+let currentPage = 1;
+let totalPages = 1;
+const notesPerPage = 10;
 
-// โหลดโน้ตจาก localStorage
-function loadNotes() {
-  const savedNotes = localStorage.getItem('dashboard-notes');
-  if (savedNotes) {
-    notes = JSON.parse(savedNotes);
+// โหลดโน้ตจากฐานข้อมูล
+async function loadNotes(page = 1) {
+  try {
+    const response = await fetch(`/api/notes?page=${page}&per_page=${notesPerPage}`);
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      notes = result.data;
+      currentPage = result.pagination.current_page;
+      totalPages = result.pagination.pages;
+      updatePaginationInfo(result.pagination);
+    }
+  } catch (error) {
+    console.error('Error loading notes:', error);
+    alert('เกิดข้อผิดพลาดในการโหลดโน้ต');
   }
 }
 
-// บันทึกโน้ตลง localStorage
-function saveNotes() {
-  localStorage.setItem('dashboard-notes', JSON.stringify(notes));
+// อัพเดตข้อมูล pagination
+function updatePaginationInfo(pagination) {
+  document.getElementById('page-info').textContent = 
+    `หน้า ${pagination.current_page} จาก ${pagination.pages} (รวม ${pagination.total} รายการ)`;
+  
+  document.getElementById('prev-page').disabled = !pagination.has_prev;
+  document.getElementById('next-page').disabled = !pagination.has_next;
 }
 
 // เปิดหน้าต่างโน้ต
-function openNotes() {
+async function openNotes() {
   document.getElementById('notes-overlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
   
@@ -2015,6 +2121,7 @@ function openNotes() {
   });
   document.getElementById('note-datetime').value = thaiDateTime;
   
+  await loadNotes();
   renderNotes();
 }
 
@@ -2033,7 +2140,7 @@ function clearNoteForm() {
 }
 
 // เพิ่มโน้ตใหม่
-function addNote() {
+async function addNote() {
   const datetime = document.getElementById('note-datetime').value;
   const amount = document.getElementById('note-amount').value;
   const author = document.getElementById('note-author').value;
@@ -2044,31 +2151,45 @@ function addNote() {
     return;
   }
   
-  const newNote = {
-    id: Date.now(),
-    datetime: datetime,
-    amount: amount,
-    author: author || 'ไม่ระบุ',
-    details: details,
-    createdAt: new Date().toISOString()
-  };
-  
-  notes.unshift(newNote); // เพิ่มที่ด้านบน
-  saveNotes();
-  renderNotes();
-  clearNoteForm();
-  
-  // ตั้งเวลาใหม่
-  const now = new Date();
-  const thaiDateTime = now.toLocaleString('th-TH', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-  document.getElementById('note-datetime').value = thaiDateTime;
+  try {
+    const response = await fetch('/api/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        datetime: datetime,
+        amount: amount,
+        author: author || 'ไม่ระบุ',
+        details: details
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      await loadNotes(currentPage);
+      renderNotes();
+      clearNoteForm();
+      
+      // ตั้งเวลาใหม่
+      const now = new Date();
+      const thaiDateTime = now.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('note-datetime').value = thaiDateTime;
+    } else {
+      alert('เกิดข้อผิดพลาด: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error adding note:', error);
+    alert('เกิดข้อผิดพลาดในการเพิ่มโน้ต');
+  }
 }
 
 // แสดงรายการโน้ต
@@ -2103,12 +2224,26 @@ function renderNotes() {
 }
 
 // ลบโน้ต
-function deleteNote(id) {
+async function deleteNote(id) {
   if (!confirm('คุณแน่ใจว่าต้องการลบโน้ตนี้?')) return;
   
-  notes = notes.filter(note => note.id !== id);
-  saveNotes();
-  renderNotes();
+  try {
+    const response = await fetch(`/api/notes/${id}`, {
+      method: 'DELETE'
+    });
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      await loadNotes(currentPage);
+      renderNotes();
+    } else {
+      alert('เกิดข้อผิดพลาด: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error deleting note:', error);
+    alert('เกิดข้อผิดพลาดในการลบโน้ต');
+  }
 }
 
 // แก้ไขโน้ต
@@ -2128,7 +2263,7 @@ function editNote(id) {
 }
 
 // อัปเดตโน้ต
-function updateNote(id) {
+async function updateNote(id) {
   const datetime = document.getElementById('note-datetime').value;
   const amount = document.getElementById('note-amount').value;
   const author = document.getElementById('note-author').value;
@@ -2139,36 +2274,49 @@ function updateNote(id) {
     return;
   }
   
-  const noteIndex = notes.findIndex(note => note.id === id);
-  if (noteIndex !== -1) {
-    notes[noteIndex] = {
-      ...notes[noteIndex],
-      datetime: datetime,
-      amount: amount,
-      author: author || 'ไม่ระบุ',
-      details: details
-    };
-    
-    saveNotes();
-    renderNotes();
-    clearNoteForm();
-    
-    // เปลี่ยนปุ่มกลับเป็น "เพิ่มโน้ต"
-    const addBtn = document.querySelector('.add-note-btn');
-    addBtn.textContent = 'เพิ่มโน้ต';
-    addBtn.onclick = addNote;
-    
-    // ตั้งเวลาใหม่
-    const now = new Date();
-    const thaiDateTime = now.toLocaleString('th-TH', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+  try {
+    const response = await fetch(`/api/notes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        datetime: datetime,
+        amount: amount,
+        author: author || 'ไม่ระบุ',
+        details: details
+      })
     });
-    document.getElementById('note-datetime').value = thaiDateTime;
+    
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      await loadNotes(currentPage);
+      renderNotes();
+      clearNoteForm();
+      
+      // เปลี่ยนปุ่มกลับเป็น "เพิ่มโน้ต"
+      const addBtn = document.querySelector('.add-note-btn');
+      addBtn.textContent = 'เพิ่มโน้ต';
+      addBtn.onclick = addNote;
+      
+      // ตั้งเวลาใหม่
+      const now = new Date();
+      const thaiDateTime = now.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      document.getElementById('note-datetime').value = thaiDateTime;
+    } else {
+      alert('เกิดข้อผิดพลาด: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error updating note:', error);
+    alert('เกิดข้อผิดพลาดในการอัปเดตโน้ต');
   }
 }
 
@@ -2179,9 +2327,102 @@ document.getElementById('notes-overlay').addEventListener('click', function(e) {
   }
 });
 
+// ฟังก์ชัน Pagination
+async function prevPage() {
+  if (currentPage > 1) {
+    await loadNotes(currentPage - 1);
+    renderNotes();
+  }
+}
+
+async function nextPage() {
+  if (currentPage < totalPages) {
+    await loadNotes(currentPage + 1);
+    renderNotes();
+  }
+}
+
+// ฟังก์ชัน Export โน้ต
+async function exportNotes() {
+  try {
+    const response = await fetch('/api/notes/export');
+    const result = await response.json();
+    
+    if (result.status === 'success') {
+      const dataStr = JSON.stringify(result, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `notes_export_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert('ส่งออกโน้ตเรียบร้อยแล้ว!');
+    } else {
+      alert('เกิดข้อผิดพลาด: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error exporting notes:', error);
+    alert('เกิดข้อผิดพลาดในการส่งออกโน้ต');
+  }
+}
+
+// ฟังก์ชัน Import โน้ต
+function importNotes() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = async function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      // ตรวจสอบรูปแบบข้อมูล
+      if (!data.data || !Array.isArray(data.data)) {
+        alert('รูปแบบไฟล์ไม่ถูกต้อง');
+        return;
+      }
+      
+      const response = await fetch('/api/notes/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          notes: data.data
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        alert(`นำเข้าโน้ตเรียบร้อย: ${result.imported_count}/${result.total_count} รายการ`);
+        await loadNotes(1);
+        renderNotes();
+      } else {
+        alert('เกิดข้อผิดพลาด: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error importing notes:', error);
+      alert('เกิดข้อผิดพลาดในการนำเข้าโน้ต: ' + error.message);
+    }
+  };
+  
+  input.click();
+}
+
 // โหลดโน้ตเมื่อเริ่มต้น
 document.addEventListener('DOMContentLoaded', function() {
-  loadNotes();
+  // ไม่ต้องโหลดจาก localStorage แล้ว
+  console.log('Notes system ready with database backend');
 });
 </script>
 </body>
