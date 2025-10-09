@@ -512,53 +512,54 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         </div>
       </div>
     </div>
-    <!-- Kbiz Box (ขวาสุด) -->
-    <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px; min-width:360px; max-width:510px;">
-      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-        <img src="{{ url_for('static', filename='kbiz.png') }}" alt="Kbiz Logo" style="height:32px;max-width:80px;width:auto;">
-        <span id="kbiz-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-        <span id="kbiz-status-text">ไม่มีข้อมูล</span>
+    <!-- Kbiz และ SCB กฤษฏา สุดแม่ง (คอลัมน์ขวาสุด) -->
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <!-- Kbiz Box -->
+      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px; min-width:360px; max-width:510px;">
+        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+          <img src="{{ url_for('static', filename='kbiz.png') }}" alt="Kbiz Logo" style="height:32px;max-width:80px;width:auto;">
+          <span id="kbiz-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="kbiz-status-text">ไม่มีข้อมูล</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="font-weight:bold;">รายการเงินออก Kbiz ปฏิพล วงค์สุวรรณ 1192211510</span>
+        </div>
+        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+          <table id="kbiz-notify-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>จำนวนเงิน</th>
+              </tr>
+            </thead>
+            <tbody id="kbiz-notify-tbody"></tbody>
+          </table>
+        </div>
       </div>
-      <div style="margin-bottom:8px;">
-        <span style="font-weight:bold;">รายการเงินออก Kbiz ปฏิพล วงค์สุวรรณ 1192211510</span>
-      </div>
-      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-        <table id="kbiz-notify-table" style="width:100%;border:none">
-          <thead>
-            <tr>
-              <th>วันที่/เวลา</th>
-              <th>รายละเอียด</th>
-              <th>จำนวนเงิน</th>
-            </tr>
-          </thead>
-          <tbody id="kbiz-notify-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- กล่อง SCB กฤษฏา สุดแม่ง (ใต้กล่อง Kbiz) -->
-  <div style="display: flex; justify-content: center; width: 100%; margin-top: 32px;">
-    <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-        <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-        <span id="scb3-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-        <span id="scb3-status-text">เชื่อมต่อ...</span>
-      </div>
-      <div style="margin-bottom:8px;">
-        <span style="font-weight:bold;">SCB กฤษฏา สุดแม่ง</span>
-      </div>
-      <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-        <table id="scb3-sms-table" style="width:100%;border:none">
-          <thead>
-            <tr>
-              <th>วันที่/เวลา</th>
-              <th>รายละเอียด</th>
-              <th>ยอดคงเหลือ</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      
+      <!-- SCB กฤษฏา สุดแม่ง Box -->
+      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
+          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
+          <span id="scb3-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
+          <span id="scb3-status-text">เชื่อมต่อ...</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          <span style="font-weight:bold;">SCB กฤษฏา สุดแม่ง</span>
+        </div>
+        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
+          <table id="scb3-sms-table" style="width:100%;border:none">
+            <thead>
+              <tr>
+                <th>วันที่/เวลา</th>
+                <th>รายละเอียด</th>
+                <th>ยอดคงเหลือ</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
