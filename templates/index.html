@@ -2359,15 +2359,13 @@ document.getElementById('notes-overlay').addEventListener('click', function(e) {
 // ฟังก์ชัน Pagination
 async function prevPage() {
   if (currentPage > 1) {
-    await loadNotes(currentPage - 1);
-    renderNotes();
+    await loadNotes(currentPage - 1); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
   }
 }
 
 async function nextPage() {
   if (currentPage < totalPages) {
-    await loadNotes(currentPage + 1);
-    renderNotes();
+    await loadNotes(currentPage + 1); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
   }
 }
 
@@ -2426,15 +2424,12 @@ function importNotes() {
       
       const result = await response.json();
       
-      if (result.status === 'success') {
-        alert(`นำเข้าไฟล์ CSV เรียบร้อย: ${result.imported_count}/${result.total_count} รายการ`);
-        await loadNotes(1);
-        renderNotes();
-      } else {
-        alert('เกิดข้อผิดพลาด: ' + result.message);
-      }
-      
-    } catch (error) {
+        if (result.status === 'success') {
+          alert(`นำเข้าไฟล์ CSV เรียบร้อย: ${result.imported_count}/${result.total_count} รายการ`);
+          await loadNotes(1); // loadNotes จะเรียก renderNotes อัตโนมัติแล้ว
+        } else {
+          alert('เกิดข้อผิดพลาด: ' + result.message);
+        }    } catch (error) {
       console.error('Error importing notes:', error);
       alert('เกิดข้อผิดพลาดในการนำเข้าโน้ต: ' + error.message);
     }
