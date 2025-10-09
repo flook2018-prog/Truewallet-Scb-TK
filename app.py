@@ -25,16 +25,21 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นคีย์ลับจริงใน production
 
-# -------------------- Database Configuration --------------------
-# ใช้ PostgreSQL สำหรับ Railway, SQLite สำหรับ local testing
+# -------------------- Database Configuration (เฉพาะระบบโน้ต) --------------------
+# ใช้ PostgreSQL เฉพาะสำหรับระบบโน้ต
 import os
-if os.environ.get('RAILWAY_ENVIRONMENT'):
-    # Production - Railway PostgreSQL
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway'
-else:
-    # Local development - SQLite
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notes.db'
 
+# PostgreSQL สำหรับระบบโน้ต (ใช้ external URL สำหรับ local testing)
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    # Production - Railway internal URL
+    NOTES_DB_URL = "postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway"
+else:
+    # Local development - External URL (ต้องหา external URL จาก Railway Dashboard)
+    # หากไม่มี external URL ให้ใช้ SQLite แทน
+    NOTES_DB_URL = "sqlite:///notes.db"
+
+# ตั้งค่าฐานข้อมูลเฉพาะโน้ต
+app.config['SQLALCHEMY_DATABASE_URI'] = NOTES_DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
