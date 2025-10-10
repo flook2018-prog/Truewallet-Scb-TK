@@ -1,0 +1,26 @@
+{
+  "name": "theking888-website",
+  "version": "1.0.0",
+  "description": "THEKING888 - เว็บสล็อตตรงจากอเมริกา",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "theking888",
+    "slot",
+    "casino",
+    "gambling",
+    "jackpot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "path": "^0.12.7"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
