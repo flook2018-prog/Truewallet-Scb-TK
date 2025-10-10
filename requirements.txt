@@ -1,9 +1,11 @@
 Flask==2.2.5
 PyJWT==2.8.0
-Flask-SQLAlchemy==3.0.5
+Flask-SQLAlchemy==3.1.1
 Flask-SocketIO==5.5.1
 eventlet==0.33.3
 python-dotenv==1.0.1
-psycopg2-binary==2.9.7
-pytz
-requests
+psycopg2-binary==2.9.10
+pytz==2023.3
+requests==2.31.0
+urllib3==2.0.4
+Werkzeug==2.3.6
