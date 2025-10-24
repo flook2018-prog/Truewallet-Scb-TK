@@ -1858,7 +1858,7 @@ renderDemoApprovedCancelled();
 </script>
 <script>
 // --- TrueWallet Transaction Notification Realtime ---
-async function fetchKbizNotifications() {
+async function fetchTrueWalletNotifications() {
   try {
     // ตรวจสอบว่า elements มีอยู่จริงก่อนใช้งาน
     const kbizInfo = document.getElementById('kbiz-withdraw-info');
@@ -1866,91 +1866,133 @@ async function fetchKbizNotifications() {
     const kbizText = document.getElementById('kbiz-status-text');
     
     if (!kbizInfo || !kbizLight || !kbizText) {
-      console.log('Kbiz elements not found, skipping...');
+      console.log('TrueWallet elements not found, skipping...');
       return;
     }
     
-    const res = await fetch('/api/kbiz_notifications');
+    // ดึงข้อมูลจาก external API
+    const res = await fetch('https://xinon1565.up.railway.app/webhook', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
+        'Content-Type': 'application/json'
+      }
+    });
     const data = await res.json();
-    if (data.notifications && data.notifications.length > 0) {
-      const latest = data.notifications[0];
-      // ตัวอย่าง: { amount, time, desc }
-      kbizInfo.textContent =
-        (latest.amount !== undefined ? latest.amount.toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท' : '-') +
-        (latest.desc ? ' | ' + latest.desc : '');
+    
+    // แสดงข้อมูลล่าสุด
+    if (data && Array.isArray(data) && data.length > 0) {
+      const latest = data[0];
+      kbizInfo.textContent = 
+        (latest.amount ? Number(latest.amount).toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท' : '-') +
+        (latest.sender_name ? ' | ' + latest.sender_name : '') +
+        (latest.event_type ? ' | ' + latest.event_type : '');
       kbizLight.style.background = '#4caf50';
-      kbizText.textContent = 'อัปเดต: ' + (latest.time || '-');
+      kbizText.textContent = 'อัปเดต: ' + (latest.received_time || new Date().toLocaleString('th-TH'));
+    } else if (data && typeof data === 'object') {
+      // ถ้าเป็น object เดียว
+      kbizInfo.textContent = 
+        (data.amount ? Number(data.amount).toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท' : '-') +
+        (data.sender_name ? ' | ' + data.sender_name : '') +
+        (data.event_type ? ' | ' + data.event_type : '');
+      kbizLight.style.background = '#4caf50';
+      kbizText.textContent = 'อัปเดต: ' + (data.received_time || new Date().toLocaleString('th-TH'));
     } else {
       kbizInfo.textContent = '-';
       kbizLight.style.background = '#ccc';
       kbizText.textContent = 'ไม่มีข้อมูล';
     }
   } catch (e) {
+    console.error('TrueWallet API Error:', e);
     const kbizInfo = document.getElementById('kbiz-withdraw-info');
     const kbizLight = document.getElementById('kbiz-status-light');
     const kbizText = document.getElementById('kbiz-status-text');
     
     if (kbizInfo) kbizInfo.textContent = '-';
-    if (kbizLight) kbizLight.style.background = '#ccc';
+    if (kbizLight) kbizLight.style.background = '#f44336';
     if (kbizText) kbizText.textContent = 'โหลดข้อมูลผิดพลาด';
   }
 }
-setInterval(fetchKbizNotifications, 4000);
-fetchKbizNotifications();
+setInterval(fetchTrueWalletNotifications, 4000);
+fetchTrueWalletNotifications();
 
-// --- Kbiz Notify Table ---
-async function renderKbizNotifyTable() {
+// --- TrueWallet Notify Table ---
+async function renderTrueWalletNotifyTable() {
   try {
     const tbody = document.getElementById('kbiz-notify-tbody');
     if (!tbody) {
-      console.log('Kbiz notify table not found, skipping...');
+      console.log('TrueWallet notify table not found, skipping...');
       return;
     }
     
-    const res = await fetch('/api/kbiz_notifications');
+    // ดึงข้อมูลจาก external API
+    const res = await fetch('https://xinon1565.up.railway.app/webhook', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
+        'Content-Type': 'application/json'
+      }
+    });
     const data = await res.json();
     tbody.innerHTML = '';
-    if (data.notifications && data.notifications.length > 0) {
-      data.notifications.forEach(n => {
-        let showAmount = n.amount || '';
-        let showDesc = n.desc || '';
-        let showTime = n.time || '';
-        // ถ้าไม่มีเวลา ให้ใช้เวลาปัจจุบัน
-        if (!showTime) {
-          showTime = new Date().toLocaleString('th-TH');
-        }
-        // ถ้า amount ว่าง แต่ desc มีตัวเลขยอดเงิน ให้แยกยอดเงินออกมา
-        if (!showAmount && showDesc) {
-          const m = showDesc.match(/([\d,]+\.\d{2})/);
-          if (m) {
-            showAmount = m[1].replace(',', '');
-            showDesc = showDesc.replace(m[0], '').replace('จำนวน', '').replace('บาท', '').trim();
+    
+    let transactions = [];
+    if (Array.isArray(data)) {
+      transactions = data;
+    } else if (data && typeof data === 'object') {
+      transactions = [data];
+    }
+    
+    if (transactions.length > 0) {
+      transactions.forEach(transaction => {
+        // แสดงข้อมูลที่ได้รับทั้งหมด
+        let showTime = transaction.received_time || transaction.time || new Date().toLocaleString('th-TH');
+        let showAmount = transaction.amount || '-';
+        let showDesc = [];
+        
+        // รวบรวมข้อมูลทั้งหมดแสดงในรายละเอียด
+        if (transaction.sender_name) showDesc.push('ผู้ส่ง: ' + transaction.sender_name);
+        if (transaction.sender_mobile) showDesc.push('เบอร์: ' + transaction.sender_mobile);
+        if (transaction.event_type) showDesc.push('ประเภท: ' + transaction.event_type);
+        if (transaction.channel) showDesc.push('ช่องทาง: ' + transaction.channel);
+        if (transaction.transaction_id) showDesc.push('ID: ' + transaction.transaction_id);
+        
+        // เพิ่มข้อมูลอื่นๆ ที่อาจมี
+        Object.keys(transaction).forEach(key => {
+          if (!['amount', 'received_time', 'time', 'sender_name', 'sender_mobile', 'event_type', 'channel', 'transaction_id'].includes(key)) {
+            showDesc.push(key + ': ' + transaction[key]);
           }
-        }
-        if (!showDesc && showAmount) {
-          showDesc = '-';
-        }
-        // amount format
+        });
+        
+        let descText = showDesc.length > 0 ? showDesc.join(' | ') : '-';
+        
+        // format amount
         let amountDisplay = '-';
         if (showAmount && !isNaN(Number(showAmount))) {
-          amountDisplay = Number(showAmount).toLocaleString('th-TH', {minimumFractionDigits:2});
-        } else if (showAmount) {
+          amountDisplay = Number(showAmount).toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท';
+        } else if (showAmount && showAmount !== '-') {
           amountDisplay = showAmount;
         }
-        // แสดงรายละเอียดเต็ม ไม่ตัด ...
+        
+        // แสดงรายละเอียดเต็ม
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${showTime || '-'}</td><td style="white-space:normal;max-width:400px;">${showDesc || '-'}</td><td>${amountDisplay}</td>`;
+        tr.innerHTML = `
+          <td style="font-size:0.9em;">${showTime}</td>
+          <td style="white-space:normal;max-width:400px;font-size:0.9em;">${descText}</td>
+          <td style="font-weight:bold;color:#2196f3;">${amountDisplay}</td>
+        `;
         tbody.appendChild(tr);
       });
     } else {
       tbody.innerHTML = '<tr><td colspan="3">ไม่มีข้อมูลแจ้งเตือน</td></tr>';
     }
   } catch (e) {
-    document.getElementById('kbiz-notify-tbody').innerHTML = '<tr><td colspan="3">โหลดข้อมูลผิดพลาด</td></tr>';
+    console.error('TrueWallet Table Error:', e);
+    document.getElementById('kbiz-notify-tbody').innerHTML = '<tr><td colspan="3">โหลดข้อมูลผิดพลาด: ' + e.message + '</td></tr>';
   }
 }
-setInterval(renderKbizNotifyTable, 4000);
-renderKbizNotifyTable();
+setInterval(renderTrueWalletNotifyTable, 4000);
+renderTrueWalletNotifyTable();
 </script>
 
 <script>
