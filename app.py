@@ -226,28 +226,45 @@ def wallet_deposit_data():
         except Exception as json_err:
             print("WALLET DEPOSIT ERROR: JSON decode", json_err)
             print("RESPONSE TEXT:", resp.text)
-            return jsonify({'error': f'JSON decode error: {json_err}', 'resp_text': resp.text}), 500
+            # ไม่ fallback ไปไฟล์เก่า แต่ return ว่าง
+            return jsonify({"new_orders": []})
+        
         # ถ้า data เป็น list (อนาคต), return ได้เลย
         if isinstance(data, list):
             return jsonify({"new_orders": data})
+        
         # ถ้า data เป็น dict ที่มี message (JWT หรือ error string)
         if "message" in data:
             token = data["message"]
-            # ถ้า message ไม่ใช่ JWT (เช่น Application not found) ให้ fallback ไปอ่านไฟล์ local
+            # ถ้า message ไม่ใช่ JWT (เช่น Application not found) ให้ return ว่าง
             if not isinstance(token, str) or token.count('.') != 2:
                 print("WALLET DEPOSIT: message is not JWT, got:", token)
-                # fallback: อ่าน new_orders จากไฟล์ local
-                try:
-                    with open(DATA_FILE, "r", encoding="utf-8") as f:
-                        local_data = json.load(f)
-                        new_orders = local_data.get("new", [])
-                        return jsonify({"new_orders": new_orders})
-                except Exception as e:
-                    print("WALLET DEPOSIT: fallback local error", e)
-                    return jsonify({"new_orders": []})
+                return jsonify({"new_orders": []})
+            
             import jwt
             try:
                 decoded = jwt.decode(token, "defbe102c9f4e9eaad1e16de7f8efe13", algorithms=["HS256"], options={"verify_iat": False})
+                
+                # เช็คว่าเป็นข้อมูลใหม่หรือไม่ (ใน 5 นาทีที่ผ่านมา)
+                received_time = decoded.get("received_time", "")
+                if received_time:
+                    try:
+                        from datetime import datetime, timedelta
+                        import pytz
+                        # Parse time และเช็คว่าใหม่กว่า 5 นาที
+                        tx_time = datetime.fromisoformat(received_time.replace('Z', '+00:00'))
+                        now = datetime.now(pytz.UTC)
+                        time_diff = (now - tx_time).total_seconds() / 60  # เป็นนาที
+                        
+                        # ถ้าเก่ากว่า 5 นาที ไม่แสดง
+                        if time_diff > 5:
+                            print(f"WALLET DEPOSIT: Transaction too old ({time_diff:.1f} minutes)")
+                            return jsonify({"new_orders": []})
+                    except Exception as time_err:
+                        print("WALLET DEPOSIT: Time check error", time_err)
+                        # ถ้าเช็คเวลาไม่ได้ ให้แสดงเฉพาะถ้าเป็นธุรกรรมใหม่จริงๆ
+                        pass
+                
                 tx = {
                     "id": decoded.get("transaction_id", ""),
                     "event": decoded.get("event_type", ""),
@@ -257,34 +274,21 @@ def wallet_deposit_data():
                     "bank": decoded.get("channel", "-"),
                     "status": "new",
                     "time": decoded.get("received_time", ""),
+                    "time_str": decoded.get("received_time", ""),
                     "slip_filename": None
                 }
                 return jsonify({"new_orders": [tx]})
             except Exception as e:
                 print("WALLET DEPOSIT ERROR: JWT decode", e)
                 print("RAW MESSAGE:", token)
-                # fallback: อ่าน new_orders จากไฟล์ local
-                try:
-                    with open(DATA_FILE, "r", encoding="utf-8") as f:
-                        local_data = json.load(f)
-                        new_orders = local_data.get("new", [])
-                        return jsonify({"new_orders": new_orders})
-                except Exception as e2:
-                    print("WALLET DEPOSIT: fallback local error", e2)
-                    return jsonify({"new_orders": []})
-        print("WALLET DEPOSIT ERROR: No data", data)
-        # fallback: อ่าน new_orders จากไฟล์ local
-        try:
-            with open(DATA_FILE, "r", encoding="utf-8") as f:
-                local_data = json.load(f)
-                new_orders = local_data.get("new", [])
-                return jsonify({"new_orders": new_orders})
-        except Exception as e:
-            print("WALLET DEPOSIT: fallback local error", e)
-            return jsonify({"new_orders": []})
+                return jsonify({"new_orders": []})
+        
+        print("WALLET DEPOSIT: No valid data", data)
+        return jsonify({"new_orders": []})
+        
     except Exception as e:
         print("WALLET DEPOSIT ERROR: Outer", e)
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e), "new_orders": []}), 500
 
 # TrueWallet External API Proxy (สำหรับแก้ปัญหา CORS)
 @app.route('/api/truewallet_external_data')

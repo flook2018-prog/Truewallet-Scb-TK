@@ -1976,15 +1976,17 @@ renderTrueWalletNotifyTable();
 </script>
 
 <script>
-// --- TrueWallet Transaction Notification Realtime ---
-async function fetchTrueWalletNotifications() {
+// === TrueWallet Smart Update ===
+let lastTrueWalletData = null;
+let lastTrueWalletUpdateTime = 0;
+
+async function checkTrueWalletUpdate() {
   try {
     const kbizInfo = document.getElementById('kbiz-withdraw-info');
     const kbizLight = document.getElementById('kbiz-status-light');
     const kbizText = document.getElementById('kbiz-status-text');
     
     if (!kbizInfo || !kbizLight || !kbizText) {
-      console.log('TrueWallet elements not found');
       return;
     }
     
@@ -1998,7 +2000,7 @@ async function fetchTrueWalletNotifications() {
         if (result.success) {
           data = result.data;
         } else {
-          errorMsg = result.error || 'Proxy failed';
+          errorMsg = result.error || 'API Error';
         }
       } else {
         errorMsg = `HTTP ${response.status}`;
@@ -2007,61 +2009,57 @@ async function fetchTrueWalletNotifications() {
       errorMsg = error.message;
     }
     
-    if (data) {
-      let transactions = Array.isArray(data) ? data : [data];
-      if (transactions.length > 0) {
-        const latest = transactions[0];
-        let displayText = '';
-        
-        if (latest.amount || latest.amount_str) {
-          const amount = latest.amount_str || Number(latest.amount).toLocaleString('th-TH');
-          displayText += amount + ' บาท';
+    // เช็คว่าข้อมูลเปลี่ยนแปลงหรือไม่
+    const currentDataString = JSON.stringify(data);
+    const lastDataString = JSON.stringify(lastTrueWalletData);
+    
+    // อัปเดตเฉพาะเมื่อข้อมูลเปลี่ยนแปลง หรือ error state เปลี่ยน
+    if (currentDataString !== lastDataString || (!data && !lastTrueWalletData)) {
+      lastTrueWalletData = data;
+      lastTrueWalletUpdateTime = Date.now();
+      
+      if (data) {
+        let transactions = Array.isArray(data) ? data : [data];
+        if (transactions.length > 0) {
+          const latest = transactions[0];
+          let displayText = '';
+          
+          if (latest.amount || latest.amount_str) {
+            const amount = latest.amount_str || Number(latest.amount).toLocaleString('th-TH');
+            displayText += amount + ' บาท';
+          }
+          if (latest.sender_name || latest.name) {
+            displayText += ' | ' + (latest.sender_name || latest.name);
+          }
+          
+          kbizInfo.textContent = displayText || 'ได้รับข้อมูลแล้ว';
+          kbizLight.style.background = '#4caf50';
+          kbizText.textContent = 'อัปเดต: ' + new Date().toLocaleString('th-TH');
+          
+          console.log('TrueWallet: ข้อมูลใหม่ - ' + displayText);
+        } else {
+          kbizInfo.textContent = 'ไม่มีธุรกรรม';
+          kbizLight.style.background = '#ff9800';
+          kbizText.textContent = 'ไม่มีข้อมูล';
         }
-        if (latest.sender_name || latest.name) {
-          displayText += ' | ' + (latest.sender_name || latest.name);
-        }
-        if (latest.event_type || latest.event) {
-          displayText += ' | ' + (latest.event_type || latest.event);
-        }
-        
-        kbizInfo.textContent = displayText || 'ได้รับข้อมูลแล้ว';
-        kbizLight.style.background = '#4caf50';
-        kbizText.textContent = 'อัปเดต: ' + (latest.received_time || latest.time || new Date().toLocaleString('th-TH'));
       } else {
-        kbizInfo.textContent = 'ไม่มีธุรกรรม';
-        kbizLight.style.background = '#ff9800';
-        kbizText.textContent = 'เชื่อมต่อสำเร็จ แต่ไม่มีข้อมูล';
+        kbizInfo.textContent = '-';
+        kbizLight.style.background = '#f44336';
+        kbizText.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + errorMsg;
       }
-    } else {
-      kbizInfo.textContent = '-';
-      kbizLight.style.background = '#f44336';
-      kbizText.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + errorMsg;
+      
+      // อัปเดตตารางด้วยเมื่อมีข้อมูลใหม่
+      updateTrueWalletTable(data);
     }
   } catch (error) {
-    console.error('TrueWallet Error:', error);
+    console.error('TrueWallet Smart Update Error:', error);
   }
 }
 
-async function renderTrueWalletNotifyTable() {
+function updateTrueWalletTable(data) {
   try {
     const tbody = document.getElementById('kbiz-notify-tbody');
     if (!tbody) return;
-    
-    tbody.innerHTML = '<tr><td colspan="3">กำลังโหลด...</td></tr>';
-    
-    let data = null;
-    
-    try {
-      const response = await fetch('/api/truewallet_external_data');
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success) {
-          data = result.data;
-        }
-      }
-    } catch (error) {
-      console.error('TrueWallet table API error:', error);
-    }
     
     if (data && Array.isArray(data) && data.length > 0) {
       const tableHTML = data.map((transaction, index) => {
@@ -2099,17 +2097,14 @@ async function renderTrueWalletNotifyTable() {
       tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#ff9800;">ไม่มีข้อมูลธุรกรรม</td></tr>';
     }
   } catch (error) {
-    console.error('TrueWallet Table Error:', error);
+    console.error('TrueWallet Table Update Error:', error);
   }
 }
 
-setInterval(fetchTrueWalletNotifications, 5000);
-setInterval(renderTrueWalletNotifyTable, 5000);
-fetchTrueWalletNotifications();
-renderTrueWalletNotifyTable();
-</script>
+// เช็คทุก 3 วินาที แต่อัปเดตเฉพาะเมื่อข้อมูลเปลี่ยน
+setInterval(checkTrueWalletUpdate, 3000);
+checkTrueWalletUpdate(); // เรียกครั้งแรก
 
-<script>
 // === เครื่องคิดเลข Windows 11 ===
 let calcDisplay = '0';
 let calcOperator = null;
