@@ -1137,6 +1137,9 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <div style="margin-bottom:8px;">
           <span style="font-weight:bold;">รายการเงินเข้า-ออก ทรูวอเลท สุนิสา หงษ์เวียงจันทร์</span>
         </div>
+        <div style="margin-bottom:8px;padding:8px;background:#f8f9fa;border-radius:6px;">
+          <span id="kbiz-withdraw-info" style="font-size:0.9em;color:#666;">กำลังโหลดข้อมูล...</span>
+        </div>
         <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
           <table id="kbiz-notify-table" style="width:100%;border:none">
             <thead>
@@ -1857,114 +1860,34 @@ fetchTransactions();
 renderDemoApprovedCancelled();
 </script>
 <script>
-// --- TrueWallet Transaction Notification Realtime ---
+// --- TrueWallet Functions ---
 async function fetchTrueWalletNotifications() {
   try {
-    // ตรวจสอบว่า elements มีอยู่จริงก่อนใช้งาน
     const kbizInfo = document.getElementById('kbiz-withdraw-info');
     const kbizLight = document.getElementById('kbiz-status-light');
     const kbizText = document.getElementById('kbiz-status-text');
     
-    if (!kbizInfo || !kbizLight || !kbizText) {
-      console.log('TrueWallet elements not found, skipping...');
-      return;
-    }
+    if (!kbizInfo || !kbizLight || !kbizText) return;
     
-    // ลอง API หลายวิธี (เรียงตามความน่าเชื่อถือ)
     let data = null;
-    let lastError = null;
+    let errorMsg = '';
     
-    // วิธีที่ 1: ผ่าน Backend Proxy (แนะนำ - ไม่มีปัญหา CORS)
     try {
-      const res1 = await fetch('/api/truewallet_external_data');
-      if (res1.ok) {
-        const proxyData = await res1.json();
-        if (proxyData.success) {
-          data = proxyData.data;
-          console.log('TrueWallet: ใช้ Backend Proxy สำเร็จ');
+      const response = await fetch('/api/truewallet_external_data');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          data = result.data;
         } else {
-          lastError = proxyData.error || 'Proxy failed';
+          errorMsg = result.error || 'API Error';
         }
+      } else {
+        errorMsg = `HTTP ${response.status}`;
       }
-    } catch (e1) {
-      console.warn('TrueWallet Backend Proxy failed:', e1.message);
-      lastError = e1.message;
-      
-      // วิธีที่ 2: เรียก External API โดยตรง (GET)
-      try {
-        const res2 = await fetch('https://xinon1565.up.railway.app/webhook', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          mode: 'cors'
-        });
-        console.log('TrueWallet API Response Status:', res2.status);
-        if (res2.ok) {
-          const text = await res2.text();
-          console.log('TrueWallet API Response Text:', text);
-          data = text ? JSON.parse(text) : null;
-        } else {
-          lastError = `HTTP ${res2.status}: ${res2.statusText}`;
-        }
-      } catch (e2) {
-        console.warn('TrueWallet API Method 2 failed:', e2.message);
-        lastError = e2.message;
-        
-        // วิธีที่ 3: POST to External API
-        try {
-          const res3 = await fetch('https://xinon1565.up.railway.app/webhook', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({ action: 'get_data' }),
-            mode: 'cors'
-          });
-          if (res3.ok) {
-            const text = await res3.text();
-            data = text ? JSON.parse(text) : null;
-          } else {
-            lastError = `HTTP ${res3.status}: ${res3.statusText}`;
-          }
-        } catch (e3) {
-          console.warn('TrueWallet API Method 3 failed:', e3.message);
-        
-        // วิธีที่ 3: ผ่าน Backend Proxy (แนะนำ)
-        try {
-          const res3 = await fetch('/api/truewallet_external_data');
-          if (res3.ok) {
-            const proxyData = await res3.json();
-            if (proxyData.success) {
-              data = proxyData.data;
-            } else {
-              lastError = proxyData.error || 'Proxy failed';
-            }
-          }
-        } catch (e3) {
-          console.warn('TrueWallet Proxy failed:', e3.message);
-          
-          // วิธีที่ 4: Fallback to local wallet data
-          try {
-            const res4 = await fetch('/api/wallet_deposit_data');
-            if (res4.ok) {
-              const fallbackData = await res4.json();
-              data = fallbackData.new_orders || fallbackData;
-            }
-          } catch (e4) {
-            console.warn('TrueWallet Fallback failed:', e4.message);
-            lastError = e4.message;
-          }
-        }
-      }
-    }
+    } catch (error) {
+      errorMsg = error.message;
     }
     
-    // แสดงข้อมูล
     if (data) {
       let transactions = Array.isArray(data) ? data : [data];
       if (transactions.length > 0) {
@@ -1972,7 +1895,127 @@ async function fetchTrueWalletNotifications() {
         let displayText = '';
         
         if (latest.amount || latest.amount_str) {
-          displayText += (latest.amount_str || Number(latest.amount).toLocaleString('th-TH', {minimumFractionDigits:2})) + ' บาท';
+          const amount = latest.amount_str || Number(latest.amount).toLocaleString('th-TH');
+          displayText += amount + ' บาท';
+        }
+        if (latest.sender_name || latest.name) {
+          displayText += ' | ' + (latest.sender_name || latest.name);
+        }
+        
+        kbizInfo.textContent = displayText || 'ได้รับข้อมูลแล้ว';
+        kbizLight.style.background = '#4caf50';
+        kbizText.textContent = 'อัปเดต: ' + new Date().toLocaleString('th-TH');
+      } else {
+        kbizInfo.textContent = 'ไม่มีธุรกรรม';
+        kbizLight.style.background = '#ff9800';
+        kbizText.textContent = 'ไม่มีข้อมูล';
+      }
+    } else {
+      kbizInfo.textContent = '-';
+      kbizLight.style.background = '#f44336';
+      kbizText.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + errorMsg;
+    }
+  } catch (error) {
+    console.error('TrueWallet Error:', error);
+  }
+}
+
+async function renderTrueWalletNotifyTable() {
+  try {
+    const tbody = document.getElementById('kbiz-notify-tbody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="3">กำลังโหลด...</td></tr>';
+    
+    let data = null;
+    
+    try {
+      const response = await fetch('/api/truewallet_external_data');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          data = result.data;
+        }
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+    }
+    
+    if (data && Array.isArray(data) && data.length > 0) {
+      const tableHTML = data.map((transaction, index) => {
+        const amount = transaction.amount_str || (transaction.amount ? Number(transaction.amount).toLocaleString('th-TH') : '-');
+        const name = transaction.sender_name || transaction.name || '-';
+        const time = transaction.received_time || transaction.time || new Date().toLocaleString('th-TH');
+        
+        return `
+          <tr style="background:${index % 2 === 0 ? '#fafafa' : '#ffffff'};">
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
+              <span style="color: #4caf50; font-weight: 600;">${amount} บาท</span>
+            </td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${name}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; color: #666;">${time}</td>
+          </tr>
+        `;
+      }).join('');
+      
+      tbody.innerHTML = tableHTML;
+    } else {
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#ff9800;">ไม่มีข้อมูลธุรกรรม</td></tr>';
+    }
+  } catch (error) {
+    console.error('Table Error:', error);
+  }
+}
+
+setInterval(fetchTrueWalletNotifications, 5000);
+setInterval(renderTrueWalletNotifyTable, 5000);
+fetchTrueWalletNotifications();
+renderTrueWalletNotifyTable();
+</script>
+
+</script>
+
+<script>
+// --- TrueWallet Transaction Notification Realtime ---
+async function fetchTrueWalletNotifications() {
+  try {
+    const kbizInfo = document.getElementById('kbiz-withdraw-info');
+    const kbizLight = document.getElementById('kbiz-status-light');
+    const kbizText = document.getElementById('kbiz-status-text');
+    
+    if (!kbizInfo || !kbizLight || !kbizText) {
+      console.log('TrueWallet elements not found');
+      return;
+    }
+    
+    let data = null;
+    let errorMsg = '';
+    
+    try {
+      const response = await fetch('/api/truewallet_external_data');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          data = result.data;
+        } else {
+          errorMsg = result.error || 'Proxy failed';
+        }
+      } else {
+        errorMsg = `HTTP ${response.status}`;
+      }
+    } catch (error) {
+      errorMsg = error.message;
+    }
+    
+    if (data) {
+      let transactions = Array.isArray(data) ? data : [data];
+      if (transactions.length > 0) {
+        const latest = transactions[0];
+        let displayText = '';
+        
+        if (latest.amount || latest.amount_str) {
+          const amount = latest.amount_str || Number(latest.amount).toLocaleString('th-TH');
+          displayText += amount + ' บาท';
         }
         if (latest.sender_name || latest.name) {
           displayText += ' | ' + (latest.sender_name || latest.name);
@@ -1992,194 +2035,77 @@ async function fetchTrueWalletNotifications() {
     } else {
       kbizInfo.textContent = '-';
       kbizLight.style.background = '#f44336';
-      kbizText.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + (lastError || 'Unknown error');
+      kbizText.textContent = 'เชื่อมต่อไม่สำเร็จ: ' + errorMsg;
     }
-  } catch (e) {
-    console.error('TrueWallet API Fatal Error:', e);
-    const kbizInfo = document.getElementById('kbiz-withdraw-info');
-    const kbizLight = document.getElementById('kbiz-status-light');
-    const kbizText = document.getElementById('kbiz-status-text');
-    
-    if (kbizInfo) kbizInfo.textContent = '-';
-    if (kbizLight) kbizLight.style.background = '#f44336';
-    if (kbizText) kbizText.textContent = 'เกิดข้อผิดพลาด: ' + e.message;
+  } catch (error) {
+    console.error('TrueWallet Error:', error);
   }
 }
-setInterval(fetchTrueWalletNotifications, 4000);
-fetchTrueWalletNotifications();
 
-// --- TrueWallet Notify Table ---
 async function renderTrueWalletNotifyTable() {
   try {
     const tbody = document.getElementById('kbiz-notify-tbody');
-    if (!tbody) {
-      console.log('TrueWallet notify table not found, skipping...');
-      return;
-    }
+    if (!tbody) return;
     
     tbody.innerHTML = '<tr><td colspan="3">กำลังโหลด...</td></tr>';
     
-    // ลอง API หลายวิธี (เรียงตามความน่าเชื่อถือ)
     let data = null;
-    let lastError = null;
     
-    // วิธีที่ 1: ผ่าน Backend Proxy (แนะนำ - ไม่มีปัญหา CORS)
     try {
-      const res1 = await fetch('/api/truewallet_external_data');
-      if (res1.ok) {
-        const proxyData = await res1.json();
-        if (proxyData.success) {
-          data = proxyData.data;
-          console.log('TrueWallet Table: ใช้ Backend Proxy สำเร็จ');
-        } else {
-          lastError = proxyData.error || 'Proxy failed';
+      const response = await fetch('/api/truewallet_external_data');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          data = result.data;
         }
       }
-    } catch (e1) {
-      console.warn('TrueWallet Table Backend Proxy failed:', e1.message);
-      lastError = e1.message;
-      
-      // วิธีที่ 2: GET External API โดยตรง
-      try {
-        const res2 = await fetch('https://xinon1565.up.railway.app/webhook', {
-          method: 'GET',
-          headers: {
-            'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          mode: 'cors'
-        });
-        
-        if (res2.ok) {
-          const text = await res2.text();
-          console.log('TrueWallet Table Raw Response:', text.substring(0, 200) + '...');
-          data = text ? JSON.parse(text) : null;
-        } else {
-          lastError = `HTTP ${res2.status}`;
-        }
-      } catch (e2) {
-        console.warn('TrueWallet Table Method 2 failed:', e2.message);
-        lastError = e2.message;
-      
-      // วิธีที่ 2: POST method
-      try {
-        const res2 = await fetch('https://xinon1565.up.railway.app/webhook', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ action: 'get_transactions' })
-        });
-        
-        if (res2.ok) {
-          const text = await res2.text();
-          data = text ? JSON.parse(text) : null;
-        }
-      } catch (e2) {
-        console.warn('TrueWallet Table Method 2 failed:', e2.message);
-        lastError = e2.message;
-        
-        // วิธีที่ 3: POST method
-        try {
-          const res3 = await fetch('https://xinon1565.up.railway.app/webhook', {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ action: 'get_transactions' })
-          });
-          
-          if (res3.ok) {
-            const text = await res3.text();
-            data = text ? JSON.parse(text) : null;
-          }
-        } catch (e3) {
-          console.warn('TrueWallet Table Method 3 failed:', e3.message);
-          
-          // วิธีที่ 4: Local fallback
-          try {
-            const res4 = await fetch('/api/wallet_deposit_data');
-            if (res4.ok) {
-              const localData = await res4.json();
-              data = localData.new_orders || localData;
-            }
-          } catch (e4) {
-            console.warn('TrueWallet Local fallback failed:', e4.message);
-          }
-        }
-      }
+    } catch (error) {
+      console.error('TrueWallet table API error:', error);
     }
     
-    tbody.innerHTML = '';
-    
-    if (data) {
-      let transactions = Array.isArray(data) ? data : [data];
+    if (data && Array.isArray(data) && data.length > 0) {
+      const tableHTML = data.map((transaction, index) => {
+        const amount = transaction.amount_str || (transaction.amount ? Number(transaction.amount).toLocaleString('th-TH') : '-');
+        const name = transaction.sender_name || transaction.name || '-';
+        const time = transaction.received_time || transaction.time || new Date().toLocaleString('th-TH');
+        
+        return `
+          <tr style="background:${index % 2 === 0 ? '#fafafa' : '#ffffff'};">
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
+              <span style="color: #4caf50; font-weight: 600;">${amount} บาท</span>
+            </td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${name}</td>
+            <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; color: #666;">${time}</td>
+          </tr>
+        `;
+      }).join('');
       
-      if (transactions.length > 0) {
-        transactions.slice(0, 10).forEach((transaction, index) => {
-          // รวบรวมข้อมูลทั้งหมด
-          let showTime = transaction.received_time || transaction.time || new Date().toLocaleString('th-TH');
-          let showAmount = transaction.amount || transaction.amount_str || '-';
-          let showDesc = [];
-          
-          // สร้างรายละเอียด
-          if (transaction.sender_name) showDesc.push('ผู้ส่ง: ' + transaction.sender_name);
-          if (transaction.name && !transaction.sender_name) showDesc.push('ชื่อ: ' + transaction.name);
-          if (transaction.sender_mobile) showDesc.push('เบอร์: ' + transaction.sender_mobile);
-          if (transaction.event_type) showDesc.push('ประเภท: ' + transaction.event_type);
-          if (transaction.event && !transaction.event_type) showDesc.push('เหตุการณ์: ' + transaction.event);
-          if (transaction.channel || transaction.bank) showDesc.push('ช่องทาง: ' + (transaction.channel || transaction.bank));
-          if (transaction.transaction_id || transaction.id) showDesc.push('ID: ' + (transaction.transaction_id || transaction.id));
-          if (transaction.status) showDesc.push('สถานะ: ' + transaction.status);
-          
-          // เพิ่มข้อมูลอื่นๆ ที่ไม่ได้ระบุ
-          Object.keys(transaction).forEach(key => {
-            const skipKeys = ['amount', 'amount_str', 'received_time', 'time', 'sender_name', 'name', 'sender_mobile', 'event_type', 'event', 'channel', 'bank', 'transaction_id', 'id', 'status'];
-            if (!skipKeys.includes(key) && transaction[key] && transaction[key] !== '' && transaction[key] !== null) {
-              showDesc.push(`${key}: ${transaction[key]}`);
-            }
-          });
-          
-          let descText = showDesc.length > 0 ? showDesc.join(' | ') : 'ไม่มีรายละเอียด';
-          
-          // format amount
-          let amountDisplay = '-';
-          if (showAmount && showAmount !== '-') {
-            if (!isNaN(Number(showAmount))) {
-              amountDisplay = Number(showAmount).toLocaleString('th-TH', {minimumFractionDigits:2}) + ' บาท';
-            } else {
-              amountDisplay = showAmount;
-            }
-          }
-          
-          // สร้างแถว
-          const tr = document.createElement('tr');
-          tr.style.backgroundColor = index % 2 === 0 ? '#f8f9fa' : '#ffffff';
-          tr.innerHTML = `
-            <td style="font-size:0.85em;padding:8px;">${showTime}</td>
-            <td style="white-space:normal;max-width:350px;font-size:0.85em;padding:8px;line-height:1.4;">${descText}</td>
-            <td style="font-weight:bold;color:#2196f3;font-size:0.9em;padding:8px;">${amountDisplay}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#666;">ไม่มีธุรกรรม</td></tr>';
-      }
+      tbody.innerHTML = tableHTML;
+    } else if (data && !Array.isArray(data)) {
+      const amount = data.amount_str || (data.amount ? Number(data.amount).toLocaleString('th-TH') : '-');
+      const name = data.sender_name || data.name || '-';
+      const time = data.received_time || data.time || new Date().toLocaleString('th-TH');
+      
+      tbody.innerHTML = `
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">
+            <span style="color: #4caf50; font-weight: 600;">${amount} บาท</span>
+          </td>
+          <td style="padding: 8px; border-bottom: 1px solid #e0e0e0;">${name}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; color: #666;">${time}</td>
+        </tr>
+      `;
     } else {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#f44336;">โหลดข้อมูลไม่สำเร็จ: ${lastError || 'Unknown error'}</td></tr>`;
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#ff9800;">ไม่มีข้อมูลธุรกรรม</td></tr>';
     }
-  } catch (mainError) {
-    console.error('TrueWallet Table Fatal Error:', mainError);
-    const tbody = document.getElementById('kbiz-notify-tbody');
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:#f44336;">เกิดข้อผิดพลาด: ${mainError.message}</td></tr>`;
-    }
+  } catch (error) {
+    console.error('TrueWallet Table Error:', error);
   }
 }
-setInterval(renderTrueWalletNotifyTable, 4000);
+
+setInterval(fetchTrueWalletNotifications, 5000);
+setInterval(renderTrueWalletNotifyTable, 5000);
+fetchTrueWalletNotifications();
 renderTrueWalletNotifyTable();
 </script>
 
