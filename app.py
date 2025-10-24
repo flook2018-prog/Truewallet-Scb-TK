@@ -286,6 +286,52 @@ def wallet_deposit_data():
         print("WALLET DEPOSIT ERROR: Outer", e)
         return jsonify({'error': str(e)}), 500
 
+# TrueWallet External API Proxy (สำหรับแก้ปัญหา CORS)
+@app.route('/api/truewallet_external_data')
+def truewallet_external_data():
+    try:
+        # ดึงข้อมูลจาก external API
+        external_url = 'https://xinon1565.up.railway.app/webhook'
+        headers = {
+            'Authorization': 'Bearer 77972f12603e263c5f8a5b58afcc4428',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+        
+        # ลอง GET ก่อน
+        try:
+            resp = requests.get(external_url, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                try:
+                    data = resp.json()
+                    return jsonify({'success': True, 'data': data})
+                except Exception as json_err:
+                    return jsonify({'success': True, 'data': resp.text, 'raw': True})
+            else:
+                print(f"TrueWallet External API GET failed: {resp.status_code}")
+        except Exception as get_err:
+            print(f"TrueWallet External API GET error: {get_err}")
+        
+        # ลอง POST
+        try:
+            post_data = {'action': 'get_data'}
+            resp = requests.post(external_url, json=post_data, headers=headers, timeout=10)
+            if resp.status_code == 200:
+                try:
+                    data = resp.json()
+                    return jsonify({'success': True, 'data': data})
+                except Exception as json_err:
+                    return jsonify({'success': True, 'data': resp.text, 'raw': True})
+        except Exception as post_err:
+            print(f"TrueWallet External API POST error: {post_err}")
+        
+        # ถ้าไม่สำเร็จ return empty
+        return jsonify({'success': False, 'data': [], 'error': 'Cannot connect to external API'})
+        
+    except Exception as e:
+        print("TrueWallet External Proxy ERROR:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 accounts_file = "accounts.json"
 accounts_lock = threading.Lock()
 
