@@ -1110,86 +1110,6 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="tw-bp-updated">-</span>
       </div>
     </div>
-    
-    <!-- Crypto Exchange Rates Box - ตำแหน่งด้านขวาสุด ตามลูกศร -->
-    <div class="summary-card" style="position:relative;min-width:320px;max-width:420px;width:380px;padding:16px 18px 14px 18px;">
-      <div class="crypto-header" style="margin-bottom: 14px; text-align: center;">
-        <div class="crypto-title" style="font-size: 1.05em; font-weight: bold; color: #333; margin-bottom: 3px;">
-          💱 อัตราแลกเปลี่ยนเงินตรา & ราคาทอง
-        </div>
-        <div class="crypto-subtitle" style="font-size: 0.8em; color: #666;">
-          ข้อมูลราคาแบบเรียลไทม์
-        </div>
-      </div>
-      
-      <div class="crypto-mini-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px;">
-        <!-- BTC -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">₿</span>
-            <span style="font-size: 0.8em; font-weight: 600;">BTC</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="btc-price-mini">2,480K บาท</div>
-          <div style="font-size: 0.65em; color: #00ff88; margin-top: 2px;" id="btc-change-mini">+1.8%</div>
-        </div>
-        
-        <!-- USDT -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">₮</span>
-            <span style="font-size: 0.8em; font-weight: 600;">USDT</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="usdt-price-mini">36.20 บาท</div>
-          <div style="font-size: 0.65em; color: #00ff88; margin-top: 2px;" id="usdt-change-mini">+0.1%</div>
-        </div>
-        
-        <!-- USD -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">$</span>
-            <span style="font-size: 0.8em; font-weight: 600;">USD</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="usd-price-mini">36.25 บาท</div>
-          <div style="font-size: 0.65em; color: #888; margin-top: 2px;" id="usd-change-mini">--</div>
-        </div>
-        
-        <!-- EUR -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">€</span>
-            <span style="font-size: 0.8em; font-weight: 600;">EUR</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="eur-price-mini">38.45 บาท</div>
-          <div style="font-size: 0.65em; color: #888; margin-top: 2px;" id="eur-change-mini">--</div>
-        </div>
-        
-        <!-- CNY -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">¥</span>
-            <span style="font-size: 0.8em; font-weight: 600;">CNY</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="cny-price-mini">5.08 บาท</div>
-          <div style="font-size: 0.65em; color: #888; margin-top: 2px;" id="cny-change-mini">--</div>
-        </div>
-        
-        <!-- GOLD -->
-        <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 8px 4px; background: #f8f9fa; border-radius: 6px; text-align: center;">
-          <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 4px;">
-            <span style="font-size: 0.9em;">🥇</span>
-            <span style="font-size: 0.8em; font-weight: 600;">GOLD</span>
-          </div>
-          <div style="font-size: 0.75em; font-weight: 600; line-height: 1.2;" id="gold-price-mini">41,250 บาท</div>
-          <div style="font-size: 0.65em; color: #00ff88; margin-top: 2px;" id="gold-change-mini">+0.5%</div>
-        </div>
-      </div>
-      
-      <div style="text-align: center; font-size: 0.7em; color: #888; border-top: 1px solid #eee; padding-top: 6px;">
-        <span id="crypto-status-mini">🔄 กำลังเตรียมข้อมูล...</span>
-        <br>
-        <button onclick="refreshCryptoRates()" style="font-size: 0.65em; padding: 2px 8px; margin-top: 3px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">รีเฟรช</button>
-      </div>
-    </div>
   </div>
   <!-- กล่อง SCB ทั้งสองใบอยู่ในกลุ่มอื่น (เช่น right-column) ตาม layout เดิม -->
   <div style="display:flex;align-items:center;gap:10px;">
@@ -1320,6 +1240,87 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </table>
         </div>
       </div>
+      
+      <!-- Crypto Exchange Rates Box - หลังกล่อง SCB SMS ของ SCB สุมิธร์ คิมภิรานนท์ -->
+      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
+        <div class="crypto-header" style="margin-bottom: 14px; text-align: center;">
+          <div class="crypto-title" style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 3px;">
+            💱 อัตราแลกเปลี่ยนเงินตรา & ราคาทอง
+          </div>
+          <div class="crypto-subtitle" style="font-size: 0.85em; color: #666;">
+            ข้อมูลราคาแบบเรียลไทม์
+          </div>
+        </div>
+        
+        <div class="crypto-mini-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
+          <!-- BTC -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">₿</span>
+              <span style="font-size: 0.9em; font-weight: 600;">BTC</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="btc-price-mini">2,480K บาท</div>
+            <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="btc-change-mini">+1.8%</div>
+          </div>
+          
+          <!-- USDT -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">₮</span>
+              <span style="font-size: 0.9em; font-weight: 600;">USDT</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="usdt-price-mini">36.20 บาท</div>
+            <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="usdt-change-mini">+0.1%</div>
+          </div>
+          
+          <!-- USD -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">$</span>
+              <span style="font-size: 0.9em; font-weight: 600;">USD</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="usd-price-mini">36.25 บาท</div>
+            <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="usd-change-mini">--</div>
+          </div>
+          
+          <!-- EUR -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">€</span>
+              <span style="font-size: 0.9em; font-weight: 600;">EUR</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="eur-price-mini">38.45 บาท</div>
+            <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="eur-change-mini">--</div>
+          </div>
+          
+          <!-- CNY -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">¥</span>
+              <span style="font-size: 0.9em; font-weight: 600;">CNY</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="cny-price-mini">5.08 บาท</div>
+            <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="cny-change-mini">--</div>
+          </div>
+          
+          <!-- GOLD -->
+          <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
+              <span style="font-size: 1.1em;">🥇</span>
+              <span style="font-size: 0.9em; font-weight: 600;">GOLD</span>
+            </div>
+            <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="gold-price-mini">41,250 บาท</div>
+            <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="gold-change-mini">+0.5%</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; font-size: 0.8em; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+          <span id="crypto-status-mini">🔄 กำลังเตรียมข้อมูล...</span>
+          <br>
+          <button onclick="refreshCryptoRates()" style="font-size: 0.75em; padding: 3px 10px; margin-top: 4px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">รีเฟรช</button>
+        </div>
+      </div>
+      
       <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
         <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
           <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
