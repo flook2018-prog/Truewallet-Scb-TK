@@ -1079,6 +1079,79 @@ def import_notes():
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+# -------------------- Gold Price API --------------------
+@app.route('/api/gold-price', methods=['GET'])
+def get_gold_price():
+    """API endpoint สำหรับดึงราคาทองจากเว็บ ราคาทองคำวันนี้"""
+    try:
+        import re
+        from bs4 import BeautifulSoup
+        
+        # ดึงข้อมูลจากเว็บราคาทอง
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        response = requests.get('https://xn--42cah7d0cxcvbbb9x.com/', headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # หาตารางราคาทอง - ค้นหาข้อมูลทองคำแท่ง
+        gold_price = None
+        
+        # ลองหาจากตาราง
+        for table in soup.find_all('table'):
+            for row in table.find_all('tr'):
+                cells = row.find_all('td')
+                if len(cells) >= 3:
+                    first_cell = cells[0].get_text(strip=True)
+                    if 'ทองคำแท่ง' in first_cell or 'ทองแท่ง' in first_cell:
+                        # ราคาขายออก (คอลัมน์ที่ 2)
+                        price_text = cells[2].get_text(strip=True) if len(cells) > 2 else cells[1].get_text(strip=True)
+                        # ลบจุลภาคและแปลงเป็นตัวเลข
+                        price_match = re.search(r'([\d,]+)', price_text)
+                        if price_match:
+                            gold_price = price_match.group(1)
+                            break
+            if gold_price:
+                break
+        
+        if not gold_price:
+            # หากไม่พบในตาราง ลองหาจากข้อความ
+            text_content = soup.get_text()
+            # ค้นหาราคาทองแท่งในข้อความ
+            pattern = r'ทองคำแท่ง[^\d]*?([\d,]+\.?\d*)'
+            match = re.search(pattern, text_content)
+            if match:
+                gold_price = match.group(1)
+        
+        if gold_price:
+            return jsonify({
+                'success': True,
+                'gold_price': gold_price,
+                'source': 'ราคาทองคำวันนี้',
+                'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+        else:
+            # ใช้ราคาสำรองจากข้อมูลล่าสุดที่เห็น
+            return jsonify({
+                'success': True,
+                'gold_price': '61,550',
+                'source': 'ราคาสำรอง (31 ต.ค. 2568)',
+                'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+            
+    except Exception as e:
+        print(f"Error fetching gold price: {e}")
+        return jsonify({
+            'success': True,
+            'gold_price': '61,550',
+            'source': 'ราคาสำรอง (เกิดข้อผิดพลาด)',
+            'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'error': str(e)
+        })
+
 # -------------------- Run --------------------
 if __name__ == "__main__":
     # สร้างตารางฐานข้อมูล

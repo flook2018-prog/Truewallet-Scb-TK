@@ -3200,34 +3200,22 @@ async function refreshRealExchangeRates() {
   }
 }
 
-// ดึงราคาทอง (1 บาท = ? บาท)
+// ดึงราคาทอง (1 บาท = ? บาท) จากเว็บ ราคาทองคำวันนี้
 async function fetchGoldPrice() {
   try {
-    // ใช้ API ราคาทองจริง - ราคาทองแท่ง 96.5% ต่อบาท
-    const response = await fetch('https://api.metals.live/v1/spot/gold');
+    // เรียก API backend ของเราเพื่อดึงข้อมูลจากเว็บราคาทอง
+    const response = await fetch('/api/gold-price');
     const data = await response.json();
     
-    if (data && data[0] && data[0].price) {
-      // ราคาทองต่อออนซ์ในดอลลาร์
-      const goldUsdPerOz = data[0].price;
-      // แปลงเป็นบาทไทย (ประมาณ 36 บาทต่อดอลลาร์)
-      const usdToThb = 36.25;
-      // 1 ออนซ์ = 31.1035 กรัม
-      const ozToGram = 31.1035;
-      // 1 บาทไทย = 15.244 กรัม
-      const bahtToGram = 15.244;
-      
-      // คำนวณราคาทองต่อบาทไทย
-      const goldThbPerGram = (goldUsdPerOz * usdToThb) / ozToGram;
-      const goldThbPerBaht = goldThbPerGram * bahtToGram;
-      
-      return Math.round(goldThbPerBaht);
+    if (data && data.success && data.gold_price) {
+      // ราคาทองแท่งขายออก (บาทต่อบาททอง)
+      return parseInt(data.gold_price.replace(/,/g, ''));
     }
-    throw new Error('Invalid gold data');
+    throw new Error('Invalid gold data from website');
   } catch (error) {
     console.error('Gold price fetch failed:', error);
-    // ใช้ราคาสำรอง
-    return 41250;
+    // ใช้ราคาสำรองตามเว็บล่าสุด (31 ต.ค. 2568)
+    return 61550;
   }
 }
 
