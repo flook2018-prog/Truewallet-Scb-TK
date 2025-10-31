@@ -1202,115 +1202,160 @@ document.getElementById('show-cancelled').addEventListener('click', function() {
 
 <script>
 // --- อัปเดตสถานะไฟและข้อความทุกกล่อง summary-card ---
+let statusCache = {};
+let lastStatusUpdate = 0;
+
 async function updateStatusLights() {
+  // Throttle updates - only check every 15 seconds instead of 3
+  const now = Date.now();
+  if (now - lastStatusUpdate < 15000) return;
+  lastStatusUpdate = now;
+
   // Truewallet TK
   try {
     const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
       headers: { 'Authorization': 'Bearer dce99fdf74189d0854c0eeb627c1f4d8' }
     });
-    if (resp.ok) {
-      document.getElementById('tw-tk-status-light').style.background = '#28a745';
-      document.getElementById('tw-tk-status-text').innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
+    const newStatus = resp.ok ? 'connected' : 'disconnected';
+    if (statusCache.twTk !== newStatus) {
+      statusCache.twTk = newStatus;
+      document.getElementById('tw-tk-status-light').style.background = resp.ok ? '#28a745' : '#ccc';
+      document.getElementById('tw-tk-status-text').innerText = resp.ok ? 'เชื่อมต่อสำเร็จ' : '';
+    }
+  } catch (e) {
+    if (statusCache.twTk !== 'error') {
+      statusCache.twTk = 'error';
       document.getElementById('tw-tk-status-light').style.background = '#ccc';
       document.getElementById('tw-tk-status-text').innerText = '';
     }
-  } catch (e) {
-    document.getElementById('tw-tk-status-light').style.background = '#ccc';
-    document.getElementById('tw-tk-status-text').innerText = '';
   }
-  // SCB สุมิธร์
+  
+  // SCB สุมิธร์ - use cached data
   try {
     const resp = await fetch(`/api/sms?tag=sumitkimphiranon&sender=027777777`);
     let data = await resp.json();
-    // Use new status field from backend
     const status = data.status || '';
-    const scbStatusText = document.getElementById('scb-status-text');
-    if (status === 'connected') {
-      document.getElementById('scb-status-light').style.background = '#28a745';
-      scbStatusText.innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
-      document.getElementById('scb-status-light').style.background = '#ccc';
-      scbStatusText.innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb1 !== status) {
+      statusCache.scb1 = status;
+      const scbStatusText = document.getElementById('scb-status-text');
+      if (status === 'connected') {
+        document.getElementById('scb-status-light').style.background = '#28a745';
+        scbStatusText.innerText = 'เชื่อมต่อสำเร็จ';
+      } else {
+        document.getElementById('scb-status-light').style.background = '#ccc';
+        scbStatusText.innerText = 'เชื่อมต่อ...';
+      }
     }
   } catch (e) {
-    document.getElementById('scb-status-light').style.background = '#ccc';
-    document.getElementById('scb-status-text').innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb1 !== 'error') {
+      statusCache.scb1 = 'error';
+      document.getElementById('scb-status-light').style.background = '#ccc';
+      document.getElementById('scb-status-text').innerText = 'เชื่อมต่อ...';
+    }
   }
+  
   // SCB พลอยไพริน
   try {
     const resp = await fetch(`/api/sms?tag=ploypairinnamkhot&sender=027777777`);
     let data = await resp.json();
     const status2 = data.status || '';
-    const scb2StatusText = document.getElementById('scb2-status-text');
-    if (status2 === 'connected') {
-      document.getElementById('scb2-status-light').style.background = '#28a745';
-      scb2StatusText.innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
-      document.getElementById('scb2-status-light').style.background = '#ccc';
-      scb2StatusText.innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb2 !== status2) {
+      statusCache.scb2 = status2;
+      const scb2StatusText = document.getElementById('scb2-status-text');
+      if (status2 === 'connected') {
+        document.getElementById('scb2-status-light').style.background = '#28a745';
+        scb2StatusText.innerText = 'เชื่อมต่อสำเร็จ';
+      } else {
+        document.getElementById('scb2-status-light').style.background = '#ccc';
+        scb2StatusText.innerText = 'เชื่อมต่อ...';
+      }
     }
   } catch (e) {
-    document.getElementById('scb2-status-light').style.background = '#ccc';
-    document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb2 !== 'error') {
+      statusCache.scb2 = 'error';
+      document.getElementById('scb2-status-light').style.background = '#ccc';
+      document.getElementById('scb2-status-text').innerText = 'เชื่อมต่อ...';
+    }
   }
+  
   // SCB กฤษฏา สุดแม่ง
   try {
     const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`);
     let data = await resp.json();
     const status3 = data.status || '';
-    const scb3StatusText = document.getElementById('scb3-status-text');
-    if (status3 === 'connected') {
-      document.getElementById('scb3-status-light').style.background = '#28a745';
-      scb3StatusText.innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
-      document.getElementById('scb3-status-light').style.background = '#ccc';
-      scb3StatusText.innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb3 !== status3) {
+      statusCache.scb3 = status3;
+      const scb3StatusText = document.getElementById('scb3-status-text');
+      if (status3 === 'connected') {
+        document.getElementById('scb3-status-light').style.background = '#28a745';
+        scb3StatusText.innerText = 'เชื่อมต่อสำเร็จ';
+      } else {
+        document.getElementById('scb3-status-light').style.background = '#ccc';
+        scb3StatusText.innerText = 'เชื่อมต่อ...';
+      }
     }
   } catch (e) {
-    document.getElementById('scb3-status-light').style.background = '#ccc';
-    document.getElementById('scb3-status-text').innerText = 'เชื่อมต่อ...';
+    if (statusCache.scb3 !== 'error') {
+      statusCache.scb3 = 'error';
+      document.getElementById('scb3-status-light').style.background = '#ccc';
+      document.getElementById('scb3-status-text').innerText = 'เชื่อมต่อ...';
+    }
   }
+  
   // Truewallet BB ENJ
   try {
     const respBB = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
       headers: { 'Authorization': 'Bearer 4cb88e53852339a9257c6fa1dccdb6af' }
     });
-    if (respBB.ok) {
-      document.getElementById('tw-bb-status-light').style.background = '#28a745';
-      document.getElementById('tw-bb-status-text').innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
+    const newStatusBB = respBB.ok ? 'connected' : 'disconnected';
+    if (statusCache.twBB !== newStatusBB) {
+      statusCache.twBB = newStatusBB;
+      document.getElementById('tw-bb-status-light').style.background = respBB.ok ? '#28a745' : '#ccc';
+      document.getElementById('tw-bb-status-text').innerText = respBB.ok ? 'เชื่อมต่อสำเร็จ' : '';
+    }
+  } catch (e) {
+    if (statusCache.twBB !== 'error') {
+      statusCache.twBB = 'error';
       document.getElementById('tw-bb-status-light').style.background = '#ccc';
       document.getElementById('tw-bb-status-text').innerText = '';
     }
-  } catch (e) {
-    document.getElementById('tw-bb-status-light').style.background = '#ccc';
-    document.getElementById('tw-bb-status-text').innerText = '';
   }
+  
   // Truewallet BP
   try {
     const respBP = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
       headers: { 'Authorization': 'Bearer 2ecade3f36166b2b9858e281e95c8560' }
     });
-    if (respBP.ok) {
-      document.getElementById('tw-bp-status-light').style.background = '#28a745';
-      document.getElementById('tw-bp-status-text').innerText = 'เชื่อมต่อสำเร็จ';
-    } else {
+    const newStatusBP = respBP.ok ? 'connected' : 'disconnected';
+    if (statusCache.twBP !== newStatusBP) {
+      statusCache.twBP = newStatusBP;
+      document.getElementById('tw-bp-status-light').style.background = respBP.ok ? '#28a745' : '#ccc';
+      document.getElementById('tw-bp-status-text').innerText = respBP.ok ? 'เชื่อมต่อสำเร็จ' : '';
+    }
+  } catch (e) {
+    if (statusCache.twBP !== 'error') {
+      statusCache.twBP = 'error';
       document.getElementById('tw-bp-status-light').style.background = '#ccc';
       document.getElementById('tw-bp-status-text').innerText = '';
     }
-  } catch (e) {
-    document.getElementById('tw-bp-status-light').style.background = '#ccc';
-    document.getElementById('tw-bp-status-text').innerText = '';
   }
 }
-setInterval(updateStatusLights, 3000);
+setInterval(updateStatusLights, 5000);
 window.addEventListener('DOMContentLoaded', updateStatusLights);
 // --- ดึงยอด Truewallet BP ผ่าน API แล้วแสดงผล ---
+let lastBPUpdate = 0;
+let cachedBPData = null;
+
 async function fetchTruewalletBPBalance() {
+  const now = Date.now();
+  // Update only every 30 seconds instead of 10
+  if (now - lastBPUpdate < 30000 && cachedBPData) {
+    return;
+  }
+  
   try {
     const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
@@ -1320,26 +1365,52 @@ async function fetchTruewalletBPBalance() {
     });
     if (!resp.ok) throw new Error('API Error');
     const data = await resp.json();
+    
     if (data.status === 'ok' && data.data) {
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-bp-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-bp-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-bp-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
+      const newData = {
+        balance: data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-',
+        mobile: 'เบอร์: ' + (data.data.mobile_no || '-'),
+        updated: 'อัปเดต: ' + (data.data.updated_at || '-')
+      };
+      
+      // Only update DOM if data changed
+      if (!cachedBPData || JSON.stringify(cachedBPData) !== JSON.stringify(newData)) {
+        cachedBPData = newData;
+        document.getElementById('tw-bp-balance').innerText = newData.balance + ' บาท';
+        document.getElementById('tw-bp-mobile').innerText = newData.mobile;
+        document.getElementById('tw-bp-updated').innerText = newData.updated;
+        lastBPUpdate = now;
+      }
     } else {
+      if (!cachedBPData || cachedBPData.balance !== '-') {
+        cachedBPData = { balance: '-', mobile: '-', updated: '-' };
+        document.getElementById('tw-bp-balance').innerText = '-';
+        document.getElementById('tw-bp-mobile').innerText = '-';
+        document.getElementById('tw-bp-updated').innerText = '-';
+      }
+    }
+  } catch (e) {
+    if (!cachedBPData || cachedBPData.balance !== '-') {
+      cachedBPData = { balance: '-', mobile: '-', updated: '-' };
       document.getElementById('tw-bp-balance').innerText = '-';
       document.getElementById('tw-bp-mobile').innerText = '-';
       document.getElementById('tw-bp-updated').innerText = '-';
     }
-  } catch (e) {
-    document.getElementById('tw-bp-balance').innerText = '-';
-    document.getElementById('tw-bp-mobile').innerText = '-';
-    document.getElementById('tw-bp-updated').innerText = '-';
   }
 }
-setInterval(fetchTruewalletBPBalance, 10000); // อัปเดตทุก 10 วินาที
+setInterval(fetchTruewalletBPBalance, 15000); // Reduced frequency
 fetchTruewalletBPBalance();
 // --- ดึงยอด Truewallet BB ENJ ผ่าน API แล้วแสดงผล ---
+let lastBBUpdate = 0;
+let cachedBBData = null;
+
 async function fetchTruewalletBBBalance() {
+  const now = Date.now();
+  // Update only every 30 seconds instead of 10
+  if (now - lastBBUpdate < 30000 && cachedBBData) {
+    return;
+  }
+  
   try {
     const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
@@ -1349,26 +1420,52 @@ async function fetchTruewalletBBBalance() {
     });
     if (!resp.ok) throw new Error('API Error');
     const data = await resp.json();
+    
     if (data.status === 'ok' && data.data) {
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-bb-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-bb-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-bb-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
+      const newData = {
+        balance: data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-',
+        mobile: 'เบอร์: ' + (data.data.mobile_no || '-'),
+        updated: 'อัปเดต: ' + (data.data.updated_at || '-')
+      };
+      
+      // Only update DOM if data changed
+      if (!cachedBBData || JSON.stringify(cachedBBData) !== JSON.stringify(newData)) {
+        cachedBBData = newData;
+        document.getElementById('tw-bb-balance').innerText = newData.balance + ' บาท';
+        document.getElementById('tw-bb-mobile').innerText = newData.mobile;
+        document.getElementById('tw-bb-updated').innerText = newData.updated;
+        lastBBUpdate = now;
+      }
     } else {
+      if (!cachedBBData || cachedBBData.balance !== '-') {
+        cachedBBData = { balance: '-', mobile: '-', updated: '-' };
+        document.getElementById('tw-bb-balance').innerText = '-';
+        document.getElementById('tw-bb-mobile').innerText = '-';
+        document.getElementById('tw-bb-updated').innerText = '-';
+      }
+    }
+  } catch (e) {
+    if (!cachedBBData || cachedBBData.balance !== '-') {
+      cachedBBData = { balance: '-', mobile: '-', updated: '-' };
       document.getElementById('tw-bb-balance').innerText = '-';
       document.getElementById('tw-bb-mobile').innerText = '-';
       document.getElementById('tw-bb-updated').innerText = '-';
     }
-  } catch (e) {
-    document.getElementById('tw-bb-balance').innerText = '-';
-    document.getElementById('tw-bb-mobile').innerText = '-';
-    document.getElementById('tw-bb-updated').innerText = '-';
   }
 }
-setInterval(fetchTruewalletBBBalance, 10000); // อัปเดตทุก 10 วินาที
+setInterval(fetchTruewalletBBBalance, 15000); // Reduced frequency
 fetchTruewalletBBBalance();
 // --- ดึงยอด TrueMoney Wallet ผ่าน API แล้วแสดงผล ---
+let lastTKUpdate = 0;
+let cachedTKData = null;
+
 async function fetchTruewalletBalance() {
+  const now = Date.now();
+  // Update only every 30 seconds instead of 10
+  if (now - lastTKUpdate < 30000 && cachedTKData) {
+    return;
+  }
+  
   try {
     const resp = await fetch('https://apis.truemoneyservices.com/account/v1/balance', {
       method: 'GET',
@@ -1378,24 +1475,40 @@ async function fetchTruewalletBalance() {
     });
     if (!resp.ok) throw new Error('API Error');
     const data = await resp.json();
+    
     if (data.status === 'ok' && data.data) {
-      // แปลงยอดจากสตางค์เป็นบาท
-      let balance = data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-';
-      document.getElementById('tw-balance').innerText = balance + ' บาท';
-      document.getElementById('tw-mobile').innerText = 'เบอร์: ' + (data.data.mobile_no || '-');
-      document.getElementById('tw-updated').innerText = 'อัปเดต: ' + (data.data.updated_at || '-');
+      const newData = {
+        balance: data.data.balance ? (parseInt(data.data.balance, 10) / 100).toLocaleString('en-US', {minimumFractionDigits:2}) : '-',
+        mobile: 'เบอร์: ' + (data.data.mobile_no || '-'),
+        updated: 'อัปเดต: ' + (data.data.updated_at || '-')
+      };
+      
+      // Only update DOM if data changed
+      if (!cachedTKData || JSON.stringify(cachedTKData) !== JSON.stringify(newData)) {
+        cachedTKData = newData;
+        document.getElementById('tw-balance').innerText = newData.balance + ' บาท';
+        document.getElementById('tw-mobile').innerText = newData.mobile;
+        document.getElementById('tw-updated').innerText = newData.updated;
+        lastTKUpdate = now;
+      }
     } else {
+      if (!cachedTKData || cachedTKData.balance !== '-') {
+        cachedTKData = { balance: '-', mobile: '-', updated: '-' };
+        document.getElementById('tw-balance').innerText = '-';
+        document.getElementById('tw-mobile').innerText = '-';
+        document.getElementById('tw-updated').innerText = '-';
+      }
+    }
+  } catch (e) {
+    if (!cachedTKData || cachedTKData.balance !== '-') {
+      cachedTKData = { balance: '-', mobile: '-', updated: '-' };
       document.getElementById('tw-balance').innerText = '-';
       document.getElementById('tw-mobile').innerText = '-';
       document.getElementById('tw-updated').innerText = '-';
     }
-  } catch (e) {
-    document.getElementById('tw-balance').innerText = '-';
-    document.getElementById('tw-mobile').innerText = '-';
-    document.getElementById('tw-updated').innerText = '-';
   }
 }
-setInterval(fetchTruewalletBalance, 10000); // อัปเดตทุก 10 วินาที
+setInterval(fetchTruewalletBalance, 15000); // Reduced frequency
 fetchTruewalletBalance();
 // --- ซ่อนโลโก้หัวเว็บหลังเข้าเว็บ 5 นาที ---
 window.addEventListener('DOMContentLoaded', function() {
@@ -1405,7 +1518,16 @@ window.addEventListener('DOMContentLoaded', function() {
   }, 300000); // 5 นาที = 300,000 ms
 });
 // --- ดึงยอดคงเหลือ SCB สุมิธร์ คิมภิรานนท์ และ พลอยไพริน นามโคตร มาแสดงในกล่องใหม่ ---
+let lastBalanceUpdate = 0;
+let cachedBalanceData = {};
+
 async function updateAccountBalanceBox() {
+  const now = Date.now();
+  // Update only every 20 seconds instead of 3
+  if (now - lastBalanceUpdate < 20000 && Object.keys(cachedBalanceData).length > 0) {
+    return;
+  }
+  
   try {
     const apiBase = 'https://xinon1565.up.railway.app';
     const resp = await fetch(`${apiBase}/api/sms?tag=sumitkimphiranon&sender=027777777`);
@@ -1413,12 +1535,21 @@ async function updateAccountBalanceBox() {
     let smsList = Array.isArray(data.sms) ? data.sms : [];
     let latest = smsList.length > 0 ? smsList[0] : null;
     let balance = latest && latest.balance ? latest.balance.replace(/[^\d.,]/g, '') : '0';
-    document.getElementById('account-balance-info').innerText = balance + ' บาท';
-    document.getElementById('scb-status-light').style.background = (data.status === 'connected') ? '#28a745' : '#ccc';
+    
+    // Only update if balance changed
+    if (!cachedBalanceData.scb1 || cachedBalanceData.scb1.balance !== balance) {
+      cachedBalanceData.scb1 = { balance, status: data.status };
+      document.getElementById('account-balance-info').innerText = balance + ' บาท';
+      document.getElementById('scb-status-light').style.background = (data.status === 'connected') ? '#28a745' : '#ccc';
+    }
   } catch (e) {
-    document.getElementById('account-balance-info').innerText = '0';
-    document.getElementById('scb-status-light').style.background = 'red';
+    if (!cachedBalanceData.scb1 || cachedBalanceData.scb1.balance !== '0') {
+      cachedBalanceData.scb1 = { balance: '0', status: 'error' };
+      document.getElementById('account-balance-info').innerText = '0';
+      document.getElementById('scb-status-light').style.background = 'red';
+    }
   }
+  
   try {
     const apiBase = 'https://xinon1565.up.railway.app';
     const resp2 = await fetch(`${apiBase}/api/sms?tag=ploypairinnamkhot&sender=027777777`);
@@ -1426,14 +1557,23 @@ async function updateAccountBalanceBox() {
     let smsList2 = Array.isArray(data2.sms) ? data2.sms : [];
     let latest2 = smsList2.length > 0 ? smsList2[0] : null;
     let balance2 = latest2 && latest2.balance ? latest2.balance.replace(/[^\d.,]/g, '') : '0';
-    document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
-    document.getElementById('scb2-status-light').style.background = (data2.status === 'connected') ? '#28a745' : '#ccc';
+    
+    // Only update if balance changed
+    if (!cachedBalanceData.scb2 || cachedBalanceData.scb2.balance !== balance2) {
+      cachedBalanceData.scb2 = { balance: balance2, status: data2.status };
+      document.getElementById('account-balance-info2').innerText = balance2 + ' บาท';
+      document.getElementById('scb2-status-light').style.background = (data2.status === 'connected') ? '#28a745' : '#ccc';
+      lastBalanceUpdate = now;
+    }
   } catch (e) {
-    document.getElementById('account-balance-info2').innerText = '0';
-    document.getElementById('scb2-status-light').style.background = 'red';
+    if (!cachedBalanceData.scb2 || cachedBalanceData.scb2.balance !== '0') {
+      cachedBalanceData.scb2 = { balance: '0', status: 'error' };
+      document.getElementById('account-balance-info2').innerText = '0';
+      document.getElementById('scb2-status-light').style.background = 'red';
+    }
   }
 }
-setInterval(updateAccountBalanceBox, 3000);
+setInterval(updateAccountBalanceBox, 10000); // Reduced frequency
 updateAccountBalanceBox();
 // --- ปุ่มเปิด/ปิดโหมดกลางคืน ---
 document.addEventListener('DOMContentLoaded', function() {
@@ -1598,25 +1738,45 @@ window.addEventListener('DOMContentLoaded', () => {
   fetchScbSummaryBox();
 });
 
+// Reduced update frequency for SMS tables from 3 seconds to 8 seconds
 setInterval(() => {
   fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
   fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
   fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', '168');
   fetchScbSummaryBox();
-}, 3000);
+}, 8000);
 
 // เก็บค่า user ที่กรอกไว้ไม่ให้หาย
 let tempUserData = {};
+let lastDepositUpdate = 0;
+let cachedDepositData = null;
 
 // ดึงข้อมูลฝากวอเลทใหม่จาก backend proxy และแสดงในตาราง wallet-deposit-table
 async function fetchDepositWallets() {
+  const now = Date.now();
+  // Throttle updates - only every 6 seconds
+  if (now - lastDepositUpdate < 6000 && cachedDepositData) {
+    return;
+  }
+  
   try {
     let resp = await fetch("/api/wallet_deposit_data");
     let data = await resp.json();
     let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
+    
+    // Check if data actually changed
+    const newDataHash = JSON.stringify(walletList);
+    if (cachedDepositData === newDataHash) {
+      return; // No changes, skip DOM update
+    }
+    
+    cachedDepositData = newDataHash;
+    lastDepositUpdate = now;
+    
     let walletBody = document.querySelector("#wallet-deposit-table tbody");
     if (!walletBody) return;
     walletBody.innerHTML = "";
+    
     walletList.forEach(tx => {
       let row = walletBody.insertRow();
       row.insertCell(0).innerText = tx.event;
@@ -1657,6 +1817,9 @@ async function fetchDepositWallets() {
           body: JSON.stringify({ id: tx.id, customer_user })
         });
         delete tempUserData[tx.id];
+        // Reset cache to force refresh
+        cachedDepositData = null;
+        lastDepositUpdate = 0;
         fetchDepositWallets();
         fetchTransactions();
       };
@@ -1669,6 +1832,9 @@ async function fetchDepositWallets() {
           body: JSON.stringify({ id: tx.id })
         });
         delete tempUserData[tx.id];
+        // Reset cache to force refresh
+        cachedDepositData = null;
+        lastDepositUpdate = 0;
         fetchDepositWallets();
         fetchTransactions();
       };
@@ -1682,8 +1848,12 @@ async function fetchDepositWallets() {
 }
 
 // เรียกฟังก์ชันนี้หลัง fetchTransactions() ทุกครั้ง
-setInterval(() => { fetchDepositWallets(); }, 3000);
-window.addEventListener('DOMContentLoaded', () => { fetchDepositWallets(); });
+setInterval(() => { 
+  fetchDepositWallets(); 
+}, 6000); // Reduced from 3 seconds to 6 seconds
+window.addEventListener('DOMContentLoaded', () => { 
+  fetchDepositWallets(); 
+});
 
 async function fetchTransactions(){
   try {
@@ -1855,7 +2025,7 @@ async function resetCancelled(){
     fetchTransactions();
 }
 
-setInterval(fetchTransactions,3000);
+setInterval(fetchTransactions,6000); // Reduced from 3 seconds to 6 seconds
 fetchTransactions();
 renderDemoApprovedCancelled();
 </script>
@@ -1967,8 +2137,8 @@ async function renderTrueWalletNotifyTable() {
   }
 }
 
-setInterval(fetchTrueWalletNotifications, 5000);
-setInterval(renderTrueWalletNotifyTable, 5000);
+setInterval(fetchTrueWalletNotifications, 8000); // Reduced from 5 seconds to 8 seconds
+setInterval(renderTrueWalletNotifyTable, 8000); // Reduced from 5 seconds to 8 seconds
 fetchTrueWalletNotifications();
 renderTrueWalletNotifyTable();
 </script>
