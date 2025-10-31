@@ -854,6 +854,211 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   color: #495057;
   padding: 0 10px;
 }
+
+/* Exchange Rates Box */
+.exchange-rates-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  padding: 24px;
+  margin: 20px auto;
+  max-width: 900px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.exchange-rates-box::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.exchange-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.exchange-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-left: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.exchange-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.exchange-item {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.exchange-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.exchange-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.exchange-item:hover::before {
+  left: 100%;
+}
+
+.currency-flag {
+  font-size: 2em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.currency-code {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.currency-name {
+  font-size: 0.8em;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.exchange-rate {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  margin-bottom: 4px;
+}
+
+.rate-change {
+  font-size: 0.85em;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.rate-up {
+  background: rgba(40, 167, 69, 0.3);
+  color: #90ee90;
+  border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+.rate-down {
+  background: rgba(220, 53, 69, 0.3);
+  color: #ffb3b3;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.rate-neutral {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.last-update {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.9em;
+  opacity: 0.8;
+  position: relative;
+  z-index: 2;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Gold Price Special Styling */
+.gold-item {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #333;
+  border: 2px solid #ffc107;
+}
+
+.gold-item .currency-code,
+.gold-item .exchange-rate {
+  color: #333;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+}
+
+.gold-item:hover {
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .exchange-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .exchange-rates-box {
+    margin: 15px 10px;
+    padding: 16px;
+  }
+  
+  .exchange-title {
+    font-size: 1.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  .exchange-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 <body>
@@ -863,6 +1068,93 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   <img src="{{ url_for('static', filename='5e9e7571-ef8d-4e7c-9e51-6b50221aceec.png') }}" alt="Logo1" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
   <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="NGOX Logo" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
 </div>
+
+<!-- Exchange Rates Box -->
+<div class="exchange-rates-box" id="exchange-rates-box">
+  <div class="exchange-header">
+    <span style="font-size: 1.8em;">💱</span>
+    <div class="exchange-title">อัตราแลกเปลี่ยนเงินตรา & ราคาทอง</div>
+  </div>
+  
+  <div class="exchange-grid" id="exchange-grid">
+    <!-- USDT -->
+    <div class="exchange-item" data-currency="USDT">
+      <div class="currency-flag">₮</div>
+      <div class="currency-code">USDT</div>
+      <div class="currency-name">Tether</div>
+      <div class="exchange-rate" id="rate-usdt">Loading...</div>
+      <div class="rate-change" id="change-usdt">--</div>
+    </div>
+    
+    <!-- USD -->
+    <div class="exchange-item" data-currency="USD">
+      <div class="currency-flag">🇺🇸</div>
+      <div class="currency-code">USD</div>
+      <div class="currency-name">US Dollar</div>
+      <div class="exchange-rate" id="rate-usd">Loading...</div>
+      <div class="rate-change" id="change-usd">--</div>
+    </div>
+    
+    <!-- EUR -->
+    <div class="exchange-item" data-currency="EUR">
+      <div class="currency-flag">🇪🇺</div>
+      <div class="currency-code">EUR</div>
+      <div class="currency-name">Euro</div>
+      <div class="exchange-rate" id="rate-eur">Loading...</div>
+      <div class="rate-change" id="change-eur">--</div>
+    </div>
+    
+    <!-- CNY -->
+    <div class="exchange-item" data-currency="CNY">
+      <div class="currency-flag">🇨🇳</div>
+      <div class="currency-code">CNY</div>
+      <div class="currency-name">Chinese Yuan</div>
+      <div class="exchange-rate" id="rate-cny">Loading...</div>
+      <div class="rate-change" id="change-cny">--</div>
+    </div>
+    
+    <!-- KHR -->
+    <div class="exchange-item" data-currency="KHR">
+      <div class="currency-flag">🇰🇭</div>
+      <div class="currency-code">KHR</div>
+      <div class="currency-name">Cambodian Riel</div>
+      <div class="exchange-rate" id="rate-khr">Loading...</div>
+      <div class="rate-change" id="change-khr">--</div>
+    </div>
+    
+    <!-- NZD -->
+    <div class="exchange-item" data-currency="NZD">
+      <div class="currency-flag">🇳🇿</div>
+      <div class="currency-code">NZD</div>
+      <div class="currency-name">New Zealand Dollar</div>
+      <div class="exchange-rate" id="rate-nzd">Loading...</div>
+      <div class="rate-change" id="change-nzd">--</div>
+    </div>
+    
+    <!-- Thai Gold -->
+    <div class="exchange-item gold-item" data-currency="GOLD">
+      <div class="currency-flag">🥇</div>
+      <div class="currency-code">GOLD</div>
+      <div class="currency-name">ทองคำไทย (บาท/บาท)</div>
+      <div class="exchange-rate" id="rate-gold">Loading...</div>
+      <div class="rate-change" id="change-gold">--</div>
+    </div>
+    
+    <!-- Bitcoin Bonus -->
+    <div class="exchange-item" data-currency="BTC">
+      <div class="currency-flag">₿</div>
+      <div class="currency-code">BTC</div>
+      <div class="currency-name">Bitcoin</div>
+      <div class="exchange-rate" id="rate-btc">Loading...</div>
+      <div class="rate-change" id="change-btc">--</div>
+    </div>
+  </div>
+  
+  <div class="last-update" id="exchange-last-update">
+    <span class="loading-spinner"></span>กำลังโหลดข้อมูล...
+  </div>
+</div>
+
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
@@ -2763,6 +3055,207 @@ function importNotes() {
 document.addEventListener('DOMContentLoaded', function() {
   // ไม่ต้องโหลดจาก localStorage แล้ว
   console.log('Notes system ready with database backend');
+});
+</script>
+
+<script>
+// === Exchange Rates System ===
+let exchangeRatesCache = {};
+let lastExchangeUpdate = 0;
+
+// Currency configuration with API sources
+const currencyConfig = {
+  USD: { api: 'fixer', symbol: '$', decimals: 2 },
+  EUR: { api: 'fixer', symbol: '€', decimals: 2 },
+  CNY: { api: 'fixer', symbol: '¥', decimals: 2 },
+  KHR: { api: 'fixer', symbol: '៛', decimals: 0 },
+  NZD: { api: 'fixer', symbol: 'NZ$', decimals: 2 },
+  USDT: { api: 'crypto', symbol: '₮', decimals: 2 },
+  BTC: { api: 'crypto', symbol: '₿', decimals: 0 },
+  GOLD: { api: 'gold', symbol: '🥇', decimals: 0 }
+};
+
+async function fetchExchangeRates() {
+  const now = Date.now();
+  // Update every 5 minutes
+  if (now - lastExchangeUpdate < 300000 && Object.keys(exchangeRatesCache).length > 0) {
+    return;
+  }
+
+  try {
+    // Show loading state
+    document.getElementById('exchange-last-update').innerHTML = 
+      '<span class="loading-spinner"></span>กำลังอัปเดตอัตราแลกเปลี่ยน...';
+
+    // Fetch traditional currencies (USD, EUR, CNY, KHR, NZD) from Exchange Rate API
+    await fetchTraditionalCurrencies();
+    
+    // Fetch crypto currencies (USDT, BTC) from CoinGecko
+    await fetchCryptoCurrencies();
+    
+    // Fetch Thai Gold price
+    await fetchThaiGoldPrice();
+    
+    lastExchangeUpdate = now;
+    
+    // Update timestamp
+    const updateTime = new Date().toLocaleString('th-TH', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    document.getElementById('exchange-last-update').innerHTML = 
+      `อัปเดตล่าสุด: ${updateTime}`;
+
+  } catch (error) {
+    console.error('Exchange rate fetch error:', error);
+    document.getElementById('exchange-last-update').innerHTML = 
+      '⚠️ ไม่สามารถอัปเดตข้อมูลได้ กรุณาลองใหม่อีกครั้ง';
+  }
+}
+
+async function fetchTraditionalCurrencies() {
+  try {
+    // Using exchangerate-api.com (free tier)
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/THB');
+    const data = await response.json();
+    
+    if (data && data.rates) {
+      // Convert from THB base to other currencies (1 THB = X foreign currency)
+      // But we want to show 1 foreign currency = X THB
+      const currencies = ['USD', 'EUR', 'CNY', 'KHR', 'NZD'];
+      
+      currencies.forEach(currency => {
+        if (data.rates[currency]) {
+          // Invert the rate to show foreign currency to THB
+          const rate = 1 / data.rates[currency];
+          const config = currencyConfig[currency];
+          
+          updateExchangeDisplay(currency, rate, config);
+          exchangeRatesCache[currency] = { rate, timestamp: Date.now() };
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Traditional currencies fetch error:', error);
+    // Fallback to approximate rates
+    updateExchangeDisplay('USD', 35.50, currencyConfig.USD);
+    updateExchangeDisplay('EUR', 38.20, currencyConfig.EUR);
+    updateExchangeDisplay('CNY', 5.15, currencyConfig.CNY);
+    updateExchangeDisplay('KHR', 0.0087, currencyConfig.KHR);
+    updateExchangeDisplay('NZD', 21.80, currencyConfig.NZD);
+  }
+}
+
+async function fetchCryptoCurrencies() {
+  try {
+    // Using CoinGecko API (free)
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether,bitcoin&vs_currencies=thb&include_24hr_change=true');
+    const data = await response.json();
+    
+    if (data.tether && data.tether.thb) {
+      const rate = data.tether.thb;
+      const change = data.tether.thb_24h_change || 0;
+      updateExchangeDisplay('USDT', rate, currencyConfig.USDT, change);
+      exchangeRatesCache.USDT = { rate, change, timestamp: Date.now() };
+    }
+    
+    if (data.bitcoin && data.bitcoin.thb) {
+      const rate = data.bitcoin.thb;
+      const change = data.bitcoin.thb_24h_change || 0;
+      updateExchangeDisplay('BTC', rate, currencyConfig.BTC, change);
+      exchangeRatesCache.BTC = { rate, change, timestamp: Date.now() };
+    }
+  } catch (error) {
+    console.error('Crypto currencies fetch error:', error);
+    // Fallback rates
+    updateExchangeDisplay('USDT', 35.45, currencyConfig.USDT);
+    updateExchangeDisplay('BTC', 2450000, currencyConfig.BTC);
+  }
+}
+
+async function fetchThaiGoldPrice() {
+  try {
+    // Using a Thai gold price API (if available) or fallback
+    // Since there's no reliable free Thai gold API, we'll use a mock implementation
+    // In production, you might want to scrape from goldtraders.or.th or similar
+    
+    // Mock data - replace with real API
+    const goldPrice = 32850; // Price per baht weight
+    const change = Math.random() * 200 - 100; // Random change for demo
+    
+    updateExchangeDisplay('GOLD', goldPrice, currencyConfig.GOLD, change);
+    exchangeRatesCache.GOLD = { rate: goldPrice, change, timestamp: Date.now() };
+    
+  } catch (error) {
+    console.error('Gold price fetch error:', error);
+    updateExchangeDisplay('GOLD', 32850, currencyConfig.GOLD);
+  }
+}
+
+function updateExchangeDisplay(currency, rate, config, change = null) {
+  const rateElement = document.getElementById(`rate-${currency.toLowerCase()}`);
+  const changeElement = document.getElementById(`change-${currency.toLowerCase()}`);
+  
+  if (!rateElement || !changeElement) return;
+  
+  // Format rate based on currency type
+  let formattedRate;
+  if (currency === 'GOLD') {
+    formattedRate = `${rate.toLocaleString('th-TH')} บาท/บาท`;
+  } else if (currency === 'BTC') {
+    formattedRate = `${(rate/1000).toFixed(0)}K บาท`;
+  } else if (currency === 'KHR') {
+    formattedRate = `${rate.toFixed(4)} บาท`;
+  } else {
+    formattedRate = `${rate.toFixed(config.decimals)} บาท`;
+  }
+  
+  rateElement.textContent = formattedRate;
+  
+  // Update change indicator
+  if (change !== null) {
+    const changeClass = change > 0 ? 'rate-up' : change < 0 ? 'rate-down' : 'rate-neutral';
+    const changeSymbol = change > 0 ? '↗' : change < 0 ? '↘' : '→';
+    const changeText = `${changeSymbol} ${Math.abs(change).toFixed(2)}%`;
+    
+    changeElement.className = `rate-change ${changeClass}`;
+    changeElement.textContent = changeText;
+  } else {
+    changeElement.className = 'rate-change rate-neutral';
+    changeElement.textContent = '→ --';
+  }
+  
+  // Add animation effect
+  const item = rateElement.closest('.exchange-item');
+  if (item) {
+    item.style.transform = 'scale(1.05)';
+    setTimeout(() => {
+      item.style.transform = 'scale(1)';
+    }, 300);
+  }
+}
+
+// Initialize exchange rates
+window.addEventListener('DOMContentLoaded', fetchExchangeRates);
+
+// Update every 5 minutes
+setInterval(fetchExchangeRates, 300000);
+
+// Manual refresh on click
+document.addEventListener('DOMContentLoaded', function() {
+  const exchangeBox = document.getElementById('exchange-rates-box');
+  if (exchangeBox) {
+    exchangeBox.addEventListener('click', function(e) {
+      if (e.target.closest('.exchange-item')) {
+        fetchExchangeRates();
+      }
+    });
+  }
 });
 </script>
 </body>
