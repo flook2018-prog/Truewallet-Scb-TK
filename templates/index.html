@@ -1243,7 +1243,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     <div style="display: flex; flex-direction: column; gap: 16px;">
       <!-- แถวที่ 1: SCB สุมิธร์ คิมภิรานนท์ และ อัตราแลกเปลี่ยน side-by-side -->
       <div class="scb-exchange-row" style="display: flex; gap: 16px; align-items: flex-start; flex-direction: column;">
-        <!-- กล่อง SCB SMS ของ SCB สุมิธร์ คิมภิรานนท์ -->
+        <!-- แถวบน: SCB สุมิธร์ + Exchange Rates แบบ side-by-side -->
         <div style="display: flex; gap: 16px; align-items: flex-start; width: 100%;">
           <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; flex: 1; min-width: 400px;">
             <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
@@ -1349,8 +1349,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         
-        <!-- SCB SMS พลอยไพริน นามโคตร (อยู่ใต้ SCB สุมิธร์) -->
-        <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-top: 2px; width: 100%;">
+        <!-- SCB SMS พลอยไพริน นามโคตร (แยกเป็นแถวล่าง ไม่ขึ้นอยู่กับความสูงของ Exchange Rates) -->
+        <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-top: -6px; width: 100%;">
           <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
             <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
             <span id="scb2-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
