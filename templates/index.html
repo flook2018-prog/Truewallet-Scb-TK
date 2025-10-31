@@ -1109,6 +1109,98 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         <span id="tw-bp-updated">-</span>
       </div>
     </div>
+    
+    <!-- Crypto Exchange Rates Box - ด้านขวาสุดของ summary cards -->
+    <div class="summary-card" style="position:relative;min-width:280px;max-width:400px;width:360px;padding:18px 20px 16px 20px;">
+      <div class="crypto-header" style="margin-bottom: 12px;">
+        <div class="crypto-title" style="font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 4px;">
+          💱 อัตราแลกเปลี่ยนเงินตรา & ราคาทอง
+        </div>
+        <div class="crypto-subtitle" style="font-size: 0.85em; color: #666;">
+          ข้อมูลราคาแบบเรียลไทม์
+        </div>
+      </div>
+      
+      <div class="crypto-mini-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px;">
+        <!-- BTC -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">₿</span>
+            <span style="font-size: 0.85em; font-weight: 500;">BTC</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="btc-price-mini">2,480K บาท</div>
+            <div style="font-size: 0.7em; color: #00ff88;" id="btc-change-mini">+1.8%</div>
+          </div>
+        </div>
+        
+        <!-- USDT -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">₮</span>
+            <span style="font-size: 0.85em; font-weight: 500;">USDT</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="usdt-price-mini">36.20 บาท</div>
+            <div style="font-size: 0.7em; color: #00ff88;" id="usdt-change-mini">+0.1%</div>
+          </div>
+        </div>
+        
+        <!-- USD -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">$</span>
+            <span style="font-size: 0.85em; font-weight: 500;">USD</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="usd-price-mini">36.25 บาท</div>
+            <div style="font-size: 0.7em; color: #888;" id="usd-change-mini">--</div>
+          </div>
+        </div>
+        
+        <!-- EUR -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">€</span>
+            <span style="font-size: 0.85em; font-weight: 500;">EUR</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="eur-price-mini">38.45 บาท</div>
+            <div style="font-size: 0.7em; color: #888;" id="eur-change-mini">--</div>
+          </div>
+        </div>
+        
+        <!-- CNY -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">¥</span>
+            <span style="font-size: 0.85em; font-weight: 500;">CNY</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="cny-price-mini">5.08 บาท</div>
+            <div style="font-size: 0.7em; color: #888;" id="cny-change-mini">--</div>
+          </div>
+        </div>
+        
+        <!-- GOLD -->
+        <div class="crypto-mini-item" style="display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #f8f9fa; border-radius: 6px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.9em;">🥇</span>
+            <span style="font-size: 0.85em; font-weight: 500;">GOLD</span>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.8em; font-weight: 600;" id="gold-price-mini">41,250 บาท</div>
+            <div style="font-size: 0.7em; color: #00ff88;" id="gold-change-mini">+0.5%</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align: center; font-size: 0.75em; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
+        <span id="crypto-status-mini">🔄 กำลังเตรียมข้อมูล...</span>
+        <br>
+        <button onclick="refreshCryptoRates()" style="font-size: 0.7em; padding: 2px 6px; margin-top: 4px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">รีเฟรช</button>
+      </div>
+    </div>
   </div>
   <!-- กล่อง SCB ทั้งสองใบอยู่ในกลุ่มอื่น (เช่น right-column) ตาม layout เดิม -->
   <div style="display:flex;align-items:center;gap:10px;">
@@ -1264,144 +1356,6 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
     </div>
   </div>
 
-  <!-- Crypto Exchange Rates Box - Bottom of the page -->
-  <div class="crypto-rates-container" id="crypto-rates-container">
-    <div class="crypto-header">
-      <div>
-        <div class="crypto-title">
-          💱 อัตราแลกเปลี่ยนเงินตรา & ราคาทอง
-        </div>
-        <div class="crypto-subtitle">ข้อมูลราคาแบบเรียลไทม์</div>
-      </div>
-      <button class="refresh-btn" onclick="refreshCryptoRates()">รีเฟรช</button>
-    </div>
-    
-    <div class="crypto-grid" id="crypto-grid">
-      <!-- BTC -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon btc">₿</div>
-          <div class="crypto-info">
-            <h4>BTC</h4>
-            <p>Bitcoin</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="btc-price">2,480K บาท</div>
-          <div class="crypto-change positive" id="btc-change">+1.8%</div>
-        </div>
-      </div>
-      
-      <!-- USDT -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon usdt">₮</div>
-          <div class="crypto-info">
-            <h4>USDT</h4>
-            <p>Tether</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="usdt-price">36.20 บาท</div>
-          <div class="crypto-change positive" id="usdt-change">+0.1%</div>
-        </div>
-      </div>
-      
-      <!-- USD -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon usd">$</div>
-          <div class="crypto-info">
-            <h4>USD</h4>
-            <p>US Dollar</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="usd-price">36.25 บาท</div>
-          <div class="crypto-change neutral" id="usd-change">--</div>
-        </div>
-      </div>
-      
-      <!-- EUR -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon eur">€</div>
-          <div class="crypto-info">
-            <h4>EUR</h4>
-            <p>Euro</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="eur-price">38.45 บาท</div>
-          <div class="crypto-change neutral" id="eur-change">--</div>
-        </div>
-      </div>
-      
-      <!-- CNY -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon cny">¥</div>
-          <div class="crypto-info">
-            <h4>CNY</h4>
-            <p>Chinese Yuan</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="cny-price">5.08 บาท</div>
-          <div class="crypto-change neutral" id="cny-change">--</div>
-        </div>
-      </div>
-      
-      <!-- NZD -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon other">NZ$</div>
-          <div class="crypto-info">
-            <h4>NZD</h4>
-            <p>New Zealand Dollar</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="nzd-price">21.95 บาท</div>
-          <div class="crypto-change neutral" id="nzd-change">--</div>
-        </div>
-      </div>
-      
-      <!-- KHR -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon other">៛</div>
-          <div class="crypto-info">
-            <h4>KHR</h4>
-            <p>Cambodian Riel</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="khr-price">0.0089 บาท</div>
-          <div class="crypto-change neutral" id="khr-change">--</div>
-        </div>
-      </div>
-      
-      <!-- GOLD -->
-      <div class="crypto-item">
-        <div class="crypto-left">
-          <div class="crypto-icon gold">🥇</div>
-          <div class="crypto-info">
-            <h4>GOLD</h4>
-            <p>ทองคำไทย</p>
-          </div>
-        </div>
-        <div class="crypto-right">
-          <div class="crypto-price" id="gold-price">41,250 บาท</div>
-          <div class="crypto-change positive" id="gold-change">+0.5%</div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="crypto-footer" id="crypto-footer">
-      🔄 กำลังเตรียมข้อมูลเรียลไทม์...
-    </div>
-  </div>
 </style>
 <script>
 // ปุ่ม toggle แสดง/ซ่อน Approved/Cancelled ใต้ wallet deposit
@@ -3023,6 +2977,12 @@ async function fetchCryptoExchangeRates() {
     // Show loading state
     document.getElementById('crypto-footer').innerHTML = 
       '<span class="crypto-loading"></span>กำลังอัปเดตอัตราแลกเปลี่ยน...';
+      
+    // Update mini status too
+    const miniStatusEl = document.getElementById('crypto-status-mini');
+    if (miniStatusEl) {
+      miniStatusEl.innerHTML = '🔄 กำลังอัปเดต...';
+    }
 
     // Fetch all rates
     await Promise.allSettled([
@@ -3045,6 +3005,12 @@ async function fetchCryptoExchangeRates() {
     
     document.getElementById('crypto-footer').innerHTML = 
       `อัปเดตล่าสุด: ${updateTime} | คลิกรีเฟรชเพื่อซิงค์ใหม่`;
+      
+    // Update mini status too
+    const miniStatusElement = document.getElementById('crypto-status-mini');
+    if (miniStatusElement) {
+      miniStatusElement.innerHTML = `✅ อัปเดต: ${updateTime}`;
+    }
 
   } catch (error) {
     console.error('Crypto exchange rate fetch error:', error);
@@ -3135,13 +3101,13 @@ async function fetchCryptoGoldPrice() {
 }
 
 function updateCryptoDisplay(currency, rate, change = null) {
+  // Update main display (original IDs)
   const priceElement = document.getElementById(`${currency.toLowerCase()}-price`);
   const changeElement = document.getElementById(`${currency.toLowerCase()}-change`);
   
-  if (!priceElement || !changeElement) {
-    console.log(`Elements not found for ${currency}: ${currency.toLowerCase()}-price, ${currency.toLowerCase()}-change`);
-    return;
-  }
+  // Update mini display (new summary card)
+  const priceMiniElement = document.getElementById(`${currency.toLowerCase()}-price-mini`);
+  const changeMiniElement = document.getElementById(`${currency.toLowerCase()}-change-mini`);
   
   const config = cryptoCurrencyConfig[currency];
   if (!config) return;
@@ -3158,7 +3124,10 @@ function updateCryptoDisplay(currency, rate, change = null) {
     formattedRate = `${rate.toFixed(config.decimals)} บาท`;
   }
   
-  priceElement.textContent = formattedRate;
+  // Update main display if exists
+  if (priceElement) priceElement.textContent = formattedRate;
+  // Update mini display if exists
+  if (priceMiniElement) priceMiniElement.textContent = formattedRate;
   
   // Update change indicator
   if (change !== null) {
@@ -3166,11 +3135,36 @@ function updateCryptoDisplay(currency, rate, change = null) {
     const changeSymbol = change > 0 ? '+' : '';
     const changeText = `${changeSymbol}${change.toFixed(2)}%`;
     
-    changeElement.className = `crypto-change ${changeClass}`;
-    changeElement.textContent = changeText;
+    // Update main change display
+    if (changeElement) {
+      changeElement.className = `crypto-change ${changeClass}`;
+      changeElement.textContent = changeText;
+    }
+    
+    // Update mini change display
+    if (changeMiniElement) {
+      changeMiniElement.textContent = changeText;
+      // Set colors for mini display
+      if (change > 0) {
+        changeMiniElement.style.color = '#00ff88';
+      } else if (change < 0) {
+        changeMiniElement.style.color = '#ff4757';
+      } else {
+        changeMiniElement.style.color = '#888';
+      }
+    }
   } else {
-    changeElement.className = 'crypto-change neutral';
-    changeElement.textContent = '--';
+    // Update main change display
+    if (changeElement) {
+      changeElement.className = 'crypto-change neutral';
+      changeElement.textContent = '--';
+    }
+    
+    // Update mini change display
+    if (changeMiniElement) {
+      changeMiniElement.textContent = '--';
+      changeMiniElement.style.color = '#888';
+    }
   }
 }
 
