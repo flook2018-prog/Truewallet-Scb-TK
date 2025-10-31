@@ -1043,92 +1043,6 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   <img src="{{ url_for('static', filename='ngox-header.png.png') }}" alt="NGOX Logo" style="height:80px;max-width:160px;width:auto;object-fit:contain;margin:0 16px;">
 </div>
 
-<!-- Exchange Rates Box -->
-<div class="exchange-rates-box" id="exchange-rates-box">
-  <div class="exchange-header">
-    <span style="font-size: 1.8em;">💱</span>
-    <div class="exchange-title">อัตราแลกเปลี่ยนเงินตรา & ราคาทอง</div>
-  </div>
-  
-  <div class="exchange-grid" id="exchange-grid">
-    <!-- USDT -->
-    <div class="exchange-item" data-currency="USDT">
-      <div class="currency-flag">₮</div>
-      <div class="currency-code">USDT</div>
-      <div class="currency-name">Tether</div>
-      <div class="exchange-rate" id="rate-usdt">Loading...</div>
-      <div class="rate-change" id="change-usdt">--</div>
-    </div>
-    
-    <!-- USD -->
-    <div class="exchange-item" data-currency="USD">
-      <div class="currency-flag">🇺🇸</div>
-      <div class="currency-code">USD</div>
-      <div class="currency-name">US Dollar</div>
-      <div class="exchange-rate" id="rate-usd">Loading...</div>
-      <div class="rate-change" id="change-usd">--</div>
-    </div>
-    
-    <!-- EUR -->
-    <div class="exchange-item" data-currency="EUR">
-      <div class="currency-flag">🇪🇺</div>
-      <div class="currency-code">EUR</div>
-      <div class="currency-name">Euro</div>
-      <div class="exchange-rate" id="rate-eur">Loading...</div>
-      <div class="rate-change" id="change-eur">--</div>
-    </div>
-    
-    <!-- CNY -->
-    <div class="exchange-item" data-currency="CNY">
-      <div class="currency-flag">🇨🇳</div>
-      <div class="currency-code">CNY</div>
-      <div class="currency-name">Chinese Yuan</div>
-      <div class="exchange-rate" id="rate-cny">Loading...</div>
-      <div class="rate-change" id="change-cny">--</div>
-    </div>
-    
-    <!-- KHR -->
-    <div class="exchange-item" data-currency="KHR">
-      <div class="currency-flag">🇰🇭</div>
-      <div class="currency-code">KHR</div>
-      <div class="currency-name">Cambodian Riel</div>
-      <div class="exchange-rate" id="rate-khr">Loading...</div>
-      <div class="rate-change" id="change-khr">--</div>
-    </div>
-    
-    <!-- NZD -->
-    <div class="exchange-item" data-currency="NZD">
-      <div class="currency-flag">🇳🇿</div>
-      <div class="currency-code">NZD</div>
-      <div class="currency-name">New Zealand Dollar</div>
-      <div class="exchange-rate" id="rate-nzd">Loading...</div>
-      <div class="rate-change" id="change-nzd">--</div>
-    </div>
-    
-    <!-- Thai Gold -->
-    <div class="exchange-item gold-item" data-currency="GOLD">
-      <div class="currency-flag">🥇</div>
-      <div class="currency-code">GOLD</div>
-      <div class="currency-name">ทองคำไทย (บาท/บาท)</div>
-      <div class="exchange-rate" id="rate-gold">Loading...</div>
-      <div class="rate-change" id="change-gold">--</div>
-    </div>
-    
-    <!-- Bitcoin Bonus -->
-    <div class="exchange-item" data-currency="BTC">
-      <div class="currency-flag">₿</div>
-      <div class="currency-code">BTC</div>
-      <div class="currency-name">Bitcoin</div>
-      <div class="exchange-rate" id="rate-btc">Loading...</div>
-      <div class="rate-change" id="change-btc">--</div>
-    </div>
-  </div>
-  
-  <div class="last-update" id="exchange-last-update">
-    <span class="loading-spinner"></span>กำลังโหลดข้อมูล...
-  </div>
-</div>
-
 <h1>Dashboard(Realtime)</h1>
 
 <div id="top-bar">
@@ -1373,8 +1287,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="btc-price">Loading...</div>
-          <div class="crypto-change" id="btc-change">--</div>
+          <div class="crypto-price" id="btc-price">2,480K บาท</div>
+          <div class="crypto-change positive" id="btc-change">+1.8%</div>
         </div>
       </div>
       
@@ -1388,8 +1302,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="usdt-price">Loading...</div>
-          <div class="crypto-change" id="usdt-change">--</div>
+          <div class="crypto-price" id="usdt-price">36.20 บาท</div>
+          <div class="crypto-change positive" id="usdt-change">+0.1%</div>
         </div>
       </div>
       
@@ -1403,8 +1317,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="usd-price">Loading...</div>
-          <div class="crypto-change" id="usd-change">--</div>
+          <div class="crypto-price" id="usd-price">36.25 บาท</div>
+          <div class="crypto-change neutral" id="usd-change">--</div>
         </div>
       </div>
       
@@ -1418,8 +1332,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="eur-price">Loading...</div>
-          <div class="crypto-change" id="eur-change">--</div>
+          <div class="crypto-price" id="eur-price">38.45 บาท</div>
+          <div class="crypto-change neutral" id="eur-change">--</div>
         </div>
       </div>
       
@@ -1433,8 +1347,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="cny-price">Loading...</div>
-          <div class="crypto-change" id="cny-change">--</div>
+          <div class="crypto-price" id="cny-price">5.08 บาท</div>
+          <div class="crypto-change neutral" id="cny-change">--</div>
         </div>
       </div>
       
@@ -1448,8 +1362,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="nzd-price">Loading...</div>
-          <div class="crypto-change" id="nzd-change">--</div>
+          <div class="crypto-price" id="nzd-price">21.95 บาท</div>
+          <div class="crypto-change neutral" id="nzd-change">--</div>
         </div>
       </div>
       
@@ -1463,8 +1377,8 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="khr-price">Loading...</div>
-          <div class="crypto-change" id="khr-change">--</div>
+          <div class="crypto-price" id="khr-price">0.0089 บาท</div>
+          <div class="crypto-change neutral" id="khr-change">--</div>
         </div>
       </div>
       
@@ -1478,14 +1392,14 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
           </div>
         </div>
         <div class="crypto-right">
-          <div class="crypto-price" id="gold-price">Loading...</div>
-          <div class="crypto-change" id="gold-change">--</div>
+          <div class="crypto-price" id="gold-price">41,250 บาท</div>
+          <div class="crypto-change positive" id="gold-change">+0.5%</div>
         </div>
       </div>
     </div>
     
     <div class="crypto-footer" id="crypto-footer">
-      <span class="crypto-loading"></span>กำลังโหลดข้อมูล...
+      🔄 กำลังเตรียมข้อมูลเรียลไทม์...
     </div>
   </div>
 </style>
@@ -3224,7 +3138,10 @@ function updateCryptoDisplay(currency, rate, change = null) {
   const priceElement = document.getElementById(`${currency.toLowerCase()}-price`);
   const changeElement = document.getElementById(`${currency.toLowerCase()}-change`);
   
-  if (!priceElement || !changeElement) return;
+  if (!priceElement || !changeElement) {
+    console.log(`Elements not found for ${currency}: ${currency.toLowerCase()}-price, ${currency.toLowerCase()}-change`);
+    return;
+  }
   
   const config = cryptoCurrencyConfig[currency];
   if (!config) return;
