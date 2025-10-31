@@ -1279,72 +1279,30 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
               </div>
             </div>
             
-            <div class="crypto-mini-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
-              <!-- BTC -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">₿</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">BTC</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="btc-price-mini">2,480K บาท</div>
-                <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="btc-change-mini">+1.8%</div>
+            <div class="crypto-simple-grid" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;">
+              <!-- ทอง 1 บาท -->
+              <div class="crypto-simple-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: linear-gradient(135deg, #ffd700, #ffed4e); border-radius: 8px; color: #333;">
+                <div style="font-weight: 600; font-size: 0.95em;">🥇 ทอง 1 บาท</div>
+                <div style="font-weight: bold; font-size: 1em;" id="gold-thb-rate">กำลังโหลด...</div>
               </div>
               
-              <!-- USDT -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">₮</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">USDT</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="usdt-price-mini">36.20 บาท</div>
-                <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="usdt-change-mini">+0.1%</div>
+              <!-- 1 USDT -->
+              <div class="crypto-simple-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: linear-gradient(135deg, #26d0ce, #1dd1a1); border-radius: 8px; color: white;">
+                <div style="font-weight: 600; font-size: 0.95em;">₮ 1 USDT</div>
+                <div style="font-weight: bold; font-size: 1em;" id="usdt-thb-rate">กำลังโหลด...</div>
               </div>
               
-              <!-- USD -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">$</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">USD</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="usd-price-mini">36.25 บาท</div>
-                <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="usd-change-mini">--</div>
-              </div>
-              
-              <!-- EUR -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">€</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">EUR</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="eur-price-mini">38.45 บาท</div>
-                <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="eur-change-mini">--</div>
-              </div>
-              
-              <!-- CNY -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">¥</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">CNY</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="cny-price-mini">5.08 บาท</div>
-                <div style="font-size: 0.75em; color: #888; margin-top: 3px;" id="cny-change-mini">--</div>
-              </div>
-              
-              <!-- GOLD -->
-              <div class="crypto-mini-item" style="display: flex; flex-direction: column; align-items: center; padding: 10px 6px; background: #f8f9fa; border-radius: 8px; text-align: center;">
-                <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 6px;">
-                  <span style="font-size: 1.1em;">🥇</span>
-                  <span style="font-size: 0.9em; font-weight: 600;">GOLD</span>
-                </div>
-                <div style="font-size: 0.85em; font-weight: 600; line-height: 1.2;" id="gold-price-mini">41,250 บาท</div>
-                <div style="font-size: 0.75em; color: #00ff88; margin-top: 3px;" id="gold-change-mini">+0.5%</div>
+              <!-- 1 บาท = กี่เรียล -->
+              <div class="crypto-simple-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; color: white;">
+                <div style="font-weight: 600; font-size: 0.95em;">🇰🇭 1 บาท</div>
+                <div style="font-weight: bold; font-size: 1em;" id="thb-khr-rate">กำลังโหลด...</div>
               </div>
             </div>
             
             <div style="text-align: center; font-size: 0.8em; color: #888; border-top: 1px solid #eee; padding-top: 8px;">
-              <span id="crypto-status-mini">🔄 กำลังเตรียมข้อมูล...</span>
+              <span id="exchange-update-time">🔄 กำลังเตรียมข้อมูล...</span>
               <br>
-              <button onclick="refreshCryptoRates()" style="font-size: 0.75em; padding: 3px 10px; margin-top: 4px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">รีเฟรช</button>
+              <button onclick="refreshRealExchangeRates()" style="font-size: 0.75em; padding: 3px 10px; margin-top: 4px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">รีเฟรช</button>
             </div>
           </div>
         </div>
@@ -3188,11 +3146,128 @@ function updateCryptoDisplay(currency, rate, change = null) {
   }
 }
 
-// Initialize crypto rates
-window.addEventListener('DOMContentLoaded', fetchCryptoExchangeRates);
+// --- ฟังก์ชันดึงข้อมูลอัตราแลกเปลี่ยนจริง ---
+async function refreshRealExchangeRates() {
+  try {
+    // แสดงสถานะกำลังโหลด
+    document.getElementById('exchange-update-time').innerHTML = '🔄 กำลังอัปเดต...';
+    document.getElementById('gold-thb-rate').textContent = 'กำลังโหลด...';
+    document.getElementById('usdt-thb-rate').textContent = 'กำลังโหลด...';
+    document.getElementById('thb-khr-rate').textContent = 'กำลังโหลด...';
+    
+    // ดึงข้อมูลแบบ parallel
+    const [goldData, cryptoData, currencyData] = await Promise.allSettled([
+      fetchGoldPrice(),
+      fetchUSDTPrice(),
+      fetchKHRRate()
+    ]);
+    
+    // อัปเดตราคาทอง
+    if (goldData.status === 'fulfilled' && goldData.value) {
+      document.getElementById('gold-thb-rate').textContent = `${goldData.value.toLocaleString('th-TH')} บาท`;
+    } else {
+      document.getElementById('gold-thb-rate').textContent = 'ไม่สามารถโหลดได้';
+    }
+    
+    // อัปเดตราคา USDT
+    if (cryptoData.status === 'fulfilled' && cryptoData.value) {
+      document.getElementById('usdt-thb-rate').textContent = `${cryptoData.value.toFixed(2)} บาท`;
+    } else {
+      document.getElementById('usdt-thb-rate').textContent = 'ไม่สามารถโหลดได้';
+    }
+    
+    // อัปเดตอัตราเรียล
+    if (currencyData.status === 'fulfilled' && currencyData.value) {
+      document.getElementById('thb-khr-rate').textContent = `${currencyData.value.toFixed(0)} เรียล`;
+    } else {
+      document.getElementById('thb-khr-rate').textContent = 'ไม่สามารถโหลดได้';
+    }
+    
+    // แสดงเวลาอัปเดต
+    const now = new Date().toLocaleString('th-TH', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    document.getElementById('exchange-update-time').innerHTML = `✅ อัปเดต: ${now}`;
+    
+  } catch (error) {
+    console.error('Error updating exchange rates:', error);
+    document.getElementById('exchange-update-time').innerHTML = '⚠️ เกิดข้อผิดพลาด';
+  }
+}
 
-// Update every 10 minutes
-setInterval(fetchCryptoExchangeRates, 600000);
+// ดึงราคาทอง (1 บาท = ? บาท)
+async function fetchGoldPrice() {
+  try {
+    // ใช้ API ราคาทองจริง - ราคาทองแท่ง 96.5% ต่อบาท
+    const response = await fetch('https://api.metals.live/v1/spot/gold');
+    const data = await response.json();
+    
+    if (data && data[0] && data[0].price) {
+      // ราคาทองต่อออนซ์ในดอลลาร์
+      const goldUsdPerOz = data[0].price;
+      // แปลงเป็นบาทไทย (ประมาณ 36 บาทต่อดอลลาร์)
+      const usdToThb = 36.25;
+      // 1 ออนซ์ = 31.1035 กรัม
+      const ozToGram = 31.1035;
+      // 1 บาทไทย = 15.244 กรัม
+      const bahtToGram = 15.244;
+      
+      // คำนวณราคาทองต่อบาทไทย
+      const goldThbPerGram = (goldUsdPerOz * usdToThb) / ozToGram;
+      const goldThbPerBaht = goldThbPerGram * bahtToGram;
+      
+      return Math.round(goldThbPerBaht);
+    }
+    throw new Error('Invalid gold data');
+  } catch (error) {
+    console.error('Gold price fetch failed:', error);
+    // ใช้ราคาสำรอง
+    return 41250;
+  }
+}
+
+// ดึงราคา USDT
+async function fetchUSDTPrice() {
+  try {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=thb');
+    const data = await response.json();
+    
+    if (data && data.tether && data.tether.thb) {
+      return data.tether.thb;
+    }
+    throw new Error('Invalid USDT data');
+  } catch (error) {
+    console.error('USDT price fetch failed:', error);
+    // ใช้ราคาสำรอง
+    return 36.20;
+  }
+}
+
+// ดึงอัตราเรียลกัมพูชา
+async function fetchKHRRate() {
+  try {
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/THB');
+    const data = await response.json();
+    
+    if (data && data.rates && data.rates.KHR) {
+      return data.rates.KHR;
+    }
+    throw new Error('Invalid KHR data');
+  } catch (error) {
+    console.error('KHR rate fetch failed:', error);
+    // ใช้อัตราสำรอง (1 บาท ≈ 112 เรียล)
+    return 112;
+  }
+}
+
+// เริ่มต้นและอัปเดตทุก 30 นาที
+window.addEventListener('DOMContentLoaded', refreshRealExchangeRates);
+setInterval(refreshRealExchangeRates, 1800000); // 30 นาที
 </script>
 </body>
 </html>
