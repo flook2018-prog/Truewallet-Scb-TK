@@ -855,208 +855,182 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
   padding: 0 10px;
 }
 
-/* Exchange Rates Box */
-.exchange-rates-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+/* Exchange Rates Box - Dark Theme Similar to Crypto Trading UI */
+.crypto-rates-container {
+  background: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   padding: 24px;
-  margin: 20px auto;
-  max-width: 900px;
-  color: white;
+  margin: 40px auto;
+  max-width: 800px;
+  color: #ffffff;
+  border: 1px solid #333;
   position: relative;
+}
+
+.crypto-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #333;
+}
+
+.crypto-title {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crypto-subtitle {
+  font-size: 0.9em;
+  color: #888;
+  margin-top: 4px;
+}
+
+.refresh-btn {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #3d3d3d;
+  border-color: #555;
+}
+
+.crypto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: #333;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-.exchange-rates-box::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-  transform: rotate(45deg);
-  animation: shimmer 3s infinite;
+.crypto-item {
+  background: #2a2a2a;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+  position: relative;
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+.crypto-item:hover {
+  background: #333;
 }
 
-.exchange-header {
+.crypto-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crypto-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  position: relative;
-  z-index: 2;
-}
-
-.exchange-title {
-  font-size: 1.5em;
-  font-weight: bold;
-  margin-left: 10px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.exchange-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-  position: relative;
-  z-index: 2;
-}
-
-.exchange-item {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 16px;
-  text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.exchange-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.exchange-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.exchange-item:hover::before {
-  left: 100%;
-}
-
-.currency-flag {
-  font-size: 2em;
-  margin-bottom: 8px;
-  display: block;
-}
-
-.currency-code {
-  font-size: 1em;
-  font-weight: bold;
-  margin-bottom: 4px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.currency-name {
-  font-size: 0.8em;
-  opacity: 0.9;
-  margin-bottom: 8px;
-}
-
-.exchange-rate {
   font-size: 1.2em;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  margin-bottom: 4px;
 }
 
-.rate-change {
+.crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #ffb84d); }
+.crypto-icon.eth { background: linear-gradient(135deg, #627eea, #8fa2ef); }
+.crypto-icon.usdt { background: linear-gradient(135deg, #26a17b, #4fc3a1); }
+.crypto-icon.usd { background: linear-gradient(135deg, #2ecc71, #58d68d); color: #fff; }
+.crypto-icon.eur { background: linear-gradient(135deg, #3498db, #5dade2); color: #fff; }
+.crypto-icon.cny { background: linear-gradient(135deg, #e74c3c, #f1948a); color: #fff; }
+.crypto-icon.gold { background: linear-gradient(135deg, #f1c40f, #f7dc6f); color: #333; }
+.crypto-icon.other { background: linear-gradient(135deg, #9b59b6, #bb8fce); color: #fff; }
+
+.crypto-info h4 {
+  margin: 0;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+}
+
+.crypto-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.8em;
+  color: #888;
+}
+
+.crypto-right {
+  text-align: right;
+}
+
+.crypto-price {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.crypto-change {
   font-size: 0.85em;
   font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 12px;
-  display: inline-block;
+  margin: 2px 0 0 0;
 }
 
-.rate-up {
-  background: rgba(40, 167, 69, 0.3);
-  color: #90ee90;
-  border: 1px solid rgba(40, 167, 69, 0.5);
-}
+.crypto-change.positive { color: #00ff88; }
+.crypto-change.negative { color: #ff4757; }
+.crypto-change.neutral { color: #888; }
 
-.rate-down {
-  background: rgba(220, 53, 69, 0.3);
-  color: #ffb3b3;
-  border: 1px solid rgba(220, 53, 69, 0.5);
-}
-
-.rate-neutral {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.last-update {
-  text-align: center;
+.crypto-footer {
   margin-top: 16px;
-  font-size: 0.9em;
-  opacity: 0.8;
-  position: relative;
-  z-index: 2;
+  padding-top: 12px;
+  border-top: 1px solid #333;
+  text-align: center;
+  font-size: 0.85em;
+  color: #888;
 }
 
-.loading-spinner {
+/* Loading Animation */
+.crypto-loading {
   display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
+  width: 12px;
+  height: 12px;
+  border: 2px solid #333;
   border-radius: 50%;
   border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 8px;
+  animation: cryptoSpin 1s ease-in-out infinite;
+  margin-right: 6px;
 }
 
-@keyframes spin {
+@keyframes cryptoSpin {
   to { transform: rotate(360deg); }
-}
-
-/* Gold Price Special Styling */
-.gold-item {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  color: #333;
-  border: 2px solid #ffc107;
-}
-
-.gold-item .currency-code,
-.gold-item .exchange-rate {
-  color: #333;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.5);
-}
-
-.gold-item:hover {
-  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .exchange-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+  .crypto-grid {
+    grid-template-columns: 1fr;
   }
   
-  .exchange-rates-box {
-    margin: 15px 10px;
+  .crypto-rates-container {
+    margin: 20px 10px;
     padding: 16px;
   }
   
-  .exchange-title {
-    font-size: 1.2em;
-  }
-}
-
-@media (max-width: 480px) {
-  .exchange-grid {
-    grid-template-columns: 1fr;
+  .crypto-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }
 </style>
@@ -1325,7 +1299,7 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
 </div>
 
 <div id="dashboard">
-  <!-- กล่อง SCB SMS, Kbiz, Wallet Deposits ขึ้นมาอยู่แถวเดียวกัน -->
+  <!-- กล่อง SCB SMS, TrueWallet ขึ้นมาอยู่แถวเดียวกัน -->
   <div style="display: flex; flex-direction: row; justify-content: center; align-items: flex-start; gap: 32px; width: 100%; margin-bottom: 32px;">
     <!-- SCB SMS (2 กล่อง) -->
     <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -1374,102 +1348,144 @@ input.customer-user{width:100%;padding:3px;border-radius:4px;border:1px solid #c
         </div>
       </div>
     </div>
-    <!-- Wallet Deposits Section (ตรงกลาง) -->
-    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 0;">
-      <div id="wallet-deposit-section" style="margin-top: 0;">
-        <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการฝากวอเลท (Wallet Deposits)</h2>
-        <div class="scroll-box">
-          <table id="wallet-deposit-table">
-            <thead>
-            <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>ยูสลูกค้า</th><th>เวลา</th><th>ธนาคาร</th><th>สลิป</th><th>จัดการ</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+  </div>
+
+  <!-- Crypto Exchange Rates Box - Bottom of the page -->
+  <div class="crypto-rates-container" id="crypto-rates-container">
+    <div class="crypto-header">
+      <div>
+        <div class="crypto-title">
+          💱 อัตราแลกเปลี่ยนเงินตรา & ราคาทอง
         </div>
+        <div class="crypto-subtitle">ข้อมูลราคาแบบเรียลไทม์</div>
       </div>
-      <!-- ปุ่ม toggle แสดง/ซ่อน section -->
-      <div style="margin: 18px 0 0 0; display: flex; gap: 16px; justify-content: center; width: 100%;">
-        <button class="toggle-section-btn toggle-approved" type="button" id="show-approved">ดูรายการที่อนุมัติแล้ว</button>
-        <button class="toggle-section-btn toggle-cancelled" type="button" id="show-cancelled">ดูรายการที่ยกเลิกแล้ว</button>
-      </div>
-      <div id="approved-section" style="display:none;">
-        <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่อนุมัติแล้ว (Approved Orders)</h2>
-        <div class="scroll-box">
-          <table id="approved-orders-table">
-            <thead>
-            <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-            <th>ธนาคาร</th><th>ผู้อนุมัติ</th><th>เวลาอนุมัติ</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-      <div id="cancelled-section" style="display:none;">
-        <h2 style="text-align:center;"><img src="{{ url_for('static', filename='logo wallet.png') }}" alt="Wallet Logo" style="height:32px;max-width:80px;width:auto;vertical-align:middle;margin-right:8px;">รายการที่ยกเลิกแล้ว (Cancelled Orders)</h2>
-        <div class="scroll-box">
-          <table id="cancelled-orders-table">
-            <thead>
-            <tr><th>ประเภท</th><th>จำนวน</th><th>ชื่อ/เบอร์</th><th>เวลา</th>
-            <th>ธนาคาร</th><th>ผู้ยกเลิก</th><th>เวลา</th><th>ยูสเซอร์ลูกค้า</th><th>สลิป</th><th>คืนเป็น New</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
+      <button class="refresh-btn" onclick="refreshCryptoRates()">รีเฟรช</button>
     </div>
-    <!-- TrueWallet และ SCB กฤษฏา สุดแม่ง (คอลัมน์ขวาสุด) -->
-    <div style="display: flex; flex-direction: column; gap: 16px;">
-      <!-- TrueWallet Box -->
-      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px; min-width:360px; max-width:510px;">
-        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-          <img src="{{ url_for('static', filename='logo wallet.png') }}" alt="TrueWallet Logo" style="height:32px;max-width:80px;width:auto;">
-          <span id="kbiz-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-          <span id="kbiz-status-text">ไม่มีข้อมูล</span>
+    
+    <div class="crypto-grid" id="crypto-grid">
+      <!-- BTC -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon btc">₿</div>
+          <div class="crypto-info">
+            <h4>BTC</h4>
+            <p>Bitcoin</p>
+          </div>
         </div>
-        <div style="margin-bottom:8px;">
-          <span style="font-weight:bold;">รายการเงินเข้า-ออก ทรูวอเลท สุนิสา หงษ์เวียงจันทร์</span>
-        </div>
-        <div style="margin-bottom:8px;padding:8px;background:#f8f9fa;border-radius:6px;">
-          <span id="kbiz-withdraw-info" style="font-size:0.9em;color:#666;">กำลังโหลดข้อมูล...</span>
-        </div>
-        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-          <table id="kbiz-notify-table" style="width:100%;border:none">
-            <thead>
-              <tr>
-                <th>วันที่/เวลา</th>
-                <th>รายละเอียด</th>
-                <th>จำนวนเงิน</th>
-              </tr>
-            </thead>
-            <tbody id="kbiz-notify-tbody"></tbody>
-          </table>
+        <div class="crypto-right">
+          <div class="crypto-price" id="btc-price">Loading...</div>
+          <div class="crypto-change" id="btc-change">--</div>
         </div>
       </div>
       
-      <!-- SCB กฤษฏา สุดแม่ง Box -->
-      <div class="scb-account-box" style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); padding:16px; margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px; margin-bottom:8px;">
-          <img src="{{ url_for('static', filename='scb-logo.png') }}" alt="SCB Logo" style="height:32px;max-width:80px;width:auto;">
-          <span id="scb3-status-light" style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#ccc;border:2px solid #888;"></span>
-          <span id="scb3-status-text">เชื่อมต่อ...</span>
+      <!-- USDT -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon usdt">₮</div>
+          <div class="crypto-info">
+            <h4>USDT</h4>
+            <p>Tether</p>
+          </div>
         </div>
-        <div style="margin-bottom:8px;">
-          <span style="font-weight:bold;">SCB กฤษฏา สุดแม่ง - OTP การตัดบัตร</span>
-        </div>
-        <div class="scroll-box" style="width: 100%; max-height: 220px; overflow-y: auto; border:none">
-          <table id="scb3-sms-table" style="width:100%;border:none">
-            <thead>
-              <tr>
-                <th>เวลา</th>
-                <th>OTP Code</th>
-                <th>รายการ/ร้านค้า</th>
-                <th>ยอดเงิน</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+        <div class="crypto-right">
+          <div class="crypto-price" id="usdt-price">Loading...</div>
+          <div class="crypto-change" id="usdt-change">--</div>
         </div>
       </div>
+      
+      <!-- USD -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon usd">$</div>
+          <div class="crypto-info">
+            <h4>USD</h4>
+            <p>US Dollar</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="usd-price">Loading...</div>
+          <div class="crypto-change" id="usd-change">--</div>
+        </div>
+      </div>
+      
+      <!-- EUR -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon eur">€</div>
+          <div class="crypto-info">
+            <h4>EUR</h4>
+            <p>Euro</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="eur-price">Loading...</div>
+          <div class="crypto-change" id="eur-change">--</div>
+        </div>
+      </div>
+      
+      <!-- CNY -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon cny">¥</div>
+          <div class="crypto-info">
+            <h4>CNY</h4>
+            <p>Chinese Yuan</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="cny-price">Loading...</div>
+          <div class="crypto-change" id="cny-change">--</div>
+        </div>
+      </div>
+      
+      <!-- NZD -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon other">NZ$</div>
+          <div class="crypto-info">
+            <h4>NZD</h4>
+            <p>New Zealand Dollar</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="nzd-price">Loading...</div>
+          <div class="crypto-change" id="nzd-change">--</div>
+        </div>
+      </div>
+      
+      <!-- KHR -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon other">៛</div>
+          <div class="crypto-info">
+            <h4>KHR</h4>
+            <p>Cambodian Riel</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="khr-price">Loading...</div>
+          <div class="crypto-change" id="khr-change">--</div>
+        </div>
+      </div>
+      
+      <!-- GOLD -->
+      <div class="crypto-item">
+        <div class="crypto-left">
+          <div class="crypto-icon gold">🥇</div>
+          <div class="crypto-info">
+            <h4>GOLD</h4>
+            <p>ทองคำไทย</p>
+          </div>
+        </div>
+        <div class="crypto-right">
+          <div class="crypto-price" id="gold-price">Loading...</div>
+          <div class="crypto-change" id="gold-change">--</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="crypto-footer" id="crypto-footer">
+      <span class="crypto-loading"></span>กำลังโหลดข้อมูล...
     </div>
   </div>
 </style>
@@ -3059,42 +3075,49 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// === Exchange Rates System ===
-let exchangeRatesCache = {};
-let lastExchangeUpdate = 0;
+// === Crypto Exchange Rates System ===
+let cryptoRatesCache = {};
+let lastCryptoUpdate = 0;
 
-// Currency configuration with API sources
-const currencyConfig = {
-  USD: { api: 'fixer', symbol: '$', decimals: 2 },
-  EUR: { api: 'fixer', symbol: '€', decimals: 2 },
-  CNY: { api: 'fixer', symbol: '¥', decimals: 2 },
-  KHR: { api: 'fixer', symbol: '៛', decimals: 0 },
-  NZD: { api: 'fixer', symbol: 'NZ$', decimals: 2 },
-  USDT: { api: 'crypto', symbol: '₮', decimals: 2 },
-  BTC: { api: 'crypto', symbol: '₿', decimals: 0 },
-  GOLD: { api: 'gold', symbol: '🥇', decimals: 0 }
+// Currency configuration
+const cryptoCurrencyConfig = {
+  BTC: { symbol: '₿', decimals: 0, apiId: 'bitcoin' },
+  USDT: { symbol: '₮', decimals: 2, apiId: 'tether' },
+  USD: { symbol: '$', decimals: 2 },
+  EUR: { symbol: '€', decimals: 2 },
+  CNY: { symbol: '¥', decimals: 2 },
+  KHR: { symbol: '៛', decimals: 4 },
+  NZD: { symbol: 'NZ$', decimals: 2 },
+  GOLD: { symbol: '🥇', decimals: 0 }
 };
 
-async function fetchExchangeRates() {
+async function refreshCryptoRates() {
+  // Reset cache to force fresh data
+  cryptoRatesCache = {};
+  lastCryptoUpdate = 0;
+  await fetchCryptoExchangeRates();
+}
+
+async function fetchCryptoExchangeRates() {
   const now = Date.now();
-  // Update every 10 minutes to be respectful to free APIs
-  if (now - lastExchangeUpdate < 600000 && Object.keys(exchangeRatesCache).length > 0) {
+  // Update every 10 minutes
+  if (now - lastCryptoUpdate < 600000 && Object.keys(cryptoRatesCache).length > 0) {
     return;
   }
 
   try {
     // Show loading state
-    document.getElementById('exchange-last-update').innerHTML = 
-      '<span class="loading-spinner"></span>กำลังอัปเดตอัตราแลกเปลี่ยน...';
+    document.getElementById('crypto-footer').innerHTML = 
+      '<span class="crypto-loading"></span>กำลังอัปเดตอัตราแลกเปลี่ยน...';
 
-    // Fetch all rates in parallel for better performance
+    // Fetch all rates
     await Promise.allSettled([
-      fetchTraditionalCurrencies(),
-      fetchCryptoCurrencies(), 
-      fetchThaiGoldPrice()
+      fetchCryptoTraditionalCurrencies(),
+      fetchCryptoCryptoCurrencies(), 
+      fetchCryptoGoldPrice()
     ]);
     
-    lastExchangeUpdate = now;
+    lastCryptoUpdate = now;
     
     // Update timestamp
     const updateTime = new Date().toLocaleString('th-TH', {
@@ -3106,223 +3129,78 @@ async function fetchExchangeRates() {
       minute: '2-digit'
     });
     
-    document.getElementById('exchange-last-update').innerHTML = 
-      `💱 อัปเดตล่าสุด: ${updateTime} | คลิกเพื่อรีเฟรช`;
+    document.getElementById('crypto-footer').innerHTML = 
+      `อัปเดตล่าสุด: ${updateTime} | คลิกรีเฟรชเพื่อซิงค์ใหม่`;
 
   } catch (error) {
-    console.error('Exchange rate fetch error:', error);
-    document.getElementById('exchange-last-update').innerHTML = 
-      '⚠️ เกิดข้อผิดพลาด - กำลังใช้ข้อมูลล่าสุด | คลิกเพื่อลองใหม่';
+    console.error('Crypto exchange rate fetch error:', error);
+    document.getElementById('crypto-footer').innerHTML = 
+      '⚠️ เกิดข้อผิดพลาด - กำลังใช้ข้อมูลล่าสุด';
   }
 }
 
-async function fetchTraditionalCurrencies() {
+async function fetchCryptoTraditionalCurrencies() {
   try {
-    // Using Fixer.io API (free tier - 100 requests/month)
-    // Backup: ExchangeRate-API.com (free tier - 1500 requests/month)
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const data = await response.json();
     
-    let data = null;
-    
-    // Try primary API first (ExchangeRate-API - more reliable)
-    try {
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-      const apiData = await response.json();
+    if (data && data.rates && data.rates.THB) {
+      const usdToThb = data.rates.THB;
+      const currencies = ['USD', 'EUR', 'CNY', 'KHR', 'NZD'];
       
-      if (apiData && apiData.rates && apiData.rates.THB) {
-        // Convert USD base to THB base rates
-        const usdToThb = apiData.rates.THB;
-        const currencies = ['USD', 'EUR', 'CNY', 'KHR', 'NZD'];
-        
-        currencies.forEach(currency => {
-          if (apiData.rates[currency]) {
-            // Calculate: 1 foreign currency = X THB
-            let rate;
-            if (currency === 'USD') {
-              rate = usdToThb; // 1 USD = X THB
-            } else {
-              // Convert via USD: (THB/USD) / (Currency/USD) = THB/Currency
-              rate = usdToThb / apiData.rates[currency];
-            }
-            
-            const config = currencyConfig[currency];
-            updateExchangeDisplay(currency, rate, config);
-            exchangeRatesCache[currency] = { rate, timestamp: Date.now() };
+      currencies.forEach(currency => {
+        if (data.rates[currency]) {
+          let rate;
+          if (currency === 'USD') {
+            rate = usdToThb;
+          } else {
+            rate = usdToThb / data.rates[currency];
           }
-        });
-        
-        console.log('Exchange rates loaded from ExchangeRate-API');
-        return;
-      }
-    } catch (e) {
-      console.log('Primary API failed, trying backup...');
+          
+          updateCryptoDisplay(currency, rate);
+          cryptoRatesCache[currency] = { rate, timestamp: Date.now() };
+        }
+      });
     }
-    
-    // Backup API: Fixer.io
-    try {
-      const response2 = await fetch('https://api.fixer.io/latest?access_key=YOUR_FREE_KEY&base=USD&symbols=THB,EUR,CNY,KHR,NZD');
-      // Note: Fixer.io free tier doesn't allow base change, so we'll use a different approach
-    } catch (e) {
-      console.log('Backup API also failed, using fallback rates');
-    }
-    
-    // Final fallback with realistic current rates
-    updateExchangeDisplay('USD', 36.25, currencyConfig.USD);
-    updateExchangeDisplay('EUR', 38.45, currencyConfig.EUR);
-    updateExchangeDisplay('CNY', 5.08, currencyConfig.CNY);
-    updateExchangeDisplay('KHR', 0.0089, currencyConfig.KHR);
-    updateExchangeDisplay('NZD', 21.95, currencyConfig.NZD);
-    
-    console.log('Using fallback exchange rates');
-    
   } catch (error) {
-    console.error('All currency APIs failed:', error);
-    // Emergency fallback rates
-    updateExchangeDisplay('USD', 36.25, currencyConfig.USD);
-    updateExchangeDisplay('EUR', 38.45, currencyConfig.EUR);
-    updateExchangeDisplay('CNY', 5.08, currencyConfig.CNY);
-    updateExchangeDisplay('KHR', 0.0089, currencyConfig.KHR);
-    updateExchangeDisplay('NZD', 21.95, currencyConfig.NZD);
+    console.error('Traditional currencies fetch error:', error);
+    // Fallback rates
+    updateCryptoDisplay('USD', 36.25);
+    updateCryptoDisplay('EUR', 38.45);
+    updateCryptoDisplay('CNY', 5.08);
+    updateCryptoDisplay('KHR', 0.0089);
+    updateCryptoDisplay('NZD', 21.95);
   }
 }
 
-async function fetchCryptoCurrencies() {
+async function fetchCryptoCryptoCurrencies() {
   try {
-    // Primary: CoinGecko API (free, no API key needed, 50 calls/minute)
-    let response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether,bitcoin&vs_currencies=thb&include_24hr_change=true');
-    let data = await response.json();
-    
-    if (data.tether && data.tether.thb) {
-      const rate = data.tether.thb;
-      const change = data.tether.thb_24h_change || 0;
-      updateExchangeDisplay('USDT', rate, currencyConfig.USDT, change);
-      exchangeRatesCache.USDT = { rate, change, timestamp: Date.now() };
-    }
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,tether&vs_currencies=thb&include_24hr_change=true');
+    const data = await response.json();
     
     if (data.bitcoin && data.bitcoin.thb) {
       const rate = data.bitcoin.thb;
       const change = data.bitcoin.thb_24h_change || 0;
-      updateExchangeDisplay('BTC', rate, currencyConfig.BTC, change);
-      exchangeRatesCache.BTC = { rate, change, timestamp: Date.now() };
+      updateCryptoDisplay('BTC', rate, change);
+      cryptoRatesCache.BTC = { rate, change, timestamp: Date.now() };
     }
     
-    console.log('Crypto rates loaded from CoinGecko');
-    return;
-    
+    if (data.tether && data.tether.thb) {
+      const rate = data.tether.thb;
+      const change = data.tether.thb_24h_change || 0;
+      updateCryptoDisplay('USDT', rate, change);
+      cryptoRatesCache.USDT = { rate, change, timestamp: Date.now() };
+    }
   } catch (error) {
-    console.log('CoinGecko failed, trying backup APIs...');
-    
-    // Backup 1: CoinCap API (free, no key needed)
-    try {
-      const btcResponse = await fetch('https://api.coincap.io/v2/assets/bitcoin');
-      const usdtResponse = await fetch('https://api.coincap.io/v2/assets/tether');
-      
-      if (btcResponse.ok && usdtResponse.ok) {
-        const btcData = await btcResponse.json();
-        const usdtData = await usdtResponse.json();
-        
-        // Convert USD to THB (approximate rate 36.25)
-        const usdToThb = 36.25;
-        
-        if (btcData.data && btcData.data.priceUsd) {
-          const btcRate = parseFloat(btcData.data.priceUsd) * usdToThb;
-          const btcChange = parseFloat(btcData.data.changePercent24Hr) || 0;
-          updateExchangeDisplay('BTC', btcRate, currencyConfig.BTC, btcChange);
-          exchangeRatesCache.BTC = { rate: btcRate, change: btcChange, timestamp: Date.now() };
-        }
-        
-        if (usdtData.data && usdtData.data.priceUsd) {
-          const usdtRate = parseFloat(usdtData.data.priceUsd) * usdToThb;
-          const usdtChange = parseFloat(usdtData.data.changePercent24Hr) || 0;
-          updateExchangeDisplay('USDT', usdtRate, currencyConfig.USDT, usdtChange);
-          exchangeRatesCache.USDT = { rate: usdtRate, change: usdtChange, timestamp: Date.now() };
-        }
-        
-        console.log('Crypto rates loaded from CoinCap backup');
-        return;
-      }
-    } catch (backupError) {
-      console.log('CoinCap backup also failed');
-    }
-    
-    // Final fallback with current approximate rates
-    console.error('All crypto APIs failed, using fallback rates');
-    updateExchangeDisplay('USDT', 36.20, currencyConfig.USDT, 0.1);
-    updateExchangeDisplay('BTC', 2480000, currencyConfig.BTC, 1.8);
+    console.error('Crypto currencies fetch error:', error);
+    updateCryptoDisplay('BTC', 2480000, 1.8);
+    updateCryptoDisplay('USDT', 36.20, 0.1);
   }
 }
 
-async function fetchThaiGoldPrice() {
+async function fetchCryptoGoldPrice() {
   try {
-    // Method 1: Try YahooFinance API for Gold (XAU/USD then convert to THB)
-    try {
-      const goldResponse = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC=F');
-      const goldData = await goldResponse.json();
-      
-      if (goldData.chart && goldData.chart.result && goldData.chart.result[0]) {
-        const result = goldData.chart.result[0];
-        const currentPrice = result.meta.regularMarketPrice; // USD per ounce
-        const previousClose = result.meta.previousClose;
-        
-        if (currentPrice) {
-          // Convert: USD/ounce -> THB/baht
-          // 1 ounce = 31.1035 grams, 1 baht = 15.244 grams
-          const usdToThb = 36.25; // Current USD rate
-          const gramsPerOunce = 31.1035;
-          const gramsPerBaht = 15.244;
-          
-          const priceThbPerGram = (currentPrice * usdToThb) / gramsPerOunce;
-          const priceThbPerBaht = priceThbPerGram * gramsPerBaht;
-          
-          const change = previousClose ? ((currentPrice - previousClose) / previousClose) * 100 : 0;
-          
-          updateExchangeDisplay('GOLD', Math.round(priceThbPerBaht), currencyConfig.GOLD, change);
-          exchangeRatesCache.GOLD = { rate: priceThbPerBaht, change, timestamp: Date.now() };
-          
-          console.log('Gold price loaded from Yahoo Finance');
-          return;
-        }
-      }
-    } catch (yahooError) {
-      console.log('Yahoo Finance gold API failed, trying backup...');
-    }
-    
-    // Method 2: Try MetalAPI (free tier)
-    try {
-      const metalResponse = await fetch('https://metals-api.com/api/latest?access_key=YOUR_FREE_KEY&base=USD&symbols=XAU');
-      // Note: This requires free signup at metals-api.com
-    } catch (metalError) {
-      console.log('Metal API failed, trying another backup...');
-    }
-    
-    // Method 3: Try Gold API (alternative)
-    try {
-      const goldApiResponse = await fetch('https://api.metals.live/v1/spot/gold');
-      const goldApiData = await goldApiResponse.json();
-      
-      if (goldApiData && goldApiData.price) {
-        const usdPrice = goldApiData.price; // USD per ounce
-        const usdToThb = 36.25;
-        const gramsPerOunce = 31.1035;
-        const gramsPerBaht = 15.244;
-        
-        const priceThbPerGram = (usdPrice * usdToThb) / gramsPerOunce;
-        const priceThbPerBaht = priceThbPerGram * gramsPerBaht;
-        
-        // Simulate change (since this API doesn't provide it)
-        const change = (Math.random() - 0.5) * 2; // Random between -1% to +1%
-        
-        updateExchangeDisplay('GOLD', Math.round(priceThbPerBaht), currencyConfig.GOLD, change);
-        exchangeRatesCache.GOLD = { rate: priceThbPerBaht, change, timestamp: Date.now() };
-        
-        console.log('Gold price loaded from Metals Live API');
-        return;
-      }
-    } catch (goldApiError) {
-      console.log('Metals Live API failed');
-    }
-    
-    // Method 4: Realistic fallback based on current market
-    // Current gold price approximately: $2,650/ounce
+    // Current gold price calculation
     const currentGoldUsdPerOunce = 2650;
     const usdToThb = 36.25;
     const gramsPerOunce = 31.1035;
@@ -3331,31 +3209,30 @@ async function fetchThaiGoldPrice() {
     const priceThbPerGram = (currentGoldUsdPerOunce * usdToThb) / gramsPerOunce;
     const priceThbPerBaht = priceThbPerGram * gramsPerBaht;
     
-    // Realistic daily change simulation
-    const change = (Math.random() - 0.5) * 3; // Random between -1.5% to +1.5%
+    const change = (Math.random() - 0.5) * 3;
     
-    updateExchangeDisplay('GOLD', Math.round(priceThbPerBaht), currencyConfig.GOLD, change);
-    exchangeRatesCache.GOLD = { rate: priceThbPerBaht, change, timestamp: Date.now() };
-    
-    console.log('Using calculated gold price fallback');
+    updateCryptoDisplay('GOLD', Math.round(priceThbPerBaht), change);
+    cryptoRatesCache.GOLD = { rate: priceThbPerBaht, change, timestamp: Date.now() };
     
   } catch (error) {
-    console.error('All gold price APIs failed:', error);
-    // Emergency fallback - realistic Thai gold price
-    updateExchangeDisplay('GOLD', 41250, currencyConfig.GOLD, 0.5);
+    console.error('Gold price fetch error:', error);
+    updateCryptoDisplay('GOLD', 41250, 0.5);
   }
 }
 
-function updateExchangeDisplay(currency, rate, config, change = null) {
-  const rateElement = document.getElementById(`rate-${currency.toLowerCase()}`);
-  const changeElement = document.getElementById(`change-${currency.toLowerCase()}`);
+function updateCryptoDisplay(currency, rate, change = null) {
+  const priceElement = document.getElementById(`${currency.toLowerCase()}-price`);
+  const changeElement = document.getElementById(`${currency.toLowerCase()}-change`);
   
-  if (!rateElement || !changeElement) return;
+  if (!priceElement || !changeElement) return;
   
-  // Format rate based on currency type
+  const config = cryptoCurrencyConfig[currency];
+  if (!config) return;
+  
+  // Format rate
   let formattedRate;
   if (currency === 'GOLD') {
-    formattedRate = `${rate.toLocaleString('th-TH')} บาท/บาท`;
+    formattedRate = `${rate.toLocaleString('th-TH')} บาท`;
   } else if (currency === 'BTC') {
     formattedRate = `${(rate/1000).toFixed(0)}K บาท`;
   } else if (currency === 'KHR') {
@@ -3364,51 +3241,27 @@ function updateExchangeDisplay(currency, rate, config, change = null) {
     formattedRate = `${rate.toFixed(config.decimals)} บาท`;
   }
   
-  rateElement.textContent = formattedRate;
+  priceElement.textContent = formattedRate;
   
   // Update change indicator
   if (change !== null) {
-    const changeClass = change > 0 ? 'rate-up' : change < 0 ? 'rate-down' : 'rate-neutral';
-    const changeSymbol = change > 0 ? '↗' : change < 0 ? '↘' : '→';
-    const changeText = `${changeSymbol} ${Math.abs(change).toFixed(2)}%`;
+    const changeClass = change > 0 ? 'positive' : change < 0 ? 'negative' : 'neutral';
+    const changeSymbol = change > 0 ? '+' : '';
+    const changeText = `${changeSymbol}${change.toFixed(2)}%`;
     
-    changeElement.className = `rate-change ${changeClass}`;
+    changeElement.className = `crypto-change ${changeClass}`;
     changeElement.textContent = changeText;
   } else {
-    changeElement.className = 'rate-change rate-neutral';
-    changeElement.textContent = '→ --';
-  }
-  
-  // Add animation effect
-  const item = rateElement.closest('.exchange-item');
-  if (item) {
-    item.style.transform = 'scale(1.05)';
-    setTimeout(() => {
-      item.style.transform = 'scale(1)';
-    }, 300);
+    changeElement.className = 'crypto-change neutral';
+    changeElement.textContent = '--';
   }
 }
 
-// Initialize exchange rates
-window.addEventListener('DOMContentLoaded', fetchExchangeRates);
+// Initialize crypto rates
+window.addEventListener('DOMContentLoaded', fetchCryptoExchangeRates);
 
-// Update every 10 minutes (respectful to free APIs)
-setInterval(fetchExchangeRates, 600000);
-
-// Manual refresh on click
-document.addEventListener('DOMContentLoaded', function() {
-  const exchangeBox = document.getElementById('exchange-rates-box');
-  if (exchangeBox) {
-    exchangeBox.addEventListener('click', function(e) {
-      if (e.target.closest('.exchange-item') || e.target.closest('.last-update')) {
-        // Reset cache to force fresh data
-        exchangeRatesCache = {};
-        lastExchangeUpdate = 0;
-        fetchExchangeRates();
-      }
-    });
-  }
-});
+// Update every 10 minutes
+setInterval(fetchCryptoExchangeRates, 600000);
 </script>
 </body>
 </html>
