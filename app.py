@@ -30,18 +30,30 @@ app.secret_key = 'your_secret_key_here'  # เปลี่ยนเป็นค�
 import os
 
 # PostgreSQL สำหรับระบบโน้ต
-if os.environ.get('RAILWAY_ENVIRONMENT'):
-    # Production - Railway internal URL
-    NOTES_DB_URL = "postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway"
+if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('DATABASE_URL'):
+    # Production - Railway environment
+    # ใช้ DATABASE_URL จาก Railway environment variables
+    NOTES_DB_URL = os.environ.get('DATABASE_URL', "postgresql://postgres:MRPyUVazXbkBoMNBDIVArmCMCkQksKCj@postgres.railway.internal:5432/railway")
+    # Railway ใหม่ใช้ postgresql:// แต่ SQLAlchemy ต้องการ postgresql://
+    if NOTES_DB_URL.startswith('postgres://'):
+        NOTES_DB_URL = NOTES_DB_URL.replace('postgres://', 'postgresql://', 1)
 else:
-    # Local development - ใช้ SQLite แทน (หรือใส่ External URL จาก Railway Dashboard)
-    # หากต้องการใช้ PostgreSQL จริง ให้ไปที่ Railway Dashboard > Database > Connect
-    # และคัดลอก External URL มาใส่ที่นี่
+    # Local development - ใช้ SQLite แทน
     NOTES_DB_URL = "sqlite:///notes.db"
+
+print(f"Database URL: {NOTES_DB_URL[:50]}...")  # แสดงแค่ส่วนต้นเพื่อความปลอดภัย
 
 # ตั้งค่าฐานข้อมูลเฉพาะโน้ต
 app.config['SQLALCHEMY_DATABASE_URI'] = NOTES_DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'connect_args': {
+        'connect_timeout': 30,
+        'application_name': 'TrueWallet-TK-App'
+    } if 'postgresql' in NOTES_DB_URL else {}
+}
 db = SQLAlchemy(app)
 
 # -------------------- Note Model --------------------
@@ -538,6 +550,37 @@ def fmt_amount(a):
     return f"{a/100:,.2f}" if isinstance(a,(int,float)) else str(a)
 
 # -------------------- Flask Endpoints --------------------
+
+# -------------------- Health Check --------------------
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Health check endpoint for Railway deployment"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.utcnow().isoformat(),
+        'app': 'TrueWallet-TK',
+        'version': '1.0.0'
+    }), 200
+
+@app.route('/health/db', methods=['GET'])
+def health_check_db():
+    """Detailed health check with database connection test"""
+    try:
+        # Test database connection
+        with app.app_context():
+            db.session.execute('SELECT 1')
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': datetime.utcnow().isoformat(),
+            'database': 'connected'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'timestamp': datetime.utcnow().isoformat(),
+            'database': 'disconnected',
+            'error': str(e)
+        }), 503
 
 # -------------------- Login --------------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -1154,24 +1197,60 @@ def get_gold_price():
 
 # -------------------- Run --------------------
 if __name__ == "__main__":
-    # สร้างตารางฐานข้อมูล
-    with app.app_context():
-        try:
-            db.create_all()
-            print("Database tables created successfully!")
-        except Exception as e:
-            print(f"Error creating database tables: {e}")
-    
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            try:
-                transactions.update(json.load(f))
-            except:
-                pass
+    print("Starting TrueWallet-TK Application...")
     
     # ใช้ PORT จาก environment variable สำหรับ Railway
     port = int(os.environ.get('PORT', 8080))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    print(f"Port: {port}")
+    print(f"Environment: {'Production (Railway)' if os.environ.get('RAILWAY_ENVIRONMENT') else 'Development'}")
+    
+    # โหลดธุรกรรมจากไฟล์ก่อน
+    print("Loading transaction data...")
+    if os.path.exists(DATA_FILE):
+        try:
+            with open(DATA_FILE, "r", encoding="utf-8") as f:
+                transactions.update(json.load(f))
+            print("Transaction data loaded successfully")
+        except Exception as e:
+            print(f"Warning: Error loading transactions: {e}")
+    
+    # สร้างตารางฐานข้อมูล (พยายาม 3 ครั้ง)
+    print("Initializing database...")
+    max_retries = 3
+    retry_count = 0
+    db_initialized = False
+    
+    while retry_count < max_retries and not db_initialized:
+        try:
+            with app.app_context():
+                # ตรวจสอบการเชื่อมต่อฐานข้อมูลก่อน
+                if 'postgresql' in NOTES_DB_URL:
+                    print("Testing PostgreSQL connection...")
+                    db.session.execute('SELECT 1')
+                    print("PostgreSQL connection successful")
+                
+                print("Creating database tables...")
+                db.create_all()
+                print("Database tables created successfully!")
+                db_initialized = True
+                
+        except Exception as e:
+            retry_count += 1
+            print(f"Database initialization attempt {retry_count}/{max_retries} failed: {e}")
+            if retry_count < max_retries:
+                import time
+                print("Retrying in 3 seconds...")
+                time.sleep(3)
+    
+    if not db_initialized:
+        print("Warning: Database initialization failed after all retries. App will start but notes feature may not work.")
+    
+    print(f"Starting Flask server on 0.0.0.0:{port}...")
+    try:
+        app.run(host="0.0.0.0", port=port, debug=False)
+    except Exception as e:
+        print(f"Error starting Flask app: {e}")
+        raise
 
 
 
