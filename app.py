@@ -1003,6 +1003,7 @@ def truewallet_webhook():
             return jsonify({"status":"error","message":"No JSON received"}), 400
 
         log_with_time(f"[WEBHOOK] Raw data keys: {list(data.keys())}")
+        log_with_time(f"[WEBHOOK] Raw data (first 300 chars): {str(data)[:300]}")
         message_jwt = data.get("message")
         decoded = None
         TRUEWALLET_SECRET = "018db5a1098fde137da6856eab3d26d7"  # Secret key from TrueWallet docs
@@ -1012,21 +1013,22 @@ def truewallet_webhook():
             try:
                 # Try TrueWallet secret first
                 decoded = jwt.decode(message_jwt, TRUEWALLET_SECRET, algorithms=["HS256"])
-                log_with_time("[WEBHOOK] JWT DECODED with TrueWallet secret")
-                log_with_time(f"[WEBHOOK] Decoded payload: {decoded}")
+                log_with_time("[WEBHOOK] ✓ JWT DECODED with TrueWallet secret")
+                log_with_time(f"[WEBHOOK] ✓ Decoded keys: {list(decoded.keys())}")
+                log_with_time(f"[WEBHOOK] ✓ Decoded payload: {decoded}")
             except Exception as e:
-                log_with_time(f"[WEBHOOK] JWT DECODE ERROR with TrueWallet secret: {str(e)}")
+                log_with_time(f"[WEBHOOK] ✗ JWT DECODE ERROR with TrueWallet secret: {str(e)}")
                 try:
                     # Fallback to app SECRET_KEY
                     decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
-                    log_with_time("[WEBHOOK] JWT DECODED with app secret")
+                    log_with_time("[WEBHOOK] ✓ JWT DECODED with app secret (fallback)")
                     log_with_time(f"[WEBHOOK] Decoded payload: {decoded}")
                 except Exception as e2:
-                    log_with_time(f"[WEBHOOK] JWT DECODE ERROR with app secret: {str(e2)}")
+                    log_with_time(f"[WEBHOOK] ✗ JWT DECODE ERROR with app secret: {str(e2)}")
                     decoded = data
                     log_with_time(f"[WEBHOOK] Using raw data as fallback")
         else:
-            log_with_time("[WEBHOOK] No JWT token in message field, using raw data")
+            log_with_time("[WEBHOOK] ✗ No JWT token in message field, using raw data")
             decoded = data
 
         txid = decoded.get("transaction_id") or f"TX{len(transactions['new'])+len(transactions['approved'])+len(transactions['cancelled'])+1}"
@@ -1047,7 +1049,11 @@ def truewallet_webhook():
         description = decoded.get("description","-")
         transaction_date = decoded.get("transaction_date","")
         
-        log_with_time(f"[WEBHOOK] event_type={event_type}, merchant_name={merchant_name}, description={description}, amount={amount}")
+        log_with_time(f"[WEBHOOK] ===== EXTRACTED DATA =====")
+        log_with_time(f"[WEBHOOK] amount={amount}, event_type={event_type}")
+        log_with_time(f"[WEBHOOK] merchant_name='{merchant_name}'")
+        log_with_time(f"[WEBHOOK] description='{description}'")
+        log_with_time(f"[WEBHOOK] transaction_date='{transaction_date}'")
         
         # Extract recipient/sender info based on event type
         # For TrueWallet P2P: merchant_name = recipient phone/ID
@@ -1065,36 +1071,42 @@ def truewallet_webhook():
             sender_mobile = merchant_name if merchant_name != "-" else "-"
             sender_name = "P2P" 
             bank_name_th = "ทรูเงิน (P2P)"
-            log_with_time(f"[WEBHOOK] SEND_P2P: recipient={sender_mobile}")
+            log_with_time(f"[WEBHOOK] EVENT: SEND_P2P → recipient phone={sender_mobile}")
             
         elif event_type == "BANK_WITHDRAW":
             # merchant_name is bank name, description might have account
             bank_name_th = merchant_name if merchant_name != "-" else "ธนาคาร"
             sender_mobile = description if description != "-" else "-"
             sender_name = "โอนธนาคาร"
+            log_with_time(f"[WEBHOOK] EVENT: BANK_WITHDRAW → bank={bank_name_th}, account={sender_mobile}")
             
         elif event_type == "PROMPTPAY_TAG29" or event_type == "PROMPTPAY_TAG30":
             # merchant_name is shop/recipient name
             sender_name = merchant_name if merchant_name != "-" else "พร้อมเพย์"
             bank_name_th = "พร้อมเพย์"
+            log_with_time(f"[WEBHOOK] EVENT: PROMPTPAY → shop={sender_name}")
             
         elif event_type == "SEND_MONEY_PLUS":
             sender_name = "Money Plus"
             bank_name_th = "ทรูเงิน (Money Plus)"
+            log_with_time(f"[WEBHOOK] EVENT: SEND_MONEY_PLUS")
             
         elif event_type == "SEND_MONEY_LINK":
             sender_name = "Money Link"
             bank_name_th = "ทรูเงิน (Money Link)"
+            log_with_time(f"[WEBHOOK] EVENT: SEND_MONEY_LINK")
             
         elif event_type == "FEE_PAYMENT":
             sender_name = merchant_name if merchant_name != "-" else "ค่าธรรมเนียม"
             bank_name_th = "ค่าธรรมเนียม"
+            log_with_time(f"[WEBHOOK] EVENT: FEE_PAYMENT → {sender_name}")
         else:
             sender_name = merchant_name if merchant_name != "-" else "-"
             bank_name_th = "อื่นๆ"
+            log_with_time(f"[WEBHOOK] EVENT: OTHER → {sender_name}")
         
         name = f"{sender_name} / {sender_mobile}" if sender_mobile and sender_mobile != "-" else sender_name
-        log_with_time(f"[WEBHOOK] Final name to save: {name}")
+        log_with_time(f"[WEBHOOK] ✓ Final name to save: '{name}', bank: '{bank_name_th}'")
 
         # Parse transaction_date
         time_str = transaction_date or datetime.utcnow().isoformat()
