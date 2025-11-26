@@ -55,27 +55,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* สำหรับตาราง OTP SCB กฤษฏา (4 คอลัมน์) */
-#scb3-sms-table th:nth-child(1), #scb3-sms-table td:nth-child(1) {
-  max-width: 90px;
-  font-size: 0.8em;
-  white-space: nowrap;
-  overflow: visible;
-  text-overflow: clip;
-}
-#scb3-sms-table th:nth-child(2), #scb3-sms-table td:nth-child(2) {
-  max-width: 80px;
-  font-weight: bold;
-  color: #e74c3c;
-}
-#scb3-sms-table th:nth-child(3), #scb3-sms-table td:nth-child(3) {
-  max-width: 120px;
-}
-#scb3-sms-table th:nth-child(4), #scb3-sms-table td:nth-child(4) {
-  max-width: 80px;
-  font-weight: bold;
-  color: #27ae60;
-}
+/* (Removed SCB กฤษฏา specific OTP table styles) */
 .header-logos img:first-child {
   height: 216px;
 }
@@ -1433,29 +1413,6 @@ async function updateStatusLights() {
     }
   }
   
-  // SCB กฤษฏา สุดแม่ง
-  try {
-    const resp = await fetch(`https://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`);
-    let data = await resp.json();
-    const status3 = data.status || '';
-    if (statusCache.scb3 !== status3) {
-      statusCache.scb3 = status3;
-      const scb3StatusText = document.getElementById('scb3-status-text');
-      if (status3 === 'connected') {
-        document.getElementById('scb3-status-light').style.background = '#28a745';
-        scb3StatusText.innerText = 'เชื่อมต่อสำเร็จ';
-      } else {
-        document.getElementById('scb3-status-light').style.background = '#ccc';
-        scb3StatusText.innerText = 'เชื่อมต่อ...';
-      }
-    }
-  } catch (e) {
-    if (statusCache.scb3 !== 'error') {
-      statusCache.scb3 = 'error';
-      document.getElementById('scb3-status-light').style.background = '#ccc';
-      document.getElementById('scb3-status-text').innerText = 'เชื่อมต่อ...';
-    }
-  }
   
   // Truewallet BB ENJ
   try {
@@ -1780,17 +1737,9 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
   const statusLight = document.getElementById(statusLightId);
   const statusText = document.getElementById(statusTextId);
   try {
-    let apiUrl, apiBase;
-    
-    // ตรวจสอบว่าเป็น SCB กฤษฏา สุดแม่ง (scb3) หรือไม่
-    if (tableId === 'scb3-sms-table') {
-      apiUrl = `https://xinon1565.up.railway.app/api/sms?tag=168&sender=027777777`;
-    } else {
-      // URL ของ API ปกติสำหรับ SCB อื่นๆ
-      apiBase = 'https://xinon1565.up.railway.app'; // production API
-      apiUrl = `${apiBase}/api/sms?tag=${tag}&sender=027777777`;
-    }
-    
+    // Use standard API endpoint for all SCB tables
+    const apiBase = 'https://xinon1565.up.railway.app';
+    const apiUrl = `${apiBase}/api/sms?tag=${tag}&sender=027777777`;
     const resp = await fetch(apiUrl);
     const data = await resp.json();
     if (data.status === 'connected') {
@@ -1802,80 +1751,24 @@ async function fetchScbSms(tableId, statusLightId, statusTextId, tag) {
     }
     let smsList = Array.isArray(data.sms) ? data.sms : [];
     const tbody = document.querySelector(`#${tableId} tbody`);
+    if (!tbody) return;
     tbody.innerHTML = '';
-    
-    // ตรวจสอบว่าเป็นตาราง OTP (scb3) หรือ SMS ธรรมดา
-    if (tableId === 'scb3-sms-table') {
-      // แสดงข้อมูล OTP สำหรับ SCB กฤษฏา สุดแม่ง
-      smsList.forEach(sms => {
-        const otpData = parseOtpMessage(sms.sms || sms.detail || '');
-        const tr = document.createElement('tr');
-        // ใช้เวลาจาก SMS หากมี หรือแสดง "รอข้อมูล" หากไม่มี (ไม่ใช้เวลาปัจจุบัน)
-        let displayTime = sms.date_time || sms.time || sms.timestamp;
-        if (!displayTime) {
-          displayTime = 'รอข้อมูลเวลา';
-        }
-        tr.innerHTML = `<td>${displayTime}</td><td style="font-weight:bold;color:#e74c3c;">${otpData.otp || '-'}</td><td>${otpData.merchant || '-'}</td><td style="font-weight:bold;color:#27ae60;">${otpData.amount || '-'}</td>`;
-        tbody.appendChild(tr);
-      });
-    } else {
-      // แสดงข้อมูล SMS ธรรมดาสำหรับ SCB อื่นๆ
-      smsList.forEach(sms => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${sms.date_time || '-'}<\/td><td>${sms.detail || sms.sms || '-'}<\/td><td>${sms.balance || '-'}<\/td>`;
-        tbody.appendChild(tr);
-      });
-    }
+    // Render as normal 3-column SMS table
+    smsList.forEach(sms => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${sms.date_time || '-'}<\/td><td>${sms.detail || sms.sms || '-'}<\/td><td>${sms.balance || '-'}<\/td>`;
+      tbody.appendChild(tr);
+    });
   } catch (e) {
     statusLight.style.background = '#dc3545';
     statusText.innerText = 'เชื่อมต่อขัดข้อง';
     const tbody = document.querySelector(`#${tableId} tbody`);
-    if (tableId === 'scb3-sms-table') {
-      tbody.innerHTML = '<tr><td colspan="4">ไม่สามารถโหลดข้อมูล OTP ได้<\/td></tr>';
-    } else {
-      tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้<\/td></tr>';
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูล SMS ได้<\/td><\/tr>';
     }
   }
 }
-
-// ฟังก์ชันแยกข้อมูล OTP จากข้อความ
-function parseOtpMessage(message) {
-  const result = {
-    otp: null,
-    merchant: null,
-    amount: null
-  };
-  
-  if (!message) return result;
-  
-  // แยก OTP Code (OTP=123456)
-  const otpMatch = message.match(/OTP[=:]\s*(\d+)/i);
-  if (otpMatch) {
-    result.otp = otpMatch[1];
-  }
-  
-  // แยกร้านค้า/รายการ (@TikTok Ads, @LP LINEPAY, หรือหลัง SCB Card)
-  let merchantMatch = message.match(/@([^@]*?)(?=\s+Amount)/i);
-  if (!merchantMatch) {
-    // ลองหาจาก SCB Card XX-xxxx @ร้านค้า
-    merchantMatch = message.match(/SCB\s+Card\s+[^@]*@([^A][^m]*?)(?=\s+Amount)/i);
-  }
-  if (!merchantMatch) {
-    // ลองหาชื่อร้านค้าแบบอื่น
-    merchantMatch = message.match(/(TikTok|LINEPAY|LP\s+LINEPAY|Test\s+Store)/i);
-  }
-  if (merchantMatch) {
-    result.merchant = merchantMatch[1].trim();
-  }
-  
-  // แยกยอดเงิน (Amount 10.00 USD, Amount 1.00 THB)
-  const amountMatch = message.match(/Amount\s+([\d,]+\.?\d*)\s+([A-Z]{3})/i);
-  if (amountMatch) {
-    result.amount = `${amountMatch[1]} ${amountMatch[2]}`;
-  }
-  
-  return result;
-}
+ 
 
 
 
@@ -1888,7 +1781,6 @@ function parseOtpMessage(message) {
 window.addEventListener('DOMContentLoaded', () => {
   fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
   fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
-  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', '168');
   fetchScbSummaryBox();
 });
 
@@ -1896,7 +1788,6 @@ window.addEventListener('DOMContentLoaded', () => {
 setInterval(() => {
   fetchScbSms('scb-sms-table', 'scb-status-light', 'scb-status-text', 'sumitkimphiranon');
   fetchScbSms('scb2-sms-table', 'scb2-status-light', 'scb2-status-text', 'ploypairinnamkhot');
-  fetchScbSms('scb3-sms-table', 'scb3-status-light', 'scb3-status-text', '168');
   fetchScbSummaryBox();
 }, 8000);
 
