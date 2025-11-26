@@ -557,22 +557,34 @@ BANK_MAP_TH = {
 # -------------------- Webhook TrueWallet (สำหรับ endpoint /webhook) --------------------
 @app.route("/webhook", methods=["POST"])
 def generic_truewallet_webhook():
+    log_with_time("[GENERIC WEBHOOK] ========== WEBHOOK RECEIVED ==========")
     try:
         data = request.get_json(force=True, silent=True)
         if not data:
-            log_with_time("[WEBHOOK ERROR] No JSON received (generic /webhook)")
+            log_with_time("[GENERIC WEBHOOK ERROR] No JSON received")
             return jsonify({"status":"error","message":"No JSON received"}), 400
 
+        log_with_time(f"[GENERIC WEBHOOK] Raw request data keys: {list(data.keys())}")
         message_jwt = data.get("message")
         decoded = None
+        TRUEWALLET_SECRET = "018db5a1098fde137da6856eab3d26d7"
+        
         if message_jwt:
+            log_with_time(f"[GENERIC WEBHOOK] JWT token found, length: {len(message_jwt)}")
             try:
-                decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
+                decoded = jwt.decode(message_jwt, TRUEWALLET_SECRET, algorithms=["HS256"])
+                log_with_time(f"[GENERIC WEBHOOK] JWT decoded with TrueWallet secret SUCCESS")
+                log_with_time(f"[GENERIC WEBHOOK] Decoded payload keys: {list(decoded.keys())}")
             except Exception as e:
-                log_with_time("[JWT ERROR] /webhook", str(e))
-                # ถ้า decode ไม่ผ่าน ให้ใช้ payload ดิบแทน
-                decoded = data
+                log_with_time(f"[GENERIC WEBHOOK] JWT decode failed with TrueWallet secret: {str(e)}")
+                try:
+                    decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
+                    log_with_time(f"[GENERIC WEBHOOK] JWT decoded with app secret")
+                except Exception as e2:
+                    log_with_time(f"[GENERIC WEBHOOK] JWT decode failed with app secret: {str(e2)}")
+                    decoded = data
         else:
+            log_with_time("[GENERIC WEBHOOK] No JWT token in message field, using raw data")
             decoded = data
 
         txid = decoded.get("transaction_id") or f"TX{len(transactions['new'])+len(transactions['approved'])+len(transactions['cancelled'])+1}"
@@ -616,7 +628,23 @@ def generic_truewallet_webhook():
         }
 
         transactions["new"].append(tx)
+        
+        # Also add to deposit_wallets
+        deposit_tx = DepositWallet(
+            id=txid,
+            event=event_type,
+            amount=amount,
+            amount_str=f"{amount/100:,.2f}",
+            name=name,
+            bank=bank_name_th,
+            status="new",
+            time=tx_time_utc.isoformat(),
+            slip_filename=None
+        )
+        deposit_wallets.append(deposit_tx)
+        
         save_transactions()
+        log_with_time(f"[GENERIC WEBHOOK SUCCESS] Added to deposit_wallets. Total: {len(deposit_wallets)}")
         log_with_time("[WEBHOOK RECEIVED] /webhook", tx)
         return jsonify({"status":"success"}), 200
 
