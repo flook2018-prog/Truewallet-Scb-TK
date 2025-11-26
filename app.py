@@ -489,6 +489,7 @@ def api_wallet_sunisa():
 
         # Fallback: check in-memory deposit_wallets
         now = datetime.utcnow()
+        print(f'[DEBUG] deposit_wallets count: {len(deposit_wallets)}')
         for tx in deposit_wallets:
             # tx may be DepositWallet object
             try:
@@ -496,8 +497,9 @@ def api_wallet_sunisa():
                 time_str = getattr(tx, 'time', '') or ''
                 amount_str = getattr(tx, 'amount_str', '') or (str(getattr(tx,'amount', '')))
                 bank = getattr(tx, 'bank', '') or ''
-                # check name or phone
-                if phone in name or 'สุนิษา' in name:
+                # check if phone in name (e.g., "ชื่อ / 0939981540")
+                if phone in name:
+                    print(f'[DEBUG] Found matching entry: {name}')
                     # parse time (assume ISO)
                     t = None
                     try:
@@ -510,9 +512,11 @@ def api_wallet_sunisa():
                     if t:
                         if (now - t).total_seconds() <= 24*3600:
                             results.append({'id': getattr(tx,'id', ''), 'time': time_str, 'amount': amount_str, 'name': name, 'bank': bank})
-            except Exception:
+            except Exception as e:
+                print(f'[DEBUG] Error processing tx: {e}')
                 continue
 
+        print(f'[DEBUG] wallet-sunisa results: {results}')
         return jsonify(results)
     except Exception as e:
         print('api_wallet_sunisa error:', e)
