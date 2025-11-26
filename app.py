@@ -432,6 +432,91 @@ def api_deposit_wallet():
 @app.route("/api/deposit_wallet", methods=["GET"])
 def get_deposit_wallets():
     return jsonify([tx.to_dict() for tx in deposit_wallets])
+
+
+@app.route('/api/wallet-sunisa', methods=['GET'])
+def api_wallet_sunisa():
+    """Return recent deposit entries for Sunisa (0939981540).
+    If caller provides the allowed key, try to fetch from external source
+    defined by env `SUNISA_SOURCE_URL` (with header X-API-Key).
+    Otherwise fallback to in-memory `deposit_wallets`.
+    """
+    try:
+        req_key = request.args.get('key', '').strip()
+        ALLOWED_KEY = '690b133d429a37963d35c7d58082edc2'
+        phone = '0939981540'
+
+        results = []
+
+        # If correct key and external source configured, try it first
+        if req_key and req_key == ALLOWED_KEY:
+            ext_url = os.environ.get('SUNISA_SOURCE_URL')
+            if ext_url:
+                try:
+                    headers = {'X-API-Key': req_key}
+                    r = requests.get(ext_url, headers=headers, timeout=10)
+                    r.raise_for_status()
+                    data = r.json()
+                    # Expecting a list or dict with 'items'
+                    items = data if isinstance(data, list) else data.get('items', []) if isinstance(data, dict) else []
+                    for it in items:
+                        # normalize possible dict structure
+                        name = (it.get('name') if isinstance(it, dict) else '') or ''
+                        mobile = (it.get('mobile') if isinstance(it, dict) else '') or ''
+                        time_str = (it.get('time') if isinstance(it, dict) else it.get('timestamp') if isinstance(it, dict) else '') if isinstance(it, dict) else ''
+                        amount = it.get('amount') if isinstance(it, dict) else (it.get('amount_str') if isinstance(it, dict) else '')
+                        if phone in name or phone in mobile or 'สุนิษา' in name:
+                            results.append({'id': it.get('id') if isinstance(it, dict) else None, 'time': time_str, 'amount': amount, 'name': name, 'bank': it.get('bank') if isinstance(it, dict) else ''})
+                    # filter last 24 hours
+                    now = datetime.utcnow()
+                    filtered = []
+                    for tx in results:
+                        tstr = tx.get('time')
+                        try:
+                            t = datetime.fromisoformat(tstr.replace('Z', '+00:00')) if tstr else None
+                        except Exception:
+                            try:
+                                t = datetime.strptime(tstr, '%Y-%m-%d %H:%M:%S') if tstr else None
+                            except Exception:
+                                t = None
+                        if t:
+                            delta = now - t
+                            if delta.total_seconds() <= 24*3600:
+                                filtered.append(tx)
+                    return jsonify(filtered)
+                except Exception as e:
+                    print('SUNISA external fetch failed:', e)
+
+        # Fallback: check in-memory deposit_wallets
+        now = datetime.utcnow()
+        for tx in deposit_wallets:
+            # tx may be DepositWallet object
+            try:
+                name = getattr(tx, 'name', '') or ''
+                time_str = getattr(tx, 'time', '') or ''
+                amount_str = getattr(tx, 'amount_str', '') or (str(getattr(tx,'amount', '')))
+                bank = getattr(tx, 'bank', '') or ''
+                # check name or phone
+                if phone in name or 'สุนิษา' in name:
+                    # parse time (assume ISO)
+                    t = None
+                    try:
+                        t = datetime.fromisoformat(time_str.replace('Z', '+00:00'))
+                    except Exception:
+                        try:
+                            t = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                        except Exception:
+                            t = None
+                    if t:
+                        if (now - t).total_seconds() <= 24*3600:
+                            results.append({'id': getattr(tx,'id', ''), 'time': time_str, 'amount': amount_str, 'name': name, 'bank': bank})
+            except Exception:
+                continue
+
+        return jsonify(results)
+    except Exception as e:
+        print('api_wallet_sunisa error:', e)
+        return jsonify([]), 500
 SECRET_KEY = "defbe102c9f4e9eaad1e16de7f8efe13"
 
 # กำหนด timezone

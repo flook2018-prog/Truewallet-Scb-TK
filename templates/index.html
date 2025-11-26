@@ -1831,64 +1831,6 @@ async function fetchDepositWallets() {
   
   try {
     let resp = await fetch("/api/wallet_deposit_data");
-
-  // --- ดึงรายการยอดเข้า Wallet สำหรับ สุนิษา (0939981540) ย้อนหลัง 24 ชั่วโมง ---
-  let lastSunisaUpdate = 0;
-  let cachedSunisaHash = null;
-  async function fetchWalletSunisaEntries() {
-    const now = Date.now();
-    if (now - lastSunisaUpdate < 8000 && cachedSunisaHash) return;
-    try {
-      const resp = await fetch('/api/deposit_wallet');
-      if (!resp.ok) throw new Error('API error');
-      const data = await resp.json();
-      const list = Array.isArray(data) ? data : (data || []);
-
-      // Filter entries that match phone or name and are within last 24h
-      const phone = '0939981540';
-      const filtered = list.filter(tx => {
-        try {
-          const name = (tx.name || '').toString();
-          const timeStr = tx.time || tx.time_str || '';
-          const t = new Date(timeStr);
-          const timeOk = !isNaN(t.getTime()) ? (Date.now() - t.getTime()) <= 24*60*60*1000 : false;
-          const phoneMatch = name.includes(phone) || name.includes('สุนิษา');
-          return phoneMatch && timeOk;
-        } catch (e) { return false; }
-      });
-
-      // Quick hash to avoid DOM churn
-      const newHash = JSON.stringify(filtered.map(f => f.id + '|' + (f.amount_str||f.amount) + '|' + f.time));
-      if (newHash === cachedSunisaHash) return;
-      cachedSunisaHash = newHash;
-      lastSunisaUpdate = now;
-
-      const tbody = document.querySelector('#wallet-sunisa-table tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">ไม่มีรายการภายใน 24 ชั่วโมง</td></tr>';
-        return;
-      }
-
-      // Sort newest first
-      filtered.sort((a,b) => new Date(b.time || b.time_str || 0) - new Date(a.time || a.time_str || 0));
-      filtered.forEach(tx => {
-        const tr = document.createElement('tr');
-        const d = new Date(tx.time || tx.time_str || tx.time_str || null);
-        const pad = n => n.toString().padStart(2,'0');
-        const displayTime = (!isNaN(d) && d instanceof Date) ? `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` : (tx.time || '-');
-        const amount = tx.amount_str || (tx.amount ? (tx.amount/100).toFixed(2) : '-');
-        const source = tx.name || tx.bank || '-';
-        tr.innerHTML = `<td>${displayTime}</td><td>${amount}</td><td>${source}</td>`;
-        tbody.appendChild(tr);
-      });
-    } catch (e) {
-      const tbody = document.querySelector('#wallet-sunisa-table tbody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="3">ไม่สามารถโหลดข้อมูลได้</td></tr>';
-    }
-  }
-  setInterval(fetchWalletSunisaEntries, 15000);
     let data = await resp.json();
     let walletList = Array.isArray(data.new_orders) ? data.new_orders : [];
     
