@@ -489,7 +489,7 @@ def api_wallet_sunisa():
 
         # Fallback: check in-memory deposit_wallets
         now = datetime.utcnow()
-        print(f'[DEBUG] deposit_wallets count: {len(deposit_wallets)}')
+        print(f'[DEBUG wallet-sunisa] deposit_wallets count: {len(deposit_wallets)}')
         for tx in deposit_wallets:
             # tx may be DepositWallet object
             try:
@@ -497,26 +497,43 @@ def api_wallet_sunisa():
                 time_str = getattr(tx, 'time', '') or ''
                 amount_str = getattr(tx, 'amount_str', '') or (str(getattr(tx,'amount', '')))
                 bank = getattr(tx, 'bank', '') or ''
+                
+                print(f'[DEBUG wallet-sunisa] Checking: name={name}, phone={phone}')
+                
                 # check if phone in name (e.g., "ชื่อ / 0939981540")
                 if phone in name:
-                    print(f'[DEBUG] Found matching entry: {name}')
+                    print(f'[DEBUG wallet-sunisa] MATCH FOUND: {name}')
                     # parse time (assume ISO)
                     t = None
                     try:
                         t = datetime.fromisoformat(time_str.replace('Z', '+00:00'))
                     except Exception:
                         try:
-                            t = datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+                            t = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S%z')
                         except Exception:
-                            t = None
+                            try:
+                                t = datetime.fromisoformat(time_str)
+                            except Exception:
+                                t = None
+                    
                     if t:
-                        if (now - t).total_seconds() <= 24*3600:
+                        # Convert to UTC if it has timezone info
+                        if t.tzinfo is None:
+                            t_utc = t
+                        else:
+                            t_utc = t.astimezone(pytz.UTC)
+                        
+                        delta = (now - t_utc).total_seconds()
+                        if delta <= 24*3600:
+                            print(f'[DEBUG wallet-sunisa] Time check passed: {delta}s ago')
                             results.append({'id': getattr(tx,'id', ''), 'time': time_str, 'amount': amount_str, 'name': name, 'bank': bank})
+                        else:
+                            print(f'[DEBUG wallet-sunisa] Time check failed: {delta}s ago > 86400s')
             except Exception as e:
-                print(f'[DEBUG] Error processing tx: {e}')
+                print(f'[DEBUG wallet-sunisa] Error processing tx: {e}')
                 continue
 
-        print(f'[DEBUG] wallet-sunisa results: {results}')
+        print(f'[DEBUG wallet-sunisa] Final results count: {len(results)}, Results: {results}')
         return jsonify(results)
     except Exception as e:
         print('api_wallet_sunisa error:', e)
@@ -952,13 +969,22 @@ def truewallet_webhook():
 
         message_jwt = data.get("message")
         decoded = None
+        TRUEWALLET_SECRET = "018db5a1098fde137da6856eab3d26d7"  # Secret key from TrueWallet docs
+        
         if message_jwt:
             try:
-                decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
+                # Try TrueWallet secret first
+                decoded = jwt.decode(message_jwt, TRUEWALLET_SECRET, algorithms=["HS256"])
+                log_with_time("[JWT DECODED with TrueWallet secret]", decoded)
             except Exception as e:
-                log_with_time("[JWT ERROR]", str(e))
-                # ถ้า decode ไม่ผ่าน ให้ใช้ payload ดิบแทน
-                decoded = data
+                log_with_time("[JWT DECODE ERROR with TrueWallet secret]", str(e))
+                try:
+                    # Fallback to app SECRET_KEY
+                    decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
+                    log_with_time("[JWT DECODED with app secret]", decoded)
+                except Exception as e2:
+                    log_with_time("[JWT DECODE ERROR with app secret]", str(e2))
+                    decoded = data
         else:
             decoded = data
 
@@ -966,31 +992,60 @@ def truewallet_webhook():
 
         if any(tx["id"] == txid for lst in transactions.values() for tx in lst):
             return jsonify({"status":"success","message":"Transaction exists"}), 200
+        
+        # Check if already in deposit_wallets
+        if any(tx.id == txid for tx in deposit_wallets):
+            return jsonify({"status":"success","message":"Transaction exists"}), 200
 
         amount = int(decoded.get("amount",0))
-        sender_name = decoded.get("sender_name","-")
-        sender_mobile = decoded.get("sender_mobile","-")
+        event_type = decoded.get("event_type","ฝาก").upper()
+        merchant_name = decoded.get("merchant_name","-")
+        description = decoded.get("description","-")
+        transaction_date = decoded.get("transaction_date","")
+        
+        # Extract sender info based on event type
+        sender_name = "-"
+        sender_mobile = "-"
+        bank_name_th = "-"
+        
+        if event_type == "SEND_P2P":
+            # merchant_name is the recipient phone/ID
+            sender_mobile = merchant_name if merchant_name != "-" else "-"
+            bank_name_th = "ทรูเงิน (P2P)"
+        elif event_type == "BANK_WITHDRAW":
+            # merchant_name is bank name
+            bank_name_th = merchant_name if merchant_name != "-" else "ธนาคาร"
+            sender_mobile = description if description != "-" else "-"
+        elif event_type == "PROMPTPAY_TAG29" or event_type == "PROMPTPAY_TAG30":
+            # merchant_name is shop/recipient name
+            sender_name = merchant_name if merchant_name != "-" else "พร้อมเพย์"
+            bank_name_th = "พร้อมเพย์"
+        elif event_type == "SEND_MONEY_PLUS":
+            sender_name = "Money Plus"
+            bank_name_th = "ทรูเงิน (Money Plus)"
+        elif event_type == "SEND_MONEY_LINK":
+            sender_name = "Money Link"
+            bank_name_th = "ทรูเงิน (Money Link)"
+        elif event_type == "FEE_PAYMENT":
+            # This is fee deduction
+            sender_name = merchant_name if merchant_name != "-" else "ค่าธรรมเนียม"
+            bank_name_th = "ค่าธรรมเนียม"
+        else:
+            sender_name = merchant_name if merchant_name != "-" else "-"
+        
         name = f"{sender_name} / {sender_mobile}" if sender_mobile and sender_mobile != "-" else sender_name
 
-        event_type = decoded.get("event_type","ฝาก").upper()
-        bank_code = (decoded.get("channel") or "").upper()
-
-        if event_type=="P2P" or bank_code in ["TRUEWALLET","WALLET"]:
-            bank_name_th="ทรูวอเลท"
-        elif bank_code in BANK_MAP_TH:
-            bank_name_th=BANK_MAP_TH[bank_code]
-        elif bank_code:
-            bank_name_th=bank_code
-        else:
-            bank_name_th="-"
-
-        time_str = decoded.get("received_time") or datetime.utcnow().isoformat()
+        # Parse transaction_date
+        time_str = transaction_date or datetime.utcnow().isoformat()
         try:
-            tx_time_utc = datetime.fromisoformat(time_str)
+            tx_time_utc = datetime.fromisoformat(time_str.replace('+0700', '+07:00'))
         except:
-            tx_time_utc = datetime.utcnow()
+            try:
+                tx_time_utc = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S+0700')
+            except:
+                tx_time_utc = datetime.utcnow()
 
-        tx = {
+        tx_dict = {
             "id": txid,
             "event": event_type,
             "amount": amount,
@@ -1002,9 +1057,26 @@ def truewallet_webhook():
             "slip_filename": None
         }
 
-        transactions["new"].append(tx)
+        # Add to both transactions (for main display) and deposit_wallets (for Sunisa filtering)
+        transactions["new"].append(tx_dict)
+        
+        # Also add to deposit_wallets for /api/wallet-sunisa filtering
+        deposit_tx = DepositWallet(
+            id=txid,
+            event=event_type,
+            amount=amount,
+            amount_str=f"{amount/100:,.2f}",
+            name=name,
+            bank=bank_name_th,
+            status="new",
+            time=tx_time_utc.isoformat(),
+            slip_filename=None
+        )
+        deposit_wallets.append(deposit_tx)
+        
         save_transactions()
-        log_with_time("[WEBHOOK RECEIVED]", tx)
+        log_with_time("[WEBHOOK RECEIVED]", tx_dict)
+        log_with_time(f"[DEPOSIT_WALLETS] Count: {len(deposit_wallets)}, Latest: {name}")
         return jsonify({"status":"success"}), 200
 
     except Exception as e:
