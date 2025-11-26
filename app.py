@@ -489,7 +489,9 @@ def api_wallet_sunisa():
 
         # Fallback: check in-memory deposit_wallets
         now = datetime.utcnow()
-        print(f'[DEBUG wallet-sunisa] deposit_wallets count: {len(deposit_wallets)}')
+        log_with_time(f'[API wallet-sunisa] ========== REQUEST ==========')
+        log_with_time(f'[API wallet-sunisa] deposit_wallets count: {len(deposit_wallets)}')
+        
         for tx in deposit_wallets:
             # tx may be DepositWallet object
             try:
@@ -498,11 +500,11 @@ def api_wallet_sunisa():
                 amount_str = getattr(tx, 'amount_str', '') or (str(getattr(tx,'amount', '')))
                 bank = getattr(tx, 'bank', '') or ''
                 
-                print(f'[DEBUG wallet-sunisa] Checking: name={name}, phone={phone}')
+                log_with_time(f'[API wallet-sunisa] Checking entry: name="{name}"')
                 
-                # check if phone in name (e.g., "ชื่อ / 0939981540")
+                # check if phone in name (e.g., "P2P / 0939981540")
                 if phone in name:
-                    print(f'[DEBUG wallet-sunisa] MATCH FOUND: {name}')
+                    log_with_time(f'[API wallet-sunisa] ✓ MATCH: {name}')
                     # parse time (assume ISO)
                     t = None
                     try:
@@ -525,15 +527,19 @@ def api_wallet_sunisa():
                         
                         delta = (now - t_utc).total_seconds()
                         if delta <= 24*3600:
-                            print(f'[DEBUG wallet-sunisa] Time check passed: {delta}s ago')
+                            log_with_time(f'[API wallet-sunisa] ✓ Time OK: {delta:.0f}s ago, Adding to results')
                             results.append({'id': getattr(tx,'id', ''), 'time': time_str, 'amount': amount_str, 'name': name, 'bank': bank})
                         else:
-                            print(f'[DEBUG wallet-sunisa] Time check failed: {delta}s ago > 86400s')
+                            log_with_time(f'[API wallet-sunisa] ✗ Time NOT OK: {delta:.0f}s ago > 86400s')
+                    else:
+                        log_with_time(f'[API wallet-sunisa] ✗ Cannot parse time: {time_str}')
+                else:
+                    log_with_time(f'[API wallet-sunisa] ✗ No match: "{phone}" not in "{name}"')
             except Exception as e:
-                print(f'[DEBUG wallet-sunisa] Error processing tx: {e}')
+                log_with_time(f'[API wallet-sunisa] ✗ Error processing tx: {str(e)}')
                 continue
 
-        print(f'[DEBUG wallet-sunisa] Final results count: {len(results)}, Results: {results}')
+        log_with_time(f'[API wallet-sunisa] Final results count: {len(results)}')
         return jsonify(results)
     except Exception as e:
         print('api_wallet_sunisa error:', e)
@@ -1041,39 +1047,54 @@ def truewallet_webhook():
         description = decoded.get("description","-")
         transaction_date = decoded.get("transaction_date","")
         
-        log_with_time(f"[WEBHOOK] event_type={event_type}, merchant_name={merchant_name}, amount={amount}")
+        log_with_time(f"[WEBHOOK] event_type={event_type}, merchant_name={merchant_name}, description={description}, amount={amount}")
         
-        # Extract sender info based on event type
+        # Extract recipient/sender info based on event type
+        # For TrueWallet P2P: merchant_name = recipient phone/ID
         sender_name = "-"
         sender_mobile = "-"
         bank_name_th = "-"
         
         if event_type == "SEND_P2P":
-            # merchant_name is the recipient phone/ID
+            # SEND_P2P: receiving money from P2P sender
+            # merchant_name = recipient phone (Sunisa's phone if she's receiving)
+            # BUT we need the SENDER who is sending to Sunisa
+            # Actually in context of webhook, if this is for Sunisa's wallet,
+            # merchant_name is the RECIPIENT (Sunisa), description might have sender info
+            # Let's assume merchant_name contains the phone number
             sender_mobile = merchant_name if merchant_name != "-" else "-"
+            sender_name = "P2P" 
             bank_name_th = "ทรูเงิน (P2P)"
+            log_with_time(f"[WEBHOOK] SEND_P2P: recipient={sender_mobile}")
+            
         elif event_type == "BANK_WITHDRAW":
-            # merchant_name is bank name
+            # merchant_name is bank name, description might have account
             bank_name_th = merchant_name if merchant_name != "-" else "ธนาคาร"
             sender_mobile = description if description != "-" else "-"
+            sender_name = "โอนธนาคาร"
+            
         elif event_type == "PROMPTPAY_TAG29" or event_type == "PROMPTPAY_TAG30":
             # merchant_name is shop/recipient name
             sender_name = merchant_name if merchant_name != "-" else "พร้อมเพย์"
             bank_name_th = "พร้อมเพย์"
+            
         elif event_type == "SEND_MONEY_PLUS":
             sender_name = "Money Plus"
             bank_name_th = "ทรูเงิน (Money Plus)"
+            
         elif event_type == "SEND_MONEY_LINK":
             sender_name = "Money Link"
             bank_name_th = "ทรูเงิน (Money Link)"
+            
         elif event_type == "FEE_PAYMENT":
-            # This is fee deduction
             sender_name = merchant_name if merchant_name != "-" else "ค่าธรรมเนียม"
             bank_name_th = "ค่าธรรมเนียม"
         else:
             sender_name = merchant_name if merchant_name != "-" else "-"
+            bank_name_th = "อื่นๆ"
         
         name = f"{sender_name} / {sender_mobile}" if sender_mobile and sender_mobile != "-" else sender_name
+        log_with_time(f"[WEBHOOK] Final name to save: {name}")
 
         # Parse transaction_date
         time_str = transaction_date or datetime.utcnow().isoformat()
