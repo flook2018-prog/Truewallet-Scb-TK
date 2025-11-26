@@ -963,38 +963,48 @@ def reset_cancelled():
 def truewallet_webhook():
     try:
         data = request.get_json(force=True, silent=True)
+        log_with_time("[WEBHOOK] Received POST request")
         if not data:
             log_with_time("[WEBHOOK ERROR] No JSON received")
             return jsonify({"status":"error","message":"No JSON received"}), 400
 
+        log_with_time(f"[WEBHOOK] Raw data keys: {list(data.keys())}")
         message_jwt = data.get("message")
         decoded = None
         TRUEWALLET_SECRET = "018db5a1098fde137da6856eab3d26d7"  # Secret key from TrueWallet docs
         
         if message_jwt:
+            log_with_time(f"[WEBHOOK] JWT token found, length: {len(message_jwt)}")
             try:
                 # Try TrueWallet secret first
                 decoded = jwt.decode(message_jwt, TRUEWALLET_SECRET, algorithms=["HS256"])
-                log_with_time("[JWT DECODED with TrueWallet secret]", decoded)
+                log_with_time("[WEBHOOK] JWT DECODED with TrueWallet secret")
+                log_with_time(f"[WEBHOOK] Decoded payload: {decoded}")
             except Exception as e:
-                log_with_time("[JWT DECODE ERROR with TrueWallet secret]", str(e))
+                log_with_time(f"[WEBHOOK] JWT DECODE ERROR with TrueWallet secret: {str(e)}")
                 try:
                     # Fallback to app SECRET_KEY
                     decoded = jwt.decode(message_jwt, SECRET_KEY, algorithms=["HS256"])
-                    log_with_time("[JWT DECODED with app secret]", decoded)
+                    log_with_time("[WEBHOOK] JWT DECODED with app secret")
+                    log_with_time(f"[WEBHOOK] Decoded payload: {decoded}")
                 except Exception as e2:
-                    log_with_time("[JWT DECODE ERROR with app secret]", str(e2))
+                    log_with_time(f"[WEBHOOK] JWT DECODE ERROR with app secret: {str(e2)}")
                     decoded = data
+                    log_with_time(f"[WEBHOOK] Using raw data as fallback")
         else:
+            log_with_time("[WEBHOOK] No JWT token in message field, using raw data")
             decoded = data
 
         txid = decoded.get("transaction_id") or f"TX{len(transactions['new'])+len(transactions['approved'])+len(transactions['cancelled'])+1}"
+        log_with_time(f"[WEBHOOK] Transaction ID: {txid}")
 
         if any(tx["id"] == txid for lst in transactions.values() for tx in lst):
+            log_with_time(f"[WEBHOOK] Transaction already exists in transactions list")
             return jsonify({"status":"success","message":"Transaction exists"}), 200
         
         # Check if already in deposit_wallets
         if any(tx.id == txid for tx in deposit_wallets):
+            log_with_time(f"[WEBHOOK] Transaction already exists in deposit_wallets")
             return jsonify({"status":"success","message":"Transaction exists"}), 200
 
         amount = int(decoded.get("amount",0))
@@ -1002,6 +1012,8 @@ def truewallet_webhook():
         merchant_name = decoded.get("merchant_name","-")
         description = decoded.get("description","-")
         transaction_date = decoded.get("transaction_date","")
+        
+        log_with_time(f"[WEBHOOK] event_type={event_type}, merchant_name={merchant_name}, amount={amount}")
         
         # Extract sender info based on event type
         sender_name = "-"
@@ -1045,6 +1057,8 @@ def truewallet_webhook():
             except:
                 tx_time_utc = datetime.utcnow()
 
+        log_with_time(f"[WEBHOOK] Processing: name={name}, bank={bank_name_th}")
+
         tx_dict = {
             "id": txid,
             "event": event_type,
@@ -1075,12 +1089,14 @@ def truewallet_webhook():
         deposit_wallets.append(deposit_tx)
         
         save_transactions()
-        log_with_time("[WEBHOOK RECEIVED]", tx_dict)
-        log_with_time(f"[DEPOSIT_WALLETS] Count: {len(deposit_wallets)}, Latest: {name}")
+        log_with_time(f"[WEBHOOK SUCCESS] Added to deposit_wallets. Total count: {len(deposit_wallets)}")
+        log_with_time(f"[WEBHOOK] Transaction saved: {tx_dict}")
         return jsonify({"status":"success"}), 200
 
     except Exception as e:
-        log_with_time("[WEBHOOK EXCEPTION]", str(e))
+        log_with_time(f"[WEBHOOK EXCEPTION] {str(e)}")
+        import traceback
+        log_with_time(f"[WEBHOOK TRACEBACK] {traceback.format_exc()}")
         return jsonify({"status":"error","message":str(e)}), 500
 
 # -------------------- Upload Slip --------------------
